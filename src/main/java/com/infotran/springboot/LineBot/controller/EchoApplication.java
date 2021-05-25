@@ -4,12 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.infotran.springboot.LineBot.service.impl.ReplyMessageHandler;
-import com.infotran.springboot.LineBot.service.impl.RichMenuHandler;
+import com.infotran.springboot.LineBot.service.ReplyMessageHandler;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.PostbackEvent;
-import com.linecorp.bot.model.event.message.StickerMessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
+import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.response.BotApiResponse;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
@@ -18,11 +17,8 @@ import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 @SpringBootApplication
 public class EchoApplication {
 	
-	
-	
 	 public static void main(String[] args) {
 	        SpringApplication.run(EchoApplication.class, args);
-	        SpringApplication.run(RichMenuHandler.class, args);
 	    }
 	
 	@Autowired
@@ -36,16 +32,9 @@ public class EchoApplication {
     }
 	
 	@EventMapping
-	public void handlePostbackEvent(PostbackEvent event) throws Exception {
-		replymessagehandler.replyPostBack(event);
+	public void handlePostBackEvent(PostbackEvent event)throws Exception{
+		
+		
 	}
-	
-	@EventMapping
-    public void handleStickerMessageEvent(MessageEvent<StickerMessageContent> event) {
-		replymessagehandler.stickerHandler(event.getReplyToken(), event.getMessage());
-    }
-	
-	
-	
 	
 }
