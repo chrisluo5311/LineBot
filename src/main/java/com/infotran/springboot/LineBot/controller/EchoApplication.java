@@ -4,9 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.infotran.springboot.LineBot.service.ReplyMessageHandler;
+import com.infotran.springboot.LineBot.service.impl.ReplyMessageHandler;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.PostbackEvent;
+import com.linecorp.bot.model.event.message.StickerMessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
 import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.response.BotApiResponse;
@@ -27,14 +28,18 @@ public class EchoApplication {
 	@EventMapping
 	public void handleTextMessageEvent(MessageEvent<TextMessageContent> event) throws Exception {  
         System.out.println("event: " + event);
-        BotApiResponse response = replymessagehandler.reply(event);
+        BotApiResponse response = replymessagehandler.textMessageReply(event);
         System.out.println("Sent messages: " + response);
     }
 	
 	@EventMapping
 	public void handlePostBackEvent(PostbackEvent event)throws Exception{
-		
-		
+		replymessagehandler.postBackReply(event);
 	}
+	
+	@EventMapping
+	public void handleStickerMessageEvent(MessageEvent<StickerMessageContent> event) {
+		replymessagehandler.handleSticker(event.getReplyToken(), event.getMessage());
+    }
 	
 }
