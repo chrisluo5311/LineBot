@@ -17,19 +17,17 @@ import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 @LineMessageHandler
 @SpringBootApplication
 public class EchoApplication {
-	
-	 public static void main(String[] args) {
-	        SpringApplication.run(EchoApplication.class, args);
-	    }
+
+//	public static void main(String[] args) {
+//	    SpringApplication.run(EchoApplication.class, args);
+//	 }
 	
 	@Autowired
 	ReplyMessageHandler replymessagehandler;
 
 	@EventMapping
 	public void handleTextMessageEvent(MessageEvent<TextMessageContent> event) throws Exception {  
-        System.out.println("event: " + event);
         BotApiResponse response = replymessagehandler.textMessageReply(event);
-        System.out.println("Sent messages: " + response);
     }
 	
 	@EventMapping

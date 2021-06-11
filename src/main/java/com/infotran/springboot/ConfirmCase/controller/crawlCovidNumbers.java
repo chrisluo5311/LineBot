@@ -101,7 +101,7 @@ public class crawlCovidNumbers {
 			int start = 0;
 			String substr = null;
 			start = divchild.indexOf(newstr)+newstr.length();
-			substr = divchild.substring(start,start+4);//e.g 476例
+			substr = divchild.substring(start,start+4);
 			int newNum = getStringNumber(substr);
 			start = divchild.indexOf(restr)+restr.length();
 			substr = divchild.substring(start,start+4);
