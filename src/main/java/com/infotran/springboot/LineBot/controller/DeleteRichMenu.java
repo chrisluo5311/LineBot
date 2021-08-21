@@ -9,10 +9,10 @@ import com.infotran.springboot.LineBot.service.LineMessaging;
 import com.linecorp.bot.model.richmenu.RichMenuListResponse;
 import com.linecorp.bot.model.richmenu.RichMenuResponse;
 
-public class deleteRichMenu implements LineMessaging{
+public class DeleteRichMenu implements LineMessaging{
 
-	public static void main (String[] args) {
-		try {
+//	public static void main (String[] args) {
+//		try {
 //			client.cancelDefaultRichMenu();
 //			client.unlinkRichMenuIdFromUser("all");
 //			RichMenuListResponse response = client.getRichMenuList().get();
@@ -21,12 +21,12 @@ public class deleteRichMenu implements LineMessaging{
 //			for (RichMenuResponse rm : listResponse) {
 //				menuId = rm.getRichMenuId();
 //			}
-			client.deleteRichMenu("richmenu-c3c97be0387cab4c8032da28546405de").get();
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-		}
-		
-		
-	}
+//			client.deleteRichMenu("richmenu-c3c97be0387cab4c8032da28546405de").get();
+//		} catch (InterruptedException | ExecutionException e) {
+//			e.printStackTrace();
+//		}
+//
+//
+//	}
 	
 }

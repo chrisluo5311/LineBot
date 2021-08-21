@@ -8,17 +8,11 @@ import javax.persistence.Id;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.stereotype.Component;
-
-import com.infotran.springboot.MenuID.Model.MenuID;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name="ConfirmCase")

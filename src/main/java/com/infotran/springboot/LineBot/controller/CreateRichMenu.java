@@ -5,36 +5,34 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+
+import com.infotran.springboot.LineBot.Model.MenuID;
+import com.infotran.springboot.LineBot.service.MenuIdService;
+import com.linecorp.bot.model.richmenu.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-
 import com.infotran.springboot.LineBot.service.LineMessaging;
-import com.infotran.springboot.MenuID.Model.MenuID;
-import com.infotran.springboot.MenuID.Service.MenuIdService;
 import com.linecorp.bot.model.action.PostbackAction;
-import com.linecorp.bot.model.action.URIAction;
 import com.linecorp.bot.model.response.BotApiResponse;
-import com.linecorp.bot.model.richmenu.RichMenu;
-import com.linecorp.bot.model.richmenu.RichMenuArea;
-import com.linecorp.bot.model.richmenu.RichMenuBounds;
-import com.linecorp.bot.model.richmenu.RichMenuIdResponse;
-import com.linecorp.bot.model.richmenu.RichMenuSize;
 
-@SpringBootApplication
-public class createRichMenu implements LineMessaging,ApplicationRunner {
-	
+public class CreateRichMenu implements LineMessaging,ApplicationRunner {
+
 	@Autowired
 	MenuIdService menuService;
 
-	private  byte[] File2Byte() {
+	@SuppressWarnings("unused")
+//	public static void main(String[] args) {
+//		ConfigurableApplicationContext appContext = SpringApplication.run(CreateRichMenu.class, args);
+//	}
+
+	private byte[] File2Byte() {
 		byte[] buffer = null;
 		try {
 			FileInputStream fis = new FileInputStream(new File("D:\\_SpringBoot\\image\\menufinal.jpg"));
@@ -55,7 +53,7 @@ public class createRichMenu implements LineMessaging,ApplicationRunner {
 		return buffer;
 	}
 	
-	private List<RichMenuArea> createRichMenuArea(){
+	private  List<RichMenuArea> createRichMenuArea(){
 		List<RichMenuArea> area = new ArrayList<>();
 		RichMenuArea todayNum = new RichMenuArea(new RichMenuBounds(0, 0, 836, 846),
 				new PostbackAction("今日確診", "1"));
@@ -77,15 +75,24 @@ public class createRichMenu implements LineMessaging,ApplicationRunner {
 		area.add(others);
 		return area;
 	}
-	
 
-	@SuppressWarnings("unused")
-	public static void main(String[] args) {
-		ConfigurableApplicationContext appContext = SpringApplication.run(createRichMenu.class, args);
+	/**
+	 * false:no rich menu;
+	 * true:rich menu exist;
+	 */
+	private static boolean isRichMenuExists() throws ExecutionException, InterruptedException {
+		List<RichMenuResponse> richmenuresponse = client.getRichMenuList().get().getRichMenus();
+		String ans = "";
+		for (RichMenuResponse res : richmenuresponse){
+			 ans = res.getRichMenuId();
+		}
+		return (ans.equals(""))?false:true;
 	}
+
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
+		if (isRichMenuExists())return;
 		List<RichMenuArea> area = createRichMenuArea();
 		RichMenu richmenu = RichMenu.builder().size(new RichMenuSize(2500, 1686)).selected(true).name("covidMenu")
 				.chatBarText("功能選單").areas(area).build();

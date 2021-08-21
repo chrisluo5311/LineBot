@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.infotran.springboot.annotation.LogInfo;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -28,7 +29,7 @@ import okhttp3.Response;
 
 @Controller
 @Slf4j
-public class crawlCovidNumbers {
+public class CrawlCovidNumbers {
 
 	private static final String CDC_URL = "http://at.cdc.tw/YEc68Q";// 新聞首頁
 
@@ -84,7 +85,7 @@ public class crawlCovidNumbers {
 			String tname = element.select(".content-boxes-v3 > a").attr("title").substring(0,8);
 			if (todayMap.containsKey(month) && todayMap.containsValue(date) && titleName.equals(tname)) {
 				res.append(element.select(".content-boxes-v3 > a").attr("href"));
-				break;
+				return res.toString();
 			}
 		}
 		return res.toString();
@@ -98,18 +99,14 @@ public class crawlCovidNumbers {
 			Document doc = Jsoup.connect(detailedURL).timeout(3000).maxBodySize(0).get();
 			Elements divchildren = doc.select("div.news-v3-in > div ");
 			String divchild = divchildren.text();
-			int start = 0;
-			String substr = null;
-			start = divchild.indexOf(newstr)+newstr.length();
-			substr = divchild.substring(start,start+4);
-			int newNum = getStringNumber(substr);
-			start = divchild.indexOf(restr)+restr.length();
-			substr = divchild.substring(start,start+4);
-			int reNum = getStringNumber(substr);
+			int numeric_Start = 0;//數字起點
+			numeric_Start = divchild.indexOf(newstr)+newstr.length();// 數字起點
+			int newNum = getStringNumber(numeric_Start,divchild);
+			numeric_Start = divchild.indexOf(restr)+restr.length();
+			int reNum = getStringNumber(numeric_Start,divchild);
 			int totalNum = newNum + reNum;
-			start = divchild.indexOf(deathstr)+deathstr.length();
-			substr = divchild.substring(start, start+4);
-			int deathNum = getStringNumber(substr);
+			numeric_Start = divchild.indexOf(deathstr)+deathstr.length();
+			int deathNum = getStringNumber(numeric_Start,divchild);
 			ConfirmCase cfc = ConfirmCase.builder()
 										 .todayAmount(newNum)
 										 .returnAmount(reNum)
@@ -122,19 +119,17 @@ public class crawlCovidNumbers {
 		}
 	}
 	
-	private int getStringNumber(String strNum) {
-		int i = 0;
+	private int getStringNumber(int index,String article) {
 		int sum = 0;
-		while (i<strNum.length()) {
-			if (!Character.isDigit(strNum.charAt(i)))break;
-			sum = sum*10 + Character.getNumericValue(strNum.charAt(i));
-			i++;
+		while (Character.isDigit(article.charAt(index))) {
+			sum = sum*10 + Character.getNumericValue(article.charAt(index));
+			index++;
 		}
 		return sum;
 	}
 	
 
-	private Map<String, String> genTodayDate() {
+	private static Map<String, String> genTodayDate() {
 		Map<String, String> date = new HashMap<>();
 		LocalDate now = LocalDate.now();
 		date.put(String.valueOf(now.getMonthValue()), String.valueOf(now.getDayOfMonth()));

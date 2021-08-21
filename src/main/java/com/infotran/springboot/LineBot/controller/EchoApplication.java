@@ -13,14 +13,15 @@ import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.response.BotApiResponse;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 
 @LineMessageHandler
 @SpringBootApplication
 public class EchoApplication {
 
-//	public static void main(String[] args) {
-//	    SpringApplication.run(EchoApplication.class, args);
-//	 }
+	public static void main(String[] args) {
+	    SpringApplication.run(EchoApplication.class, args);
+	 }
 	
 	@Autowired
 	ReplyMessageHandler replymessagehandler;

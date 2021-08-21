@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+
+import com.infotran.springboot.annotation.LogInfo;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -168,7 +170,6 @@ public class ReplyMessageHandler implements LineMessaging {
 	     
 	     return botApiResponse;
 	}
-	
 	
 	public void postBackReply(PostbackEvent event)throws IOException{
 		String replyToken = event.getReplyToken();

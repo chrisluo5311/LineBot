@@ -1,17 +1,13 @@
-package com.infotran.springboot.MenuID.Model;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-import org.springframework.stereotype.Component;
+package com.infotran.springboot.LineBot.Model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.stereotype.Component;
+
+import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name="MenuID")
@@ -20,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Component
-public class MenuID {
+public class MenuID implements Serializable {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
