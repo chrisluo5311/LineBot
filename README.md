@@ -1,4 +1,4 @@
-# LineBot
+# LineBot (疫情小幫手)
 ![目錄](https://github.com/chrisluo5311/LineBot/blob/master/src/main/resources/static/menufinal.jpg "line bot richmenu")
 ### 目錄內容 
 1. 功能表、負責人、狀態、使用技術 
