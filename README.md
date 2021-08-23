@@ -1,6 +1,6 @@
 # LineBot
 ![目錄](https://github.com/chrisluo5311/LineBot/blob/master/src/main/resources/static/menufinal.jpg "line bot richmenu")
-### 目錄內容可彈性更改(都只是初步想法) 
+### 目錄內容 
 1. 功能表、負責人、狀態、使用技術 
 
 |  功能  |    負責人    | 狀態 | 主要使用技術 |
