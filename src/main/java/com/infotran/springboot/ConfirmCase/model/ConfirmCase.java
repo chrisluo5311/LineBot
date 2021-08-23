@@ -1,5 +1,6 @@
 package com.infotran.springboot.ConfirmCase.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -37,16 +38,16 @@ public class ConfirmCase {
 	
 	private Integer releasedQuarantine;
 	
-	private LocalDateTime confirmTime;
+	private LocalDate confirmTime;
 	
 	@PrePersist
 	protected void createConfirmTime() {
-		confirmTime = LocalDateTime.now(); 
+		confirmTime = LocalDate.now();
 	}
 	
 	@PreUpdate
 	protected void updateConfirmTime() {
-		confirmTime = LocalDateTime.now();
+		confirmTime = LocalDate.now();
 	}
 	
 	

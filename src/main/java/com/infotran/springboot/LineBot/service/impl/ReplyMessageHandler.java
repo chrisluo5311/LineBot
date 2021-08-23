@@ -10,7 +10,11 @@ import java.util.List;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
+import com.infotran.springboot.ConfirmCase.model.ConfirmCase;
+import com.infotran.springboot.ConfirmCase.service.ConfirmCaseService;
 import com.infotran.springboot.annotation.LogInfo;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -36,7 +40,11 @@ import com.linecorp.bot.model.response.BotApiResponse;
 import lombok.NonNull;
 
 @Service
+@Slf4j
 public class ReplyMessageHandler implements LineMessaging {
+
+	@Autowired
+	private ConfirmCaseService caseService;
 	
 	private ReplyMessage replyMessage = null;
 	
@@ -174,8 +182,20 @@ public class ReplyMessageHandler implements LineMessaging {
 	public void postBackReply(PostbackEvent event)throws IOException{
 		String replyToken = event.getReplyToken();
 		String data = event.getPostbackContent().getData();
-		System.out.println("here"+data);
-		this.replyText(replyToken,data);
+		StringBuilder message = new StringBuilder();
+		switch (data){
+			case "1" :
+				ConfirmCase confirmCase = caseService.findByConfirmTime(LocalDate.now());
+				if (confirmCase!=null){
+					message.append("指揮中心快訊：今日新增"+ confirmCase.getTodayAmount() + "例COVID-19確定病例。");
+					message.append("校正回歸數"+confirmCase.getReturnAmount()+"例。");
+					message.append("死亡人數"+confirmCase.getDeathAmount()+"例。");
+				}else {
+					message.append("本日確診數量尚未公布。");
+				}
+				this.replyText(replyToken,message.toString());
+				break;
+		}
 	}
 	
 	

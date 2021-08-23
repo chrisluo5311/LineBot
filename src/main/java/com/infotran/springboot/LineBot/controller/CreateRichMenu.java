@@ -22,15 +22,16 @@ import com.infotran.springboot.LineBot.service.LineMessaging;
 import com.linecorp.bot.model.action.PostbackAction;
 import com.linecorp.bot.model.response.BotApiResponse;
 
+@SpringBootApplication
 public class CreateRichMenu implements LineMessaging,ApplicationRunner {
 
 	@Autowired
 	MenuIdService menuService;
 
 	@SuppressWarnings("unused")
-//	public static void main(String[] args) {
-//		ConfigurableApplicationContext appContext = SpringApplication.run(CreateRichMenu.class, args);
-//	}
+	public static void main(String[] args) {
+		ConfigurableApplicationContext appContext = SpringApplication.run(CreateRichMenu.class, args);
+	}
 
 	private byte[] File2Byte() {
 		byte[] buffer = null;
