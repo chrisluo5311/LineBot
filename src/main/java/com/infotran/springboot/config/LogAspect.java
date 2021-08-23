@@ -14,7 +14,6 @@ public class LogAspect {
 
     @Before("LogAspect()")
     public void dobefore(JoinPoint joinpoint) {
-        System.out.println(joinpoint.toString());
         System.out.println("====之前====");
     }
 

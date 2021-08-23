@@ -1,12 +1,13 @@
 package com.infotran.springboot.config;
 
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
-@Log4j2
+@Slf4j
 @Aspect
 @Component
 public class LogInfoAspect {
