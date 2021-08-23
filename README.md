@@ -21,7 +21,7 @@ spring.datasource.username=watcher
 spring.datasource.password=P@ssw0rd
 ```
 
-3. 緩存(還在學習哈哈) 
+3. 緩存 
 > Redis
 
 
