@@ -31,7 +31,6 @@ public class MyRedisConfig {
 
     private StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
 
-    private Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
 
     @Primary
     @Bean
@@ -52,8 +51,9 @@ public class MyRedisConfig {
         return template;
     }
 
-
+    @Bean
     public CacheManager confirmCaseRedisCacheManager (RedisConnectionFactory factory) {
+        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
         // 解决查询缓存转换异常的问题
         ObjectMapper om = new ObjectMapper();
         //POJO无public的属性或方法时，不报错
@@ -70,7 +70,7 @@ public class MyRedisConfig {
         om.registerModule(new JavaTimeModule()); // 配置序列化（解决乱码的问题）
         RedisCacheConfiguration config = RedisCacheConfiguration
                                         .defaultCacheConfig()
-                                        .entryTtl(Duration.ofDays(30))
+                                        .entryTtl(Duration.ofDays(1))
                                         .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(stringRedisSerializer))
                                         .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jackson2JsonRedisSerializer))
                                         .disableCachingNullValues();

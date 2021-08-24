@@ -1,6 +1,7 @@
 package com.infotran.springboot.ConfirmCase.service.Impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,7 @@ public class ConfirmCaseImpl implements ConfirmCaseService {
 		return conRepo.save(fcase);
 	}
 
+	@Cacheable(value = "ConfirmCase")
 	@Override
 	public ConfirmCase findByConfirmTime(LocalDate localDate) {
 		return conRepo.findByConfirmTime(localDate);
