@@ -1,9 +1,11 @@
 package com.infotran.springboot;
 
+import com.infotran.springboot.ConfirmCase.controller.CrawlCovidNumbers;
 import com.infotran.springboot.ConfirmCase.model.ConfirmCase;
 import com.infotran.springboot.ConfirmCase.service.ConfirmCaseService;
 import com.infotran.springboot.LineBot.Model.MenuID;
 import com.infotran.springboot.LineBot.service.MenuIdService;
+import com.infotran.springboot.MedicineStore.Controller.GetMaskJsonController;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -13,6 +15,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.IOException;
 import java.time.LocalDate;
 
 @RunWith(SpringRunner.class)
@@ -34,6 +37,12 @@ class LineBotApplicationTests {
 
 	@Autowired
 	RedisTemplate<Object, MenuID> menuIDRedisTemplate;
+
+	@Autowired
+    GetMaskJsonController getMaskJson;
+
+	@Autowired
+	CrawlCovidNumbers covidNumbers;
 
 	@Test
 	public void test01(){
@@ -63,5 +72,10 @@ class LineBotApplicationTests {
 		System.out.print(message);
 	}
 
+	@Test
+	void test04() throws IOException {
+		covidNumbers.run();
+//		getMaskJson.run();
+	}
 
 }

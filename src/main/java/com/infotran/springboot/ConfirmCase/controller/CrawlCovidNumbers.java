@@ -82,7 +82,7 @@ public class CrawlCovidNumbers {
 			@Override
 			public void onResponse(Call call, Response response) throws IOException {
 				String body = response.body().string();
-//				log.info("This is body ===>" + body);
+				log.info("This is body ===>" + body);
 				CDC_NewsDetail = getNewsDetailURL(body);
 				parseBody(CDC_NewsDetail);
 			}

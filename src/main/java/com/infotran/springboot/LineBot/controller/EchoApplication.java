@@ -1,5 +1,6 @@
 package com.infotran.springboot.LineBot.controller;
 
+import com.linecorp.bot.model.event.message.LocationMessageContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -40,5 +41,10 @@ public class EchoApplication {
 	public void handleStickerMessageEvent(MessageEvent<StickerMessageContent> event) {
 		replymessagehandler.handleSticker(event.getReplyToken(), event.getMessage());
     }
-	
+
+
+	@EventMapping
+	public void handleLocationMessageEvent(MessageEvent<LocationMessageContent> event) {
+		replymessagehandler.handleLocationMessageRely(event);
+	}
 }

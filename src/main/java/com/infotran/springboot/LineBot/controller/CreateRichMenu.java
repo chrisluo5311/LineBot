@@ -56,18 +56,18 @@ public class CreateRichMenu implements LineMessaging,ApplicationRunner {
 	
 	private  List<RichMenuArea> createRichMenuArea(){
 		List<RichMenuArea> area = new ArrayList<>();
-		RichMenuArea todayNum = new RichMenuArea(new RichMenuBounds(0, 0, 836, 846),
-				new PostbackAction("今日確診", "1"));
-		RichMenuArea BuyMask = new RichMenuArea(new RichMenuBounds(833, 2, 836, 844),
-				new PostbackAction("買口罩", "2"));
-		RichMenuArea locationStatus = new RichMenuArea(new RichMenuBounds(1666, 3, 834, 843),
-				new PostbackAction("位置狀況", "3"));
-		RichMenuArea globalStatus = new RichMenuArea(new RichMenuBounds(0, 846, 835, 840),
-				new PostbackAction("國內外疫情", "4"));
-		RichMenuArea vaccineReport = new RichMenuArea(new RichMenuBounds(833, 846, 833, 840),
-				new PostbackAction("施打疫苗統計", "5"));
-		RichMenuArea others = new RichMenuArea(new RichMenuBounds(1663, 843, 835, 843),
-				new PostbackAction("其他", "6"));
+		PostbackAction action01 = PostbackAction.builder().label("今日確診").data("1").displayText("今日確診").build();
+		RichMenuArea todayNum = new RichMenuArea(new RichMenuBounds(0, 0, 836, 846),action01);
+		PostbackAction action02 = PostbackAction.builder().label("買口罩").data("2").displayText("買口罩").build();
+		RichMenuArea BuyMask = new RichMenuArea(new RichMenuBounds(833, 2, 836, 844),action02);
+		PostbackAction action03 = PostbackAction.builder().label("位置狀況").data("3").displayText("位置狀況").build();
+		RichMenuArea locationStatus = new RichMenuArea(new RichMenuBounds(1666, 3, 834, 843),action03);
+		PostbackAction action04 = PostbackAction.builder().label("國內外疫情").data("4").displayText("國內外疫情").build();
+		RichMenuArea globalStatus = new RichMenuArea(new RichMenuBounds(0, 846, 835, 840),action04);
+		PostbackAction action05 = PostbackAction.builder().label("施打疫苗統計").data("5").displayText("施打疫苗統計").build();
+		RichMenuArea vaccineReport = new RichMenuArea(new RichMenuBounds(833, 846, 833, 840),action05);
+		PostbackAction action06 = PostbackAction.builder().label("其他").data("6").displayText("其他").build();
+		RichMenuArea others = new RichMenuArea(new RichMenuBounds(1663, 843, 835, 843),action06);
 		area.add(todayNum);
 		area.add(BuyMask);
 		area.add(locationStatus);
