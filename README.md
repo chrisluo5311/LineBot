@@ -19,12 +19,24 @@ spring.jpa.hibernate.ddl-auto=update
 spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=linebot
 spring.datasource.username=watcher
 spring.datasource.password=P@ssw0rd
+server.port=9090
 ```
 
 3. 緩存 
 > Redis
 
+### 測試須知
+1. [ngrok下載請點我](https://ngrok.com/download "ngrok")
+2. 開啟ngrok，登入ngrok的網站
+3. 於ngrok輸入 **taskkill /f /im ngrok.exe**
+4. 再將ngrok網站上的authtoken複製到ngrok上面(**不要複製到斜線**)
+5. 再輸ngrok http 9090  
+6. 出現online連線成功
 
 ### 參考網站
 1. [衛福部疾管署](https://www.cdc.gov.tw/ "link") 
-2. [全球疫情地圖](https://covid-19.nchc.org.tw/ "")
+2. [全球疫情地圖](https://covid-19.nchc.org.tw/ "全球疫情地圖")
+3. [健保特約機構口罩剩餘數量明細](https://data.gov.tw/dataset/116285 "口罩link")
+4. [台灣電子地圖服務網](https://www.map.com.tw/ "台灣電子地圖服務網")
+5. [LINE Messaging API SDK for Java](https://github.com/line/line-bot-sdk-java "LineBot API SDK")
+6. [Messaging API reference](https://developers.line.biz/en/reference/messaging-api/ "LineBot API 文件")
