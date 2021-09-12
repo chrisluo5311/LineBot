@@ -19,11 +19,14 @@ spring.jpa.hibernate.ddl-auto=update
 spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=linebot
 spring.datasource.username=watcher
 spring.datasource.password=P@ssw0rd
+server.port=9090
 ```
 
 3. 緩存 
 > Redis
 
+4. 啟動須知(測試請下載ngrok)
+ 4.1 ngrok http 443
 
 ### 參考網站
 1. [衛福部疾管署](https://www.cdc.gov.tw/ "link") 
