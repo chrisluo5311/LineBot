@@ -94,10 +94,9 @@ public class CrawlCovidNumbers implements ClientUtil {
 	 * Parse the detailed news body
 	 * Save the confirmed numbers
 	 */
+	@LogInfo(warning = "每日確診文章用字可能會更改!!!請定期檢查!!!")
 	private void parseBody(String detailedURL) {
 		try {
-			log.info("[CrawlCovidNumbers.parseBody() arg is {}]",detailedURL);
-			log.info("[CrawlCovidNumbers.parseBody() method starts here]");
 			Document doc = SSLHelper.getConnection(detailedURL).timeout(3000).maxBodySize(0).get();
 //			Document doc = Jsoup.connect(detailedURL).timeout(3000).maxBodySize(0).get();
 			Elements divchildren = doc.select("div.news-v3-in > div ");
@@ -127,7 +126,6 @@ public class CrawlCovidNumbers implements ClientUtil {
 										 .deathAmount(deathNum)
 										 .build();
 			cService.save(cfc);
-			log.info("Saving finished");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

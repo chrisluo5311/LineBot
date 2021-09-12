@@ -29,8 +29,7 @@ public class LogAspect {
         String mthName = joinpoint.getSignature().getName();
         List<String> args = Arrays.asList(String.valueOf(joinpoint.getArgs()));
         args.stream().collect(Collectors.joining(",","[","]"));
-
-        log.info("ClassName:{} MethodName:{} args:{} WarningMessage:{}",clsName,mthName,args,logInfo.warning());
+        log.info("類名:{} 方法名:{} 參數:{} 需注意的事項:{}",clsName,mthName,args,logInfo.warning());
     }
 
 
