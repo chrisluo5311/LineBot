@@ -25,12 +25,12 @@ server.port=9090
 3. 緩存 
 > Redis
 
-### 啟動須知(測試請下載ngrok)
+### 測試須知
 1. [ngrok下載請點我](https://ngrok.com/download "ngrok")
 2. 開啟ngrok，登入ngrok的網站
 3. 於ngrok輸入 **taskkill /f /im ngrok.exe**
 4. 再將ngrok網站上的authtoken複製到ngrok上面(**不要複製到斜線**)
-5. 再書ngrok http 9090  
+5. 再輸ngrok http 9090  
 6. 出現online連線成功
 
 ### 參考網站
