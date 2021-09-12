@@ -1,11 +1,12 @@
 package com.infotran.springboot;
 
-import com.infotran.springboot.ConfirmCase.controller.CrawlCovidNumbers;
-import com.infotran.springboot.ConfirmCase.model.ConfirmCase;
-import com.infotran.springboot.ConfirmCase.service.ConfirmCaseService;
-import com.infotran.springboot.LineBot.Model.MenuID;
-import com.infotran.springboot.LineBot.service.MenuIdService;
-import com.infotran.springboot.MedicineStore.Controller.GetMaskJsonController;
+import com.infotran.springboot.annotation.LogInfo;
+import com.infotran.springboot.confirmcase.controller.CrawlCovidNumbers;
+import com.infotran.springboot.confirmcase.model.ConfirmCase;
+import com.infotran.springboot.confirmcase.service.ConfirmCaseService;
+import com.infotran.springboot.linebot.model.MenuID;
+import com.infotran.springboot.linebot.service.MenuIdService;
+import com.infotran.springboot.medicinestore.controller.GetMaskJsonController;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -15,6 +16,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.time.LocalDate;
 
@@ -23,59 +25,11 @@ import java.time.LocalDate;
 @Slf4j
 class LineBotApplicationTests {
 
-	@Autowired
-	MenuIdService menuIdService;
-	
-	@Autowired
+	@Resource
 	ConfirmCaseService caseService;
 
-	@Autowired
-	StringRedisTemplate stringRedisTemplate;
-
-	@Autowired
-	RedisTemplate redisTemplate;
-
-	@Autowired
-	RedisTemplate<Object, MenuID> menuIDRedisTemplate;
-
-	@Autowired
-    GetMaskJsonController getMaskJson;
-
-	@Autowired
-	CrawlCovidNumbers covidNumbers;
-
 	@Test
-	public void test01(){
-//		stringRedisTemplate.opsForValue().append("msg","hello world");
-//		String msg = stringRedisTemplate.opsForValue().get("msg");
-//		System.out.println(msg);
-//		stringRedisTemplate.opsForList().leftPush("mylist","1");
-//		stringRedisTemplate.opsForList().leftPush("mylist","2");
-	}
-
-	@Test
-	public void test02(){
-		MenuID menu = menuIdService.getMenuByName("covidMenu");
-//		redisTemplate.opsForValue().set("menu-01",menu);
-		menuIDRedisTemplate.opsForValue().set("menu-01",menu);
-	}
-
-
-
-	@Test
-	void test03() {
-		System.out.print(LocalDate.now().minusDays(1));
-		ConfirmCase confirmCase = caseService.findByConfirmTime(LocalDate.now().minusDays(1));
-		System.out.print(confirmCase.getTodayAmount());
-		String message = "";
-		message = "指揮中心快訊：新增"+ String.valueOf(confirmCase.getTodayAmount()) + "例COVID-19確定病例，校正回歸數" + String.valueOf(confirmCase.getReturnAmount())+ "例，死亡人數" + String.valueOf(confirmCase.getDeathAmount()) + "例。$";
-		System.out.print(message);
-	}
-
-	@Test
-	void test04() throws IOException {
-		covidNumbers.run();
-//		getMaskJson.run();
+	void test01() throws IOException {
 	}
 
 }

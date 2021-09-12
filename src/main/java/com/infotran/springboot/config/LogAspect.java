@@ -1,25 +1,38 @@
 package com.infotran.springboot.config;
 
+import com.infotran.springboot.annotation.LogInfo;
+import io.lettuce.core.output.ScanOutput;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 @Component
 @org.aspectj.lang.annotation.Aspect
+@Slf4j
 public class LogAspect {
 
-    @Pointcut("execution(* com.infotran.springboot.*.*.*(..))")
-    public void LogAspect() {};
+    @Pointcut(value = "@annotation(com.infotran.springboot.annotation.LogInfo)")
+    private void LogAspect() {};
 
-    @Before("LogAspect()")
-    public void dobefore(JoinPoint joinpoint) {
-        System.out.println("====之前====");
+    @Before(value = "LogAspect() && @annotation(logInfo)")
+    public void dobefore(JoinPoint joinpoint, LogInfo logInfo) {
+        //class name
+        String clsName = joinpoint.getSignature().getDeclaringType().getSimpleName();
+        //method name
+        String mthName = joinpoint.getSignature().getName();
+        List<String> args = Arrays.asList(String.valueOf(joinpoint.getArgs()));
+        args.stream().collect(Collectors.joining(",","[","]"));
+
+        log.info("ClassName:{} MethodName:{} args:{} WarningMessage:{}",clsName,mthName,args,logInfo.warning());
     }
 
-    @After("LogAspect()")
-    public void doAfter(JoinPoint joinpoint) {
-        System.out.println("====之後====");
-    }
+
 
 }
