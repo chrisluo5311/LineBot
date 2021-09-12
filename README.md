@@ -25,8 +25,8 @@ server.port=9090
 3. 緩存 
 > Redis
 
-4. 啟動須知(測試請下載ngrok)
-1. ngrok http 443
+### 啟動須知(測試請下載ngrok)
+1. [ngrok連結:](https://ngrok.com/download "ngrok")
 
 ### 參考網站
 1. [衛福部疾管署](https://www.cdc.gov.tw/ "link") 
