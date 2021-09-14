@@ -1,5 +1,12 @@
 # LineBot (疫情小幫手)
 ![目錄](https://github.com/chrisluo5311/LineBot/blob/master/src/main/resources/static/menufinal.jpg "line bot richmenu")
+
+# 安装各软件对应版本(仅供参考):
+|  软件  |  版本  |   说明   |
+|:------:|:--------:|:------------:|
+|  JDK  |    | Spring boot对低版支持无测试过 |
+|  Redis  |    |  |
+|  MS SQLServer  |    |  |
 ### 目錄內容 
 1. 功能表、負責人、狀態、使用技術 
 
