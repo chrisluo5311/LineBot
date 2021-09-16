@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.infotran.springboot.confirmcase.model.ConfirmCase;
 import com.infotran.springboot.linebot.model.MenuID;
+import com.infotran.springboot.medicinestore.model.MedicineStore;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,6 +46,15 @@ public class MyRedisConfig {
         RedisTemplate<Object, ConfirmCase> template = new RedisTemplate<Object, ConfirmCase>();
         template.setConnectionFactory(redisConnectionFactory);
         Jackson2JsonRedisSerializer<ConfirmCase> ser = new Jackson2JsonRedisSerializer<ConfirmCase>(ConfirmCase.class);
+        template.setDefaultSerializer(ser);
+        return template;
+    }
+
+    @Bean
+    public RedisTemplate<Object, MedicineStore> medicineStoreRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<Object, MedicineStore> template = new RedisTemplate<Object, MedicineStore>();
+        template.setConnectionFactory(redisConnectionFactory);
+        Jackson2JsonRedisSerializer<MedicineStore> ser = new Jackson2JsonRedisSerializer<MedicineStore>(MedicineStore.class);
         template.setDefaultSerializer(ser);
         return template;
     }

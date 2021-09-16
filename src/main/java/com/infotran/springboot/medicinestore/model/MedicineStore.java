@@ -2,6 +2,7 @@ package com.infotran.springboot.medicinestore.model;
 
 import org.springframework.stereotype.Component;
 
+import javax.annotation.processing.Generated;
 import javax.persistence.*;
 
 @Entity
