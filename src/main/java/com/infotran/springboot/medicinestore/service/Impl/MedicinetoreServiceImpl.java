@@ -34,4 +34,10 @@ public class MedicinetoreServiceImpl implements MedicineStoreService {
     public MedicineStore findById (String id){
         return medRepo.findById(id);
     }
+
+    @Override
+    public List<MedicineStore> saveAll(List<MedicineStore> storeList) {
+        List<MedicineStore> list = medRepo.saveAll(storeList);
+        return (list!=null)?list:null;
+    }
 }

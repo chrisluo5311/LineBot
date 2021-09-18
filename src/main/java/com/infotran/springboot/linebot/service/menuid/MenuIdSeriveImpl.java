@@ -1,4 +1,4 @@
-package com.infotran.springboot.linebot.service.impl;
+package com.infotran.springboot.linebot.service.menuid;
 
 
 import com.infotran.springboot.linebot.dao.MenuIdRepository;
