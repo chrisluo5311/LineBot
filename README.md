@@ -49,3 +49,4 @@ server.port=9090
 4. [台灣電子地圖服務網](https://www.map.com.tw/ "台灣電子地圖服務網")
 5. [LINE Messaging API SDK for Java](https://github.com/line/line-bot-sdk-java "LineBot API SDK")
 6. [Messaging API reference](https://developers.line.biz/en/reference/messaging-api/ "LineBot API 文件")
+7. [口罩即時查](https://wenyo.github.io/maskmap/ "口罩即時查")
