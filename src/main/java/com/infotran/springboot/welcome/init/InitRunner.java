@@ -21,8 +21,8 @@ public class InitRunner implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		System.out.println("Successful!");
-		crawl.run();
-		getMaskJson.run();
+//		crawl.run();
+//		getMaskJson.run();
 	}
 
 }

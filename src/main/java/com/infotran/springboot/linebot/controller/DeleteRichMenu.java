@@ -1,8 +1,6 @@
 package com.infotran.springboot.linebot.controller;
 
-import com.infotran.springboot.linebot.service.LineClientUtil;
-
-public class DeleteRichMenu implements LineClientUtil {
+public class DeleteRichMenu {
 
 //	public static void main (String[] args) {
 //		try {

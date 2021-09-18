@@ -4,7 +4,7 @@ package com.infotran.springboot.Exception.Enum;
 * 爬蟲狀態
 *
 * */
-public enum WebCrawlerCode {
+public enum LineBotExceptionCode {
 
     SUCCESS("000","爬蟲成功"),
 
@@ -14,7 +14,9 @@ public enum WebCrawlerCode {
     RESPONSE_EMPTY("B01","響應物件為空"),
     RESPONSE_NOT_TARGET("B02","響應物件非目標"),
 
-    NEWS_KEYWORD_CHANGE("C01","新聞關鍵字改變");
+    NEWS_KEYWORD_CHANGE("C01","新聞關鍵字改變"),
+
+    FAIL_ON_SAVING_RESPONSE("D01","資料庫儲存失敗");
 
 
 
@@ -22,7 +24,7 @@ public enum WebCrawlerCode {
     private String status;
 
 
-    WebCrawlerCode(String code, String status) {
+    LineBotExceptionCode(String code, String status) {
         this.code = code;
         this.status = status;
     }

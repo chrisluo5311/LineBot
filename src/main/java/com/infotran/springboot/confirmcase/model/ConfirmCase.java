@@ -25,19 +25,19 @@ public class ConfirmCase {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer confirmId;
+	private Integer confirmId; //確診表id
 
-	private Integer totalAmount;
+	private Integer totalAmount; //確診總數
 	
-	private Integer deathAmount;
+	private Integer deathAmount; //死亡數目
 	
-	private Integer todayAmount;
+	private Integer todayAmount; //今日確診數目
 	
-	private Integer returnAmount;
+	private Integer returnAmount; //校正回歸數
 	
-	private Integer releasedQuarantine;
+	private Integer releasedQuarantine; //解除14天隔離數目(沒用到)
 	
-	private LocalDate confirmTime;
+	private LocalDate confirmTime;//更新時間(now)
 	
 	@PrePersist
 	protected void createConfirmTime() {

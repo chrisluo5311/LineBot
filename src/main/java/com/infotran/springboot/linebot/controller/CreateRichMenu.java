@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutionException;
 
 import com.infotran.springboot.linebot.model.MenuID;
 import com.infotran.springboot.linebot.service.MenuIdService;
+import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.richmenu.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -18,12 +19,12 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-import com.infotran.springboot.linebot.service.LineClientUtil;
+import com.infotran.springboot.linebot.service.LineReplyMessageHandler;
 import com.linecorp.bot.model.action.PostbackAction;
 import com.linecorp.bot.model.response.BotApiResponse;
 
 @SpringBootApplication
-public class CreateRichMenu implements LineClientUtil,ApplicationRunner {
+public class CreateRichMenu implements LineReplyMessageHandler,ApplicationRunner {
 
 	@Autowired
 	MenuIdService menuService;
@@ -112,4 +113,8 @@ public class CreateRichMenu implements LineClientUtil,ApplicationRunner {
 		
 	}
 
+	@Override
+	public void postBackReply(PostbackEvent event) throws Exception {
+
+	}
 }
