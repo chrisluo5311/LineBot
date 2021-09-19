@@ -28,5 +28,5 @@ public interface LineReplyMessageHandler {
 	 *				  "6":其他
 	 * @param postbackEvent
 	 * */
-	public void postBackReply(PostbackEvent postbackEvent) throws Exception;
+	void postBackReply(PostbackEvent postbackEvent) throws Exception;
 }

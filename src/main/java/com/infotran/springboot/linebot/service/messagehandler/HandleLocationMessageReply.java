@@ -117,6 +117,14 @@ public class HandleLocationMessageReply extends BaseMessageHandler {
         }
     }
 
+    /**
+     * 計算兩點距離
+     * @param lat1 緯度1
+     * @param lon1 經度1
+     * @param lat2 緯度2
+     * @param lon2 經度2
+     * @return double 距離
+     * */
     private double distance (double lat1,double lon1,double lat2,double lon2){
         if ((lat1 == lat2) && (lon1 == lon2)){
             return 0;
@@ -129,16 +137,5 @@ public class HandleLocationMessageReply extends BaseMessageHandler {
 //			dist = dist * 1.609344;
             return (dist);
         }
-    }
-
-    @Override
-    public BotApiResponse testTextMessageReply(MessageEvent<TextMessageContent> event) {
-        //不使用
-        return null;
-    }
-
-    @Override
-    public void handleSticker(String replyToken, StickerMessageContent content) {
-        //不使用
     }
 }

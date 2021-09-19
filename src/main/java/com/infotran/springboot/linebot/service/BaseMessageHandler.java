@@ -12,6 +12,7 @@ import com.linecorp.bot.model.event.message.LocationMessageContent;
 import com.linecorp.bot.model.event.message.StickerMessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
 import com.linecorp.bot.model.message.Message;
+import com.linecorp.bot.model.message.StickerMessage;
 import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.message.quickreply.QuickReply;
 import com.linecorp.bot.model.message.quickreply.QuickReplyItem;
@@ -41,24 +42,73 @@ public abstract class BaseMessageHandler implements LineReplyMessageHandler {
 
     /**
      * 處理使用者回傳的現在位置
+     *
      * @param event LocationMessageContent
-     * */
-    public abstract void handleLocationMessageRely(MessageEvent<LocationMessageContent> event);
+     */
+    public void handleLocationMessageRely(MessageEvent<LocationMessageContent> event) {
+    }
 
     /**
      * 測試用<br>
      * 處理使用者回傳的文字訊息
      * @param event TextMessageContent
      * */
-    public abstract BotApiResponse testTextMessageReply(MessageEvent<TextMessageContent> event);
+    public BotApiResponse testTextMessageReply(MessageEvent<TextMessageContent> event){
+        return null;
+    }
 
     /**
      * 測試用<br>
-     * 處理使用者回傳的貼圖
+     * 處理使用者回傳的貼圖(預設回復一模一樣的貼圖)
      * @param replyToken String
      * @param content StickerMessageContent
      * */
-    public abstract void handleSticker(String replyToken, StickerMessageContent content);
+    public void handleSticker(String replyToken, StickerMessageContent content) {
+        //回傳一模一樣的給用戶
+        reply(replyToken, new StickerMessage(
+                content.getPackageId(), content.getStickerId())
+        );
+    };
+
+    /**
+     * 處理今日新增確診數目
+     * @param replyToken String
+     */
+    public void handleTodayAmountMessageRely(StringBuilder message,String replyToken){
+        ConfirmCase confirmCase = caseService.findByConfirmTime(LocalDate.now());
+        if (confirmCase!=null){
+            message.append("指揮中心快訊：今日新增"+ confirmCase.getTodayAmount() + "例COVID-19確定病例。\n");
+            message.append("校正回歸數"+confirmCase.getReturnAmount()+"例。\n");
+            message.append("死亡人數"+confirmCase.getDeathAmount()+"例。");
+        }else {
+            message.append("本日確診數量尚未公布。");
+            log.info("{} 本日新增不存在",LOG_PREFIX);
+        }
+        this.replyText(replyToken,message.toString());
+    }
+
+    /**
+     * 處理其他
+     * @param replyToken String
+     * */
+    public void handleOtherMessageReply(StringBuilder message,String replyToken){
+        message.append("⊂_ヽ\n" +
+                "　 ＼＼ ＿\n" +
+                "　　 ＼(　•_•) F\n" +
+                "　　　 <　⌒ヽ A\n" +
+                "　　　/ 　 へ＼ B\n" +
+                "　　 /　　/　＼＼ U\n" +
+                "　　 ﾚ　ノ　　 ヽ_つ L\n" +
+                "　　/　/ O\n" +
+                "　 /　/| U\n" +
+                "　(　(ヽ S\n" +
+                "　|　|、＼\n" +
+                "　| 丿 ＼ ⌒)\n" +
+                "　| |　　) /\n" +
+                "`ノ )　　Lﾉ\n" +
+                "(_／");
+        this.replyText(replyToken,message.toString());
+    }
 
     @Override
     public void postBackReply(PostbackEvent event)throws IOException {
@@ -67,15 +117,7 @@ public abstract class BaseMessageHandler implements LineReplyMessageHandler {
         StringBuilder message = new StringBuilder();
         switch (data){
             case "1" :
-                ConfirmCase confirmCase = caseService.findByConfirmTime(LocalDate.now());
-                if (confirmCase!=null){
-                    message.append("指揮中心快訊：今日新增"+ confirmCase.getTodayAmount() + "例COVID-19確定病例。\n");
-                    message.append("校正回歸數"+confirmCase.getReturnAmount()+"例。\n");
-                    message.append("死亡人數"+confirmCase.getDeathAmount()+"例。");
-                }else {
-                    message.append("本日確診數量尚未公布。");
-                }
-                this.replyText(replyToken,message.toString());
+                handleTodayAmountMessageRely(message,replyToken);
                 break;
             case "2" :
                 this.reply(replyToken,new OpenMapQuickReplySupplier().get());
@@ -87,22 +129,7 @@ public abstract class BaseMessageHandler implements LineReplyMessageHandler {
             case "5" :
                 break;
             case "6" :
-                message.append("⊂_ヽ\n" +
-                        "　 ＼＼ ＿\n" +
-                        "　　 ＼(　•_•) F\n" +
-                        "　　　 <　⌒ヽ A\n" +
-                        "　　　/ 　 へ＼ B\n" +
-                        "　　 /　　/　＼＼ U\n" +
-                        "　　 ﾚ　ノ　　 ヽ_つ L\n" +
-                        "　　/　/ O\n" +
-                        "　 /　/| U\n" +
-                        "　(　(ヽ S\n" +
-                        "　|　|、＼\n" +
-                        "　| 丿 ＼ ⌒)\n" +
-                        "　| |　　) /\n" +
-                        "`ノ )　　Lﾉ\n" +
-                        "(_／");
-                this.replyText(replyToken,message.toString());
+                handleOtherMessageReply(message,replyToken);
                 break;
 
         }
