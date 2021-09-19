@@ -30,7 +30,7 @@ import java.util.function.Supplier;
 
 @Service
 @Slf4j
-public abstract class BaseMessageHandler implements LineReplyMessageHandler {
+public abstract class BaseMessageHandler implements LineReplyMessageInterface {
 
     private static String LOG_PREFIX = "BaseMessageHandler";
 

@@ -19,12 +19,12 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-import com.infotran.springboot.linebot.service.LineReplyMessageHandler;
+import com.infotran.springboot.linebot.service.LineReplyMessageInterface;
 import com.linecorp.bot.model.action.PostbackAction;
 import com.linecorp.bot.model.response.BotApiResponse;
 
 @SpringBootApplication
-public class CreateRichMenu implements LineReplyMessageHandler,ApplicationRunner {
+public class CreateRichMenu implements LineReplyMessageInterface,ApplicationRunner {
 
 	@Autowired
 	MenuIdService menuService;
