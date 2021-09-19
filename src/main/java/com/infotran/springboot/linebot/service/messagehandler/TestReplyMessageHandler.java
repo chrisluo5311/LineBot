@@ -25,18 +25,16 @@ import com.linecorp.bot.model.response.BotApiResponse;
 
 import lombok.NonNull;
 
+/**
+ * @author chris
+ * 測試及做筆記用
+ *
+ * */
 @Service
 @Slf4j
 public class TestReplyMessageHandler extends BaseMessageHandler {
 
 	private ReplyMessage replyMessage = null;
-
-	@Override
-    public void handleSticker(String replyToken, StickerMessageContent content) {
-        reply(replyToken, new StickerMessage(
-                content.getPackageId(), content.getStickerId())
-        );
-    }
 
 	@Override
 	public BotApiResponse testTextMessageReply(MessageEvent<TextMessageContent> event){
@@ -122,8 +120,4 @@ public class TestReplyMessageHandler extends BaseMessageHandler {
 		return botApiResponse;
 	}
 
-	@Override
-	public void handleLocationMessageRely(MessageEvent<LocationMessageContent> event) {
-		//不使用
-	}
 }
