@@ -4,9 +4,9 @@
 ### 安装各软件对应版本(仅供参考):
 |  软件  |  版本  |   说明   |
 |:------:|:--------:|:------------:|
-|  JDK  |    | Spring boot对低版支持无测试过 |
-|  Redis  |    |  |
-|  MS SQLServer  |    |  |
+|  JDK  | 11.0.10   | Spring boot对低版支持无测试过 |
+|  Redis  | 5.0.10   | 低版支持无测试过  |
+|  MS SQLServer  | MS SQLServer2019  | 低版支持无测试过 |
 ### 定时任务说明
 
 ### 目錄內容 
@@ -45,8 +45,8 @@ server.port=9090
 ### 參考網站
 1. [衛福部疾管署](https://www.cdc.gov.tw/ "link") 
 2. [全球疫情地圖](https://covid-19.nchc.org.tw/ "全球疫情地圖")
-3. [健保特約機構口罩剩餘數量明細](https://data.gov.tw/dataset/116285 "口罩link")
+3. [健保特約機構口罩剩餘數量明細](https://data.gov.tw/dataset/116285 "口罩link") 或 [口罩即時查](https://wenyo.github.io/maskmap/ "口罩即時查")(帶經緯度)
 4. [台灣電子地圖服務網](https://www.map.com.tw/ "台灣電子地圖服務網")
 5. [LINE Messaging API SDK for Java](https://github.com/line/line-bot-sdk-java "LineBot API SDK")
 6. [Messaging API reference](https://developers.line.biz/en/reference/messaging-api/ "LineBot API 文件")
-7. [口罩即時查](https://wenyo.github.io/maskmap/ "口罩即時查")
+
