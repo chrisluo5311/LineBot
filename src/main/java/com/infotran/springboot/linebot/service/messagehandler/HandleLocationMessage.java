@@ -94,7 +94,7 @@ public class HandleLocationMessage extends BaseMessageHandler {
         return locationList;
     }
 
-    public void postbackEventUserDefined(String replyToken) {
+    public void postbackEventLocation(String replyToken) {
         List<LocationMessage> locationList = locationMessageRedisTemplate.opsForList().range(REDIS_KEY,0,-1);
         List<Message> messageList = locationList.stream().map(Message.class::cast).collect(Collectors.toList());
         reply(replyToken,messageList);
