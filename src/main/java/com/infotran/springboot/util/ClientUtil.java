@@ -1,4 +1,4 @@
-package com.infotran.springboot.Util;
+package com.infotran.springboot.util;
 
 import okhttp3.OkHttpClient;
 import javax.net.ssl.X509TrustManager;

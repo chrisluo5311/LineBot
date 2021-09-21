@@ -1,4 +1,4 @@
-package com.infotran.springboot.Util;
+package com.infotran.springboot.util;
 
 import org.springframework.stereotype.Component;
 

@@ -1,12 +1,10 @@
 package com.infotran.springboot.linebot.controller;
 
 import com.infotran.springboot.linebot.service.BaseMessageHandler;
-import com.infotran.springboot.linebot.service.LineReplyMessageInterface;
-import com.infotran.springboot.linebot.service.messagehandler.HandleLocationMessageReply;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.StickerMessageContent;
@@ -18,6 +16,7 @@ import javax.annotation.Resource;
 
 @LineMessageHandler
 @SpringBootApplication
+@Slf4j
 public class EchoApplication {
 
     public static void main(String[] args) {
@@ -25,13 +24,8 @@ public class EchoApplication {
     }
 
     @Resource
-    LineReplyMessageInterface lineReplyMessageHandler;
-
-    @Resource
     BaseMessageHandler baseMessageHandler;
 
-    @Resource
-    HandleLocationMessageReply handleLocationMessageRely;
 
     /**
      * 處理目錄
@@ -39,7 +33,7 @@ public class EchoApplication {
      * */
     @EventMapping
     public void handlePostBackEvent(PostbackEvent event) throws Exception {
-        lineReplyMessageHandler.postBackReply(event);
+        baseMessageHandler.postBackReply(event);
     }
 
     /**
@@ -47,8 +41,8 @@ public class EchoApplication {
      * @param event MessageEvent<LocationMessageContent>
      * */
     @EventMapping
-    public void handleLocationMessageEvent(MessageEvent<LocationMessageContent> event) {
-        handleLocationMessageRely.handleLocationMessageRely(event);
+    public void handleLocationMessageEvent(MessageEvent<LocationMessageContent> event) throws Exception {
+        baseMessageHandler.handleMessageEvent(event);
     }
 
     /**
@@ -57,7 +51,7 @@ public class EchoApplication {
      * */
     @EventMapping
     public void handleTextMessageEvent(MessageEvent<TextMessageContent> event) throws Exception {
-        baseMessageHandler.testTextMessageReply(event);
+        baseMessageHandler.handleMessageEvent(event);
     }
 
     /**
@@ -65,8 +59,8 @@ public class EchoApplication {
      * @param event MessageEvent<StickerMessageContent>
      * */
     @EventMapping
-    public void handleStickerMessageEvent(MessageEvent<StickerMessageContent> event) {
-        baseMessageHandler.handleSticker(event.getReplyToken(), event.getMessage());
+    public void handleStickerMessageEvent(MessageEvent<StickerMessageContent> event) throws Exception {
+        baseMessageHandler.handleMessageEvent(event);
     }
 
 

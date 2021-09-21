@@ -1,4 +1,4 @@
-package com.infotran.springboot.Exception.Enum;
+package com.infotran.springboot.exception.exceptionenum;
 
 /*
 * 爬蟲狀態

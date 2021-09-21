@@ -9,52 +9,51 @@ import java.util.List;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import com.infotran.springboot.linebot.service.BaseMessageHandler;
+import com.linecorp.bot.client.LineMessagingClient;
 import com.linecorp.bot.model.action.*;
-import com.linecorp.bot.model.event.message.LocationMessageContent;
 import com.linecorp.bot.model.message.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import com.linecorp.bot.model.ReplyMessage;
 import com.linecorp.bot.model.event.MessageEvent;
-import com.linecorp.bot.model.event.message.StickerMessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
 import com.linecorp.bot.model.message.TextMessage.Emoji;
 import com.linecorp.bot.model.message.template.CarouselColumn;
 import com.linecorp.bot.model.message.template.CarouselTemplate;
 import com.linecorp.bot.model.response.BotApiResponse;
 
-import lombok.NonNull;
-
 /**
  * @author chris
  * 測試及做筆記用
  *
  * */
-@Service
 @Slf4j
-public class TestReplyMessageHandler extends BaseMessageHandler {
+@Component(value = "TestReplyMessageHandler")
+public class HandleTestReplyMessage extends BaseMessageHandler {
 
 	private ReplyMessage replyMessage = null;
 
-	@Override
-	public BotApiResponse testTextMessageReply(MessageEvent<TextMessageContent> event){
+	private static String LOG_PREFIX = "TestReplyMessageHandler";
 
-		String receivedMessage = event.getMessage().getText();
-		String replyToken = event.getReplyToken();
+	/**
+	 * 測試用<br>
+	 * 處理使用者回傳的文字訊息
+	 *
+	 * @param replyToken
+	 * @param receivedMessage 接收到的訊息
+	 */
+	public BotApiResponse testTextMessageReply(String replyToken,String receivedMessage){
 		BotApiResponse botApiResponse = null;
-
 		switch (receivedMessage) {
 			case "測試文字":
 				List<Emoji> emojis = new ArrayList<Emoji>();
 				Emoji emoji = Emoji.builder().index(4).productId("5ac1bfd5040ab15980c9b435").emojiId("002").build();
 				emojis.add(emoji);
 				TextMessage textMessage = TextMessage.builder().text("測試成功$").emojis(emojis).build();
-				replyMessage = new ReplyMessage(replyToken,textMessage);
-				try {
-					botApiResponse = client.replyMessage(replyMessage).get();
-				} catch (InterruptedException | ExecutionException e) {
-					e.printStackTrace();
-				}
+				botApiResponse = reply(replyToken,textMessage);
+				log.info("{} response物件 {} ",LOG_PREFIX,botApiResponse);
 				break;
 			case "測試carousel":
 				URI imageuri = URI.create("https://www.ballarataquaticcentre.com/wp-content/uploads/2020/07/mask-icon.jpg");
@@ -107,10 +106,10 @@ public class TestReplyMessageHandler extends BaseMessageHandler {
 								))
 						));
 				TemplateMessage templateMessage = new TemplateMessage("Carousel alt text", carouselTemplate);
-				this.reply(replyToken, templateMessage);
+				reply(replyToken, templateMessage);
 				break;
 			default:
-				this.replyText(
+				replyText(
 						replyToken,
 						receivedMessage
 				);

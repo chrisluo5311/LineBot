@@ -4,15 +4,18 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Map;
 
-import com.infotran.springboot.Util.ClientUtil;
-import com.infotran.springboot.Util.TimeUtil;
-import com.infotran.springboot.Util.SSLHelper;
+import com.infotran.springboot.util.ClientUtil;
+import com.infotran.springboot.util.TimeUtil;
+import com.infotran.springboot.util.SSLHelper;
 import com.infotran.springboot.annotation.LogInfo;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 
 import com.infotran.springboot.confirmcase.model.ConfirmCase;
@@ -26,7 +29,7 @@ import okhttp3.Response;
 
 @Controller
 @Slf4j
-public class CrawlCovidNumbers implements ClientUtil {
+public class CrawlCovidNumbers implements ClientUtil, CommandLineRunner {
 
 	private final String CDC_URL = "http://at.cdc.tw/YEc68Q";// 新聞首頁
 
@@ -40,14 +43,24 @@ public class CrawlCovidNumbers implements ClientUtil {
 	
 	private final String DEATH_NUM = "確診個案中新增";
 
+	private static final String LOG_PREFIX = "CrawlCovidNumbers";
+
 	@Autowired
 	private ConfirmCaseService cService;
+
+	@Autowired
+	RedisTemplate<Object, ConfirmCase> confirmCaseRedisTemplate;
+
+	@Override
+	public void run(String... args) throws Exception {
+		executeCrawlCovid();
+	}
 
 	/*
 	 * 執行爬蟲
 	 */
-//	@Scheduled(cron = "0 0/5 14 * * ?")
-	public void run() throws IOException {
+	@Scheduled(cron = "0 0/5 14 * * ?")
+	public void executeCrawlCovid() throws IOException {
 		ConfirmCase confirmCase = cService.findByConfirmTime(LocalDate.now());
 		if (confirmCase!=null) return;
 		Request request = new Request.Builder().url(CDC_URL).get().build(); // get post put 等
@@ -60,7 +73,8 @@ public class CrawlCovidNumbers implements ClientUtil {
 
 			@Override
 			public void onResponse(Call call, Response response) throws IOException {
-				String body = response.body().string();
+				log.info("@@@@@@ {} 爬蟲成功 @@@@@@",LOG_PREFIX);
+				String body = response.body().string();//整頁內容
 				CDC_NewsDetail = getURLOfNewsDetail(body);
 				parseBody(CDC_NewsDetail);
 			}
@@ -81,12 +95,12 @@ public class CrawlCovidNumbers implements ClientUtil {
 			String date = element.select("p.icon-date").text();
 			String tname = element.select(".content-boxes-v3 > a").attr("title");
 			if (todayMap.containsKey(month) && todayMap.containsValue(date) && tname.indexOf("確定病例") != -1) {
-				log.info("[The rest of the news url is here] {} " , element.select(".content-boxes-v3 > a").attr("href"));
+				log.info("[The rest of the news url is here : {} ]" , element.select(".content-boxes-v3 > a").attr("href"));
 				res.append(element.select(".content-boxes-v3 > a").attr("href"));
 				return res.toString();
 			}
 		}
-		log.info("this is newsdetail url ==> "+res.toString());
+		log.info("News detailed url: {} "+res.toString());
 		return res.toString();
 	}
 
@@ -102,22 +116,11 @@ public class CrawlCovidNumbers implements ClientUtil {
 			Elements divchildren = doc.select("div.news-v3-in > div ");
 			String divchild = divchildren.text();
 			Integer numeric_Start = 0;//數字起點
-			Integer newNum = 0;
-			if (divchild.indexOf(DOMESTIC_NEWNUM) != -1){
-				numeric_Start = divchild.indexOf(DOMESTIC_NEWNUM)+ DOMESTIC_NEWNUM.length();// 數字起點
-				newNum = getNumberFromEachCategory(numeric_Start,divchild);
-			}
-			Integer reNum = 0;
-			if (divchild.indexOf(RETURN_NUM) != -1) {
-				numeric_Start = divchild.indexOf(RETURN_NUM)+ RETURN_NUM.length();
-				reNum = getNumberFromEachCategory(numeric_Start,divchild);
-			}
+			//今日確診數
+			Integer newNum = getNumFromDivchild(divchild,DOMESTIC_NEWNUM);
+			Integer reNum = getNumFromDivchild(divchild,RETURN_NUM);
 			Integer totalNum = newNum + reNum;
-			Integer deathNum = 0;
-			if (divchild.indexOf(DEATH_NUM) != -1) {
-				numeric_Start = divchild.indexOf(DEATH_NUM)+ DEATH_NUM.length();
-				deathNum = getNumberFromEachCategory(numeric_Start,divchild);
-			}
+			Integer deathNum = getNumFromDivchild(divchild,DEATH_NUM);
 			log.info("新增數目{},校正回歸{},總數{},死亡數目{}",newNum,reNum,totalNum,deathNum);
 			ConfirmCase cfc = ConfirmCase.builder()
 										 .todayAmount(newNum)
@@ -125,12 +128,30 @@ public class CrawlCovidNumbers implements ClientUtil {
 										 .totalAmount(totalNum)
 										 .deathAmount(deathNum)
 										 .build();
+			log.info("{} 今日確診物件 {}",LOG_PREFIX,cfc);
+			confirmCaseRedisTemplate.opsForValue().set("今日確診",cfc);
 			cService.save(cfc);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
+	/**
+	 * 根據關鍵字取得不同的確診數目
+	 * @param divchild 新聞body
+	 * @param keyword 搜索的關鍵字
+	 * @return Integer 確診數目
+	 * */
+	private Integer getNumFromDivchild(String divchild,String keyword) {
+		Integer numeric_Start = 0;//數字起點
+		Integer target = 0;//返回結果
+		if (divchild.indexOf(keyword) != -1) {
+			numeric_Start = divchild.indexOf(keyword)+ keyword.length();// 數字起點
+			target = getNumberFromEachCategory(numeric_Start,divchild);
+		}
+		return target;
+	}
+
 	private int getNumberFromEachCategory(int index, String article) {
 		Integer sum = 0;
 		while (Character.isDigit(article.charAt(index))) {
@@ -139,6 +160,5 @@ public class CrawlCovidNumbers implements ClientUtil {
 		}
 		return sum;
 	}
-	
 
 }

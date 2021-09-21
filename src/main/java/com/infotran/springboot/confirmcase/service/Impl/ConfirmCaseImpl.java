@@ -22,10 +22,14 @@ public class ConfirmCaseImpl implements ConfirmCaseService {
 	
 	@Override
 	public ConfirmCase save (ConfirmCase fcase) {
+//		ConfirmCase confirmCase = findByConfirmTime(LocalDate.now());
+//		// confirmCase不為Null
+//		if (confirmCase!=null){
+//			return confirmCase;
+//		}
 		return conRepo.save(fcase);
 	}
 
-	@Cacheable(value = "ConfirmCase",unless = "#result == null")
 	@Override
 	public ConfirmCase findByConfirmTime(LocalDate localDate) {
 //		confirmCaseRedisTemplate.opsForValue().

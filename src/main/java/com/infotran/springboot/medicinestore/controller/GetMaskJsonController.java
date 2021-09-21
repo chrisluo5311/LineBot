@@ -1,14 +1,15 @@
 package com.infotran.springboot.medicinestore.controller;
 
-import com.infotran.springboot.Exception.Enum.LineBotExceptionCode;
-import com.infotran.springboot.Exception.LineBotException;
-import com.infotran.springboot.Util.ClientUtil;
+import com.infotran.springboot.exception.exceptionenum.LineBotExceptionCode;
+import com.infotran.springboot.exception.LineBotException;
+import com.infotran.springboot.util.ClientUtil;
 import com.infotran.springboot.medicinestore.model.MedicineStore;
 import com.infotran.springboot.medicinestore.service.MedicineStoreService;
 import com.infotran.springboot.schedular.TimeUnit;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
@@ -21,7 +22,7 @@ import java.util.*;
 
 @Controller
 @Slf4j
-public class GetMaskJsonController implements ClientUtil {
+public class GetMaskJsonController implements ClientUtil, CommandLineRunner {
 
     //口罩即時url
     private String Mask_URL = "https://raw.githubusercontent.com/kiang/pharmacies/master/json/points.json";
@@ -37,11 +38,17 @@ public class GetMaskJsonController implements ClientUtil {
     @Resource
     RedisTemplate<Object, MedicineStore> medicineStoreRedisTemplate;
 
+    @Override
+    public void run(String... args) throws Exception {
+        executeMaskCrawl();
+        scheduledSaving();
+    }
+
     /**
      * 執行異步請求
      * */
-    @Scheduled(cron = "0 0 0/1 * * ? *")
-    public void run() throws IOException {
+    @Scheduled(cron = "0 0 0/1 * * ?")
+    public void executeMaskCrawl() throws IOException {
         Request request = new Request.Builder().url(Mask_URL).get().build(); // get
         Call call = client.newCall(request);
         call.enqueue(new Callback() {
@@ -53,9 +60,8 @@ public class GetMaskJsonController implements ClientUtil {
             @SneakyThrows
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                log.info("@@@@@@ 爬蟲成功 @@@@@@");
+                log.info("@@@@@@ {} 爬蟲成功 @@@@@@",LOG_PREFIX);
                 String jsonBody = response.body().string();
-                log.info("{} 即時口罩JSON: {}",LOG_PREFIX,jsonBody);
                 parseMaskInfo(jsonBody);
             }
         });
@@ -110,9 +116,9 @@ public class GetMaskJsonController implements ClientUtil {
                                                       .longitude(longitude)
                                                       .updateTime(updateTime.toString())
                                                       .build();
-            log.info("{} 藥局物件 {}",LOG_PREFIX,medicineStore);
             medList.add(medicineStore);
         }
+        log.info("{} 藥局List物件 {}",LOG_PREFIX,medList);
         medicineStoreRedisTemplate.opsForList().leftPushAll(REDIS_KEY,medList);
     }
 
@@ -122,13 +128,16 @@ public class GetMaskJsonController implements ClientUtil {
      * Batch Size是設定對資料庫進行批量刪除，批量更新和批量插入的時候的批次大小
      * */
     @Scheduled(fixedRate = 1*TimeUnit.HOUR)
-    public void scheduledSaving () throws Exception {
+    private void scheduledSaving () throws Exception {
         List<MedicineStore> medList = medicineStoreRedisTemplate.opsForList().range(REDIS_KEY, 0, -1);
+        log.info("{} 從redis 取出所有藥局 {}",LOG_PREFIX,medList);
         List<MedicineStore> response = medicinetoreService.saveAll(medList);
+        log.info("{} 儲存DB後的response物件 {}",LOG_PREFIX,response);
         if (response==null) {
             throw new LineBotException(LineBotExceptionCode.FAIL_ON_SAVING_RESPONSE);
         }
     }
+
 
 
 }
