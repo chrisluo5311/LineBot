@@ -1,12 +1,12 @@
 # LineBot (疫情小幫手)
 ![目錄](https://github.com/chrisluo5311/LineBot/blob/master/src/main/resources/static/menufinal.jpg "line bot richmenu")
 
-### 安装各软件对应版本(仅供参考):
-|  软件  |  版本  |   说明   |
+### 安裝軟體對應版本(僅供参考):
+|  軟體  |  版本  |   說明   |
 |:------:|:--------:|:------------:|
-|  JDK  | 11.0.10   | Spring boot对低版支持无测试过 |
-|  Redis  | 5.0.10   | 低版支持无测试过  |
-|  MS SQLServer  | MS SQLServer2019  | 低版支持无测试过 |
+|  JDK  | 11.0.10   | Spring boot對低版支持無測試過 |
+|  Redis  | 5.0.10   | 低版支持無測試過  |
+|  MS SQLServer  | MS SQLServer2019  | 低版支持無測試過 |
 
 ### 定时任务说明
 
