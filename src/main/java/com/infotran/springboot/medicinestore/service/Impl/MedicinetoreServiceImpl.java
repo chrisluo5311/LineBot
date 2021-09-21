@@ -6,18 +6,20 @@ import com.infotran.springboot.medicinestore.service.MedicineStoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MedicinetoreServiceImpl implements MedicineStoreService {
 
-    @Autowired
+    @Resource
     MedicineStoreRepository medRepo;
+
 
     @Override
     public MedicineStore findByLatitudeAndLogitude(Double latitude, Double longitude) {
-        medRepo.findByLatitudeAndLongitude(latitude,longitude);
-        return null;
+        return medRepo.findByLatitudeAndLongitude(latitude,longitude);
     }
 
     @Override
@@ -32,7 +34,11 @@ public class MedicinetoreServiceImpl implements MedicineStoreService {
 
     @Override
     public MedicineStore findById (String id){
-        return medRepo.findById(id);
+        Optional<MedicineStore> med = medRepo.findById(id);
+        if(!med.isEmpty()){
+            return med.get();
+        }
+        return null;
     }
 
     @Override

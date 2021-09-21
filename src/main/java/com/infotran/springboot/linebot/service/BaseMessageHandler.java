@@ -1,36 +1,42 @@
 package com.infotran.springboot.linebot.service;
 
 
-import com.infotran.springboot.confirmcase.model.ConfirmCase;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.infotran.springboot.annotation.QuickReplyMode;
+import com.infotran.springboot.annotation.quickreplyenum.ActionMode;
 import com.infotran.springboot.confirmcase.service.ConfirmCaseService;
+import com.infotran.springboot.linebot.service.messagehandler.HandleLocationMessage;
+import com.infotran.springboot.linebot.service.messagehandler.HandleOtherMessage;
+import com.infotran.springboot.linebot.service.messagehandler.HandleTestReplyMessage;
+import com.infotran.springboot.linebot.service.messagehandler.HandleTodayAmountMessage;
 import com.infotran.springboot.medicinestore.service.MedicineStoreService;
 import com.linecorp.bot.model.ReplyMessage;
-import com.linecorp.bot.model.action.LocationAction;
+import com.linecorp.bot.model.action.*;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
+import com.linecorp.bot.model.event.message.MessageContent;
 import com.linecorp.bot.model.event.message.StickerMessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
-import com.linecorp.bot.model.message.Message;
-import com.linecorp.bot.model.message.StickerMessage;
-import com.linecorp.bot.model.message.TextMessage;
+import com.linecorp.bot.model.message.*;
 import com.linecorp.bot.model.message.quickreply.QuickReply;
 import com.linecorp.bot.model.message.quickreply.QuickReplyItem;
 import com.linecorp.bot.model.response.BotApiResponse;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.time.LocalDate;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
-@Service
+
 @Slf4j
-public abstract class BaseMessageHandler implements LineReplyMessageInterface {
+@Component
+public class BaseMessageHandler implements LineMessageClientInterface {
 
     private static String LOG_PREFIX = "BaseMessageHandler";
 
@@ -40,26 +46,100 @@ public abstract class BaseMessageHandler implements LineReplyMessageInterface {
     @Resource
     public MedicineStoreService mService;
 
-    /**
-     * 處理使用者回傳的現在位置
-     *
-     * @param event LocationMessageContent
-     */
-    public void handleLocationMessageRely(MessageEvent<LocationMessageContent> event) {
-    }
+    @Resource
+    private ObjectMapper objectMapper;
+
+    @Resource
+    private HandleLocationMessage LocationReply;
+
+    @Resource
+    private HandleTestReplyMessage testReplyMessageHandler;
+
+    @Resource
+    private HandleTodayAmountMessage handleTodayAmount;
+
+    @Resource
+    private HandleOtherMessage handleOtherMessage;
 
     /**
-     * 測試用<br>
-     * 處理使用者回傳的文字訊息
-     * @param event TextMessageContent
+     *  PostbackEvent分配器<br>
+     *  根據PostbackEvent的data參數不同執行相對應的方法
+     *  @return Map
      * */
-    public BotApiResponse testTextMessageReply(MessageEvent<TextMessageContent> event){
-        return null;
+    public Map<String,String> postBackReply(PostbackEvent event) throws IOException, NoSuchMethodException {
+        Map<String,String> param = new HashMap<>();
+        String replyToken = event.getReplyToken();
+        String data = event.getPostbackContent().getData();
+        StringBuilder message = new StringBuilder();
+        log.info("{} event data: {}",LOG_PREFIX,data);
+        switch (data){
+            case "1" :
+                handleTodayAmount.handleTodayAmountMessageRely(message,replyToken);
+                break;
+            case "2" :
+                TextMessage textMessage =LocationReply.openMap();
+                Method method = HandleLocationMessage.class.getDeclaredMethod("openMap");
+                QuickReply quickReply = getQuickReplyMode(method);
+                TextMessage newTextMessage = textMessage.toBuilder().quickReply(quickReply).build();
+                this.reply(replyToken,newTextMessage);
+                break;
+            case "3" :
+                break;
+            case "4" :
+                break;
+            case "5" :
+                break;
+            case "6" :
+                handleOtherMessage.handleOtherMessageReply(message,replyToken);
+                break;
+            case "next5":
+                log.info("進入下五間");
+                LocationReply.postbackEventUserDefined(replyToken);
+                break;
+            default:
+                param.put(replyToken,data);
+                log.info("PostBack event in default -> {}",param);
+                return param;
+        }
+        return param;
+    }
+
+    /**
+     *  MessageEvent分配器<br>
+     *  根據傳送訊息調用不同物件執行相對應的方法
+     *  @return BotApiResponse 響應物件
+     * */
+    public final <T extends MessageContent> BotApiResponse handleMessageEvent(MessageEvent<T> event) throws Exception{
+        BotApiResponse botApiResponse = null;
+        //replyToken
+        String replyToken = event.getReplyToken();
+        if (event.getMessage() instanceof TextMessageContent){
+            //測試類
+            String receivedMessage = ((TextMessageContent) event.getMessage()).getText();
+            testReplyMessageHandler.testTextMessageReply(replyToken,receivedMessage);
+        } else if (event.getMessage() instanceof LocationMessageContent) {
+            //收到使用者傳送地圖
+            Double lat1 = ((LocationMessageContent) event.getMessage()).getLatitude();
+            Double long1 = ((LocationMessageContent) event.getMessage()).getLongitude();
+            List<LocationMessage> locationMessage = LocationReply.handleLocationMessageReply(lat1,long1);
+            Method handleLocationMethod = HandleLocationMessage.class.getDeclaredMethod("handleLocationMessageReply",Double.class, Double.class);
+            //如果有@QuickReply自動產生QuickReply物件
+            QuickReply quickReply = getQuickReplyMode(handleLocationMethod);
+            List<Message> messageList = locationMessage.stream().map(x -> x.toBuilder().quickReply(quickReply).build()).map(Message.class::cast).collect(Collectors.toList());
+            this.reply(replyToken,messageList);
+        } else if (event.getMessage() instanceof StickerMessageContent) {
+            StickerMessageContent stickerMessageContent = (StickerMessageContent) event.getMessage();
+            handleSticker(replyToken,stickerMessageContent);
+        }
+
+
+        return botApiResponse;
     }
 
     /**
      * 測試用<br>
-     * 處理使用者回傳的貼圖(預設回復一模一樣的貼圖)
+     * 處理使用者回傳的貼圖
+     * (預設回復一模一樣的貼圖)
      * @param replyToken String
      * @param content StickerMessageContent
      * */
@@ -71,78 +151,13 @@ public abstract class BaseMessageHandler implements LineReplyMessageInterface {
     };
 
     /**
-     * 處理今日新增確診數目
-     * @param replyToken String
-     */
-    public void handleTodayAmountMessageRely(StringBuilder message,String replyToken){
-        ConfirmCase confirmCase = caseService.findByConfirmTime(LocalDate.now());
-        if (confirmCase!=null){
-            message.append("指揮中心快訊：今日新增"+ confirmCase.getTodayAmount() + "例COVID-19確定病例。\n");
-            message.append("校正回歸數"+confirmCase.getReturnAmount()+"例。\n");
-            message.append("死亡人數"+confirmCase.getDeathAmount()+"例。");
-        }else {
-            message.append("本日確診數量尚未公布。");
-            log.info("{} 本日新增不存在",LOG_PREFIX);
-        }
-        this.replyText(replyToken,message.toString());
-    }
-
-    /**
-     * 處理其他
-     * @param replyToken String
-     * */
-    public void handleOtherMessageReply(StringBuilder message,String replyToken){
-        message.append("⊂_ヽ\n" +
-                "　 ＼＼ ＿\n" +
-                "　　 ＼(　•_•) F\n" +
-                "　　　 <　⌒ヽ A\n" +
-                "　　　/ 　 へ＼ B\n" +
-                "　　 /　　/　＼＼ U\n" +
-                "　　 ﾚ　ノ　　 ヽ_つ L\n" +
-                "　　/　/ O\n" +
-                "　 /　/| U\n" +
-                "　(　(ヽ S\n" +
-                "　|　|、＼\n" +
-                "　| 丿 ＼ ⌒)\n" +
-                "　| |　　) /\n" +
-                "`ノ )　　Lﾉ\n" +
-                "(_／");
-        this.replyText(replyToken,message.toString());
-    }
-
-    @Override
-    public void postBackReply(PostbackEvent event)throws IOException {
-        String replyToken = event.getReplyToken();
-        String data = event.getPostbackContent().getData();
-        StringBuilder message = new StringBuilder();
-        switch (data){
-            case "1" :
-                handleTodayAmountMessageRely(message,replyToken);
-                break;
-            case "2" :
-                this.reply(replyToken,new OpenMapQuickReplySupplier().get());
-                break;
-            case "3" :
-                break;
-            case "4" :
-                break;
-            case "5" :
-                break;
-            case "6" :
-                handleOtherMessageReply(message,replyToken);
-                break;
-
-        }
-    }
-
-    /**
      * 回應訊息(replyToken,Message物件)<br>
      * 將Message物件轉成List
      * @param replyToken
      * @param message 單一Message物件
      * */
-    protected void reply(@NonNull String replyToken, @NonNull Message message) {
-        reply(replyToken, Collections.singletonList(message));
+    protected BotApiResponse reply(@NonNull String replyToken, @NonNull Message message) {
+        return reply(replyToken, Collections.singletonList(message));
     }
 
     /**
@@ -150,8 +165,8 @@ public abstract class BaseMessageHandler implements LineReplyMessageInterface {
      * @param replyToken String
      * @param messages List
      * */
-    protected void reply(@NonNull String replyToken, @NonNull List<Message> messages) {
-        reply(replyToken, messages, false);
+    protected BotApiResponse reply(@NonNull String replyToken, @NonNull List<Message> messages) {
+        return reply(replyToken, messages, false);
     }
 
     /**
@@ -160,7 +175,7 @@ public abstract class BaseMessageHandler implements LineReplyMessageInterface {
      * @param messages
      * @param notificationDisabled
      * */
-    protected void reply(@NonNull String replyToken,
+    protected BotApiResponse reply(@NonNull String replyToken,
                        @NonNull List<Message> messages,
                        boolean notificationDisabled) {
         try {
@@ -168,6 +183,7 @@ public abstract class BaseMessageHandler implements LineReplyMessageInterface {
                     .replyMessage(new ReplyMessage(replyToken, messages, notificationDisabled))
                     .get();
             log.info("{} replyMessage物件: {}",LOG_PREFIX,apiResponse);
+            return apiResponse;
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
@@ -189,30 +205,45 @@ public abstract class BaseMessageHandler implements LineReplyMessageInterface {
     }
 
 
-
     /**
-     * 內部類別<br>
-     * 打開地圖快捷鍵的提供器
+     *  取得註解QuickReplyMode並建立QuickReply物件
+     *  @param method Method
+     *  @return QuickReply
      * */
-    private class OpenMapQuickReplySupplier implements Supplier<Message> {
-        @Override
-        public Message get() {
-            final List<QuickReplyItem> items = Arrays.<QuickReplyItem>asList(
+    public QuickReply getQuickReplyMode(Method method) {
+        QuickReplyMode quickReplyMode = method.getAnnotation(QuickReplyMode.class);
+        if (quickReplyMode == null) {
+            //不使用sign要自己寫QuickReply
+            return null;
+        }
+        String label = quickReplyMode.label();
+        String data = quickReplyMode.data();
+        String displayText = quickReplyMode.displayText();
+        log.info("getQuickReplyMode ==> label: {} data: {} displaytext: {}",label,data,displayText);
+        if (ActionMode.POSTBACK.equals(quickReplyMode.mode())){
+            List<QuickReplyItem> items = Arrays.<QuickReplyItem>asList(
                     QuickReplyItem.builder()
-                            .action(LocationAction.withLabel("打開地圖"))
+                            .action(PostbackAction.builder()
+                                    .label(label)
+                                    .data(data)
+                                    .displayText(displayText)
+                                    .build())
                             .build()
             );
-
-            final QuickReply quickReply = QuickReply.items(items);
-
-            return TextMessage
-                    .builder()
-                    .text("請點選下方快捷鍵")
-                    .quickReply(quickReply)
-                    .build();
+            return QuickReply.items(items);
+        } else if (ActionMode.LOCATION.equals(quickReplyMode.mode())) {
+            List<QuickReplyItem> items = Arrays.<QuickReplyItem>asList(
+                    QuickReplyItem.builder()
+                            .action(LocationAction.withLabel(label))
+                            .build()
+            );
+            return QuickReply.items(items);
+        } else if (ActionMode.MESSAGE.equals(quickReplyMode.mode())) {
+            //TODO MESSAGE Action 尚未實作
         }
-    }
 
+        return null;
+    }
 
 
 }

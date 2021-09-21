@@ -11,6 +11,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.infotran.springboot.confirmcase.model.ConfirmCase;
 import com.infotran.springboot.linebot.model.MenuID;
 import com.infotran.springboot.medicinestore.model.MedicineStore;
+import com.linecorp.bot.model.message.LocationMessage;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -55,6 +56,15 @@ public class MyRedisConfig {
         RedisTemplate<Object, MedicineStore> template = new RedisTemplate<Object, MedicineStore>();
         template.setConnectionFactory(redisConnectionFactory);
         Jackson2JsonRedisSerializer<MedicineStore> ser = new Jackson2JsonRedisSerializer<MedicineStore>(MedicineStore.class);
+        template.setDefaultSerializer(ser);
+        return template;
+    }
+
+    @Bean
+    public RedisTemplate<Object, LocationMessage> locationMessageRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<Object, LocationMessage> template = new RedisTemplate<Object, LocationMessage>();
+        template.setConnectionFactory(redisConnectionFactory);
+        Jackson2JsonRedisSerializer<LocationMessage> ser = new Jackson2JsonRedisSerializer<LocationMessage>(LocationMessage.class);
         template.setDefaultSerializer(ser);
         return template;
     }

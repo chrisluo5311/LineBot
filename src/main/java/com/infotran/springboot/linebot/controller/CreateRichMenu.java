@@ -7,31 +7,51 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import com.infotran.springboot.linebot.model.MenuID;
 import com.infotran.springboot.linebot.service.MenuIdService;
 import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.richmenu.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.boot.SpringApplication;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
-import com.infotran.springboot.linebot.service.LineReplyMessageInterface;
+import com.infotran.springboot.linebot.service.LineMessageClientInterface;
 import com.linecorp.bot.model.action.PostbackAction;
 import com.linecorp.bot.model.response.BotApiResponse;
+import org.springframework.core.annotation.Order;
+
+import javax.annotation.Resource;
 
 @SpringBootApplication
-public class CreateRichMenu implements LineReplyMessageInterface,ApplicationRunner {
+@Order(1)
+public class CreateRichMenu implements LineMessageClientInterface, CommandLineRunner {
 
-	@Autowired
+	@Resource
 	MenuIdService menuService;
 
-	@SuppressWarnings("unused")
-	public static void main(String[] args) {
-		ConfigurableApplicationContext appContext = SpringApplication.run(CreateRichMenu.class, args);
+	@Override
+	public void run(String... args) throws Exception {
+		if (isRichMenuExists())return;
+		executeCreateRichMenu();
+	}
+
+	public void executeCreateRichMenu() throws Exception {
+		List<RichMenuArea> area = createRichMenuArea();
+		RichMenu richmenu = RichMenu.builder().size(new RichMenuSize(2500, 1686)).selected(true).name("covidMenu")
+				.chatBarText("功能選單").areas(area).build();
+		byte[] buffer = File2Byte();
+		try {
+			RichMenuIdResponse menuResponse = client.createRichMenu(richmenu).get();
+			String menuId = menuResponse.getRichMenuId();
+			MenuID menu = MenuID.builder().menuId(menuId).menuName(richmenu.getName()).build();
+			menuService.save(menu);
+			BotApiResponse apiResponse = blobClient.setRichMenuImage(menuId, "image/jpeg", buffer).get();
+			client.linkRichMenuIdToUser("all", menuId).get();
+			client.setDefaultRichMenu(menuId).get();
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private byte[] File2Byte() {
@@ -92,29 +112,8 @@ public class CreateRichMenu implements LineReplyMessageInterface,ApplicationRunn
 	}
 
 
-	@Override
-	public void run(ApplicationArguments args) throws Exception {
-		if (isRichMenuExists())return;
-		List<RichMenuArea> area = createRichMenuArea();
-		RichMenu richmenu = RichMenu.builder().size(new RichMenuSize(2500, 1686)).selected(true).name("covidMenu")
-				.chatBarText("功能選單").areas(area).build();
-		byte[] buffer = File2Byte();
-		try {
-			RichMenuIdResponse menuResponse = client.createRichMenu(richmenu).get();
-			String menuId = menuResponse.getRichMenuId();
-			MenuID menu = MenuID.builder().menuId(menuId).menuName(richmenu.getName()).build();
-			menuService.save(menu);
-			BotApiResponse apiResponse = blobClient.setRichMenuImage(menuId, "image/jpeg", buffer).get();
-			client.linkRichMenuIdToUser("all", menuId).get();
-			client.setDefaultRichMenu(menuId).get();
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-		}
-		
-	}
 
-	@Override
-	public void postBackReply(PostbackEvent event) throws Exception {
 
-	}
+
+
 }

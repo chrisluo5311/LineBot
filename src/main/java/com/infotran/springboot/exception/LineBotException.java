@@ -1,6 +1,6 @@
-package com.infotran.springboot.Exception;
+package com.infotran.springboot.exception;
 
-import com.infotran.springboot.Exception.Enum.LineBotExceptionCode;
+import com.infotran.springboot.exception.exceptionenum.LineBotExceptionCode;
 
 public class LineBotException extends Exception{
 
