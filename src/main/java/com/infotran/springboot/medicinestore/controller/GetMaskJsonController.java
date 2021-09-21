@@ -13,6 +13,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
@@ -22,6 +23,7 @@ import java.util.*;
 
 @Controller
 @Slf4j
+@Order(2)
 public class GetMaskJsonController implements ClientUtil, CommandLineRunner {
 
     //口罩即時url
@@ -60,7 +62,7 @@ public class GetMaskJsonController implements ClientUtil, CommandLineRunner {
             @SneakyThrows
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                log.info("@@@@@@ {} 爬蟲成功 @@@@@@",LOG_PREFIX);
+                log.info("@@@@@@ {} Mask爬蟲成功 @@@@@@",LOG_PREFIX);
                 String jsonBody = response.body().string();
                 parseMaskInfo(jsonBody);
             }
@@ -118,7 +120,7 @@ public class GetMaskJsonController implements ClientUtil, CommandLineRunner {
                                                       .build();
             medList.add(medicineStore);
         }
-        log.info("{} 藥局List物件 {}",LOG_PREFIX,medList);
+//        log.info("{} 藥局List物件 {}",LOG_PREFIX,medList);
         medicineStoreRedisTemplate.opsForList().leftPushAll(REDIS_KEY,medList);
     }
 
@@ -130,9 +132,9 @@ public class GetMaskJsonController implements ClientUtil, CommandLineRunner {
     @Scheduled(fixedRate = 1*TimeUnit.HOUR)
     private void scheduledSaving () throws Exception {
         List<MedicineStore> medList = medicineStoreRedisTemplate.opsForList().range(REDIS_KEY, 0, -1);
-        log.info("{} 從redis 取出所有藥局 {}",LOG_PREFIX,medList);
+//        log.info("{} 從redis 取出所有藥局 {}",LOG_PREFIX,medList);
         List<MedicineStore> response = medicinetoreService.saveAll(medList);
-        log.info("{} 儲存DB後的response物件 {}",LOG_PREFIX,response);
+//        log.info("{} 儲存DB後的response物件 {}",LOG_PREFIX,response);
         if (response==null) {
             throw new LineBotException(LineBotExceptionCode.FAIL_ON_SAVING_RESPONSE);
         }

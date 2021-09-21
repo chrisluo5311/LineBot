@@ -10,4 +10,6 @@ public interface ConfirmCaseService {
 
 	ConfirmCase findByConfirmTime(LocalDate localDate);
 
+	ConfirmCase update(ConfirmCase fcase);
+
 }

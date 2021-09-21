@@ -74,7 +74,10 @@ public class BaseMessageHandler implements LineMessageClientInterface {
         log.info("{} event data: {}",LOG_PREFIX,data);
         switch (data){
             case "1" :
-                handleTodayAmount.handleTodayAmountMessageRely(message,replyToken);
+                TextMessage todayTextMessage = handleTodayAmount.handleTodayAmountMessageReply(message);
+                Method todayMethod = HandleTodayAmountMessage.class.getDeclaredMethod("handleTodayAmountMessageReply",StringBuilder.class);
+                QuickReply todayQuickReply = getQuickReplyMode(todayMethod);
+                this.reply(replyToken,todayTextMessage.toBuilder().quickReply(todayQuickReply).build());
                 break;
             case "2" :
                 TextMessage textMessage =LocationReply.openMap();
@@ -93,8 +96,10 @@ public class BaseMessageHandler implements LineMessageClientInterface {
                 handleOtherMessage.handleOtherMessageReply(message,replyToken);
                 break;
             case "next5":
-                log.info("進入下五間");
-                LocationReply.postbackEventUserDefined(replyToken);
+                LocationReply.postbackEventLocation(replyToken);
+                break;
+            case "昨日確診數" :
+                handleTodayAmount.postbackEventTodayAmount(replyToken,new StringBuilder());
                 break;
             default:
                 param.put(replyToken,data);
@@ -241,7 +246,6 @@ public class BaseMessageHandler implements LineMessageClientInterface {
         } else if (ActionMode.MESSAGE.equals(quickReplyMode.mode())) {
             //TODO MESSAGE Action 尚未實作
         }
-
         return null;
     }
 
