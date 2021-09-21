@@ -7,15 +7,22 @@
 |  JDK  | 11.0.10   | Spring boot对低版支持无测试过 |
 |  Redis  | 5.0.10   | 低版支持无测试过  |
 |  MS SQLServer  | MS SQLServer2019  | 低版支持无测试过 |
+
 ### 定时任务说明
+
+|  功能  |  任務說明  |
+|:------:|:--------:|
+|  查詢今日確診數   | `cron`表示式: `0 0/5 14 * * ?`(每天14:00開始到14:55，每五分鐘執行一次)  |
+|  查詢藥局口罩剩餘數目   | `cron`表示式: `0 0 0/1 * * ?`(每小時執行一次)  |
+|  定時新增藥局資訊至資料庫   | @Scheduled(fixedRate = 1*TimeUnit.HOUR)(每小時執行一次)<br>使用自定義hibernate.jdbc.batch_size=1000。<br>Batch Size是設定對資料庫進行批量刪除，批量更新和批量插入的時候的批次大小 |
 
 ### 目錄內容 
 1. 功能表、負責人、狀態、使用技術 
 
 |  功能  |    負責人    | 狀態 | 主要技術 | 內容說明 |
 |:------:|:----------:|:------------:|:------------:| :----------:|
-|  查詢今日確診數  |  chris  | `完成` | okhttp、jsoup | SpringBoot Scheduling定時爬蟲，`cron`表示式: `0 0/5 14 * * ?`(每天14:00開始到14:55，每五分鐘執行一次)  |
-|  哪裡買口罩  |  chris  | `尚未開始` | leaflet |           |
+|  查詢今日確診數  |  chris  | `完成` | okhttp、jsoup | 解析新聞稿並擷取出新增確診人數、校正回歸數、及死亡數  |
+|  哪裡買口罩  |  chris  | `完成` | okhttp、jsoup | 發送請求至 [口罩即時查](https://wenyo.github.io/maskmap/ "口罩即時查") 後台的Request URL，返回含經緯度的藥局資訊，解析後發送LocationMessage給使用者   |
 |  所處位置疫情狀況  |  chris  |  `尚未開始` | leaflet |           |
 |  國內外疫情  |  chris  |  `尚未開始`  | okhttp、jsoup |           |
 |  疫苗施打統計圖  |  chris  |  `尚未開始`  | okhttp、jsoup |            |
