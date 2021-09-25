@@ -2,23 +2,29 @@ package com.infotran.springboot.linebot.service;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.infotran.springboot.annotation.MultiQuickReply;
 import com.infotran.springboot.annotation.QuickReplyMode;
 import com.infotran.springboot.annotation.quickreplyenum.ActionMode;
 import com.infotran.springboot.confirmcase.service.ConfirmCaseService;
 import com.infotran.springboot.linebot.service.messagehandler.HandleLocationMessage;
 import com.infotran.springboot.linebot.service.messagehandler.HandleOtherMessage;
-import com.infotran.springboot.linebot.service.messagehandler.HandleTestReplyMessage;
+import com.infotran.springboot.linebot.service.messagehandler.HandleTextMessage;
 import com.infotran.springboot.linebot.service.messagehandler.HandleTodayAmountMessage;
 import com.infotran.springboot.medicinestore.service.MedicineStoreService;
 import com.linecorp.bot.model.ReplyMessage;
-import com.linecorp.bot.model.action.*;
+import com.linecorp.bot.model.action.LocationAction;
+import com.linecorp.bot.model.action.MessageAction;
+import com.linecorp.bot.model.action.PostbackAction;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
 import com.linecorp.bot.model.event.message.MessageContent;
 import com.linecorp.bot.model.event.message.StickerMessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
-import com.linecorp.bot.model.message.*;
+import com.linecorp.bot.model.message.LocationMessage;
+import com.linecorp.bot.model.message.Message;
+import com.linecorp.bot.model.message.StickerMessage;
+import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.message.quickreply.QuickReply;
 import com.linecorp.bot.model.message.quickreply.QuickReplyItem;
 import com.linecorp.bot.model.response.BotApiResponse;
@@ -36,7 +42,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class BaseMessageHandler implements LineMessageClientInterface {
+public abstract class BaseMessageHandler implements BaseMessageInterface,LineClientInterface {
 
     private static String LOG_PREFIX = "BaseMessageHandler";
 
@@ -53,7 +59,7 @@ public class BaseMessageHandler implements LineMessageClientInterface {
     private HandleLocationMessage LocationReply;
 
     @Resource
-    private HandleTestReplyMessage testReplyMessageHandler;
+    private HandleTextMessage testReplyMessageHandler;
 
     @Resource
     private HandleTodayAmountMessage handleTodayAmount;
@@ -61,11 +67,40 @@ public class BaseMessageHandler implements LineMessageClientInterface {
     @Resource
     private HandleOtherMessage handleOtherMessage;
 
+
+    @Override
+    public boolean canSupport(String className) {
+        return getClassName().equals(className);
+    }
+
     /**
-     *  PostbackEvent分配器<br>
-     *  根據PostbackEvent的data參數不同執行相對應的方法
-     *  @return Map
+     * 處理文字訊息<br>
+     * 可搭配使用的annotation : {@link QuickReplyMode}
+     *
+     * @param event MessageEvent
+     * @return
+     *
      * */
+    protected abstract List<TextMessage> textMessageReply(TextMessageContent event,String replyToken);
+
+    /**
+     * 處理文字訊息<br>
+     * 可搭配使用的annotation : {@link QuickReplyMode}
+     *
+     * @param event PostbackEvent
+     * @return
+     *
+     * */
+    protected abstract List<TextMessage> textMessageReply(PostbackEvent event);
+
+    /**
+     * 處理使用者回傳的現在位置
+     *
+     * @param event  MessageEvent
+     */
+    protected abstract <T extends MessageContent> List<LocationMessage> handleLocationMessageReply(LocationMessageContent event);
+
+    @Override
     public Map<String,String> postBackReply(PostbackEvent event) throws IOException, NoSuchMethodException {
         Map<String,String> param = new HashMap<>();
         String replyToken = event.getReplyToken();
@@ -73,33 +108,13 @@ public class BaseMessageHandler implements LineMessageClientInterface {
         StringBuilder message = new StringBuilder();
         log.info("{} event data: {}",LOG_PREFIX,data);
         switch (data){
-            case "1" :
-                TextMessage todayTextMessage = handleTodayAmount.handleTodayAmountMessageReply(message);
-                Method todayMethod = HandleTodayAmountMessage.class.getDeclaredMethod("handleTodayAmountMessageReply",StringBuilder.class);
-                QuickReply todayQuickReply = getQuickReplyMode(todayMethod);
-                this.reply(replyToken,todayTextMessage.toBuilder().quickReply(todayQuickReply).build());
-                break;
-            case "2" :
-                TextMessage textMessage =LocationReply.openMap();
-                Method method = HandleLocationMessage.class.getDeclaredMethod("openMap");
-                QuickReply quickReply = getQuickReplyMode(method);
-                TextMessage newTextMessage = textMessage.toBuilder().quickReply(quickReply).build();
-                this.reply(replyToken,newTextMessage);
-                break;
-            case "3" :
-                break;
             case "4" :
                 break;
             case "5" :
                 break;
             case "6" :
-                handleOtherMessage.handleOtherMessageReply(message,replyToken);
-                break;
-            case "next5":
-                LocationReply.postbackEventLocation(replyToken);
-                break;
-            case "昨日確診數" :
-                handleTodayAmount.postbackEventTodayAmount(replyToken,new StringBuilder());
+                List<Message> textList = textMessageReply(event).stream().collect(Collectors.toList());
+                this.reply(replyToken,textList);
                 break;
             default:
                 param.put(replyToken,data);
@@ -110,34 +125,34 @@ public class BaseMessageHandler implements LineMessageClientInterface {
     }
 
     /**
-     *  MessageEvent分配器<br>
-     *  根據傳送訊息調用不同物件執行相對應的方法
-     *  @return BotApiResponse 響應物件
+     * 回覆順序: 處理文字訊息(可null) -> 功能訊息(確診數目、藥局地址、統計圖、貼圖...等等)
+     *
      * */
+    @Override
     public final <T extends MessageContent> BotApiResponse handleMessageEvent(MessageEvent<T> event) throws Exception{
         BotApiResponse botApiResponse = null;
+        List<Message> replyMessageList = new ArrayList<>();
         //replyToken
         String replyToken = event.getReplyToken();
-        if (event.getMessage() instanceof TextMessageContent){
-            //測試類
-            String receivedMessage = ((TextMessageContent) event.getMessage()).getText();
-            testReplyMessageHandler.testTextMessageReply(replyToken,receivedMessage);
+        if(event.getMessage() instanceof TextMessageContent){
+            //1. 處理文字(可null)
+            List<TextMessage> textMessageList = textMessageReply((TextMessageContent)event.getMessage(),replyToken);
+            if (Objects.nonNull(textMessageList)){
+                Method textMethod = this.getClass().getDeclaredMethod("textMessageReply",TextMessageContent.class,String.class);
+                botApiResponse =execute(textMethod,textMessageList,replyToken);
+            }
         } else if (event.getMessage() instanceof LocationMessageContent) {
-            //收到使用者傳送地圖
-            Double lat1 = ((LocationMessageContent) event.getMessage()).getLatitude();
-            Double long1 = ((LocationMessageContent) event.getMessage()).getLongitude();
-            List<LocationMessage> locationMessage = LocationReply.handleLocationMessageReply(lat1,long1);
-            Method handleLocationMethod = HandleLocationMessage.class.getDeclaredMethod("handleLocationMessageReply",Double.class, Double.class);
-            //如果有@QuickReply自動產生QuickReply物件
-            QuickReply quickReply = getQuickReplyMode(handleLocationMethod);
-            List<Message> messageList = locationMessage.stream().map(x -> x.toBuilder().quickReply(quickReply).build()).map(Message.class::cast).collect(Collectors.toList());
-            this.reply(replyToken,messageList);
-        } else if (event.getMessage() instanceof StickerMessageContent) {
-            StickerMessageContent stickerMessageContent = (StickerMessageContent) event.getMessage();
-            handleSticker(replyToken,stickerMessageContent);
+            //2. 功能訊息-(處理使用者地址並回傳藥局資訊/可null)
+            List<LocationMessage> locationMessageList = handleLocationMessageReply((LocationMessageContent) event.getMessage());
+            if(Objects.nonNull(locationMessageList)){
+                Method locationMethod = this.getClass().getDeclaredMethod("handleLocationMessageReply",MessageEvent.class);
+                botApiResponse = execute(locationMethod,locationMessageList,replyToken);
+            }
+        } else if (event.getMessage() instanceof  StickerMessageContent) {
+            //處理貼圖(如果是官方貼圖，預設回覆一樣)
+            handleSticker(replyToken, (StickerMessageContent) event.getMessage());
         }
-
-
+        log.info("{} 回覆物件botApiResponse: {}",LOG_PREFIX,botApiResponse);
         return botApiResponse;
     }
 
@@ -154,6 +169,38 @@ public class BaseMessageHandler implements LineMessageClientInterface {
                 content.getPackageId(), content.getStickerId())
         );
     };
+
+    /**
+     * 解析@QuickReply並合併回Message集合後回覆<br>
+     * @param method
+     * @param messageList
+     * @param replyToken
+     * @return BotApiResponse
+     *
+     * */
+    private <T extends Message> BotApiResponse execute(Method method,List<T> messageList,String replyToken){
+        if(messageList.stream().allMatch(TextMessage.class::isInstance)) {
+            List<TextMessage> textMessageList = (List<TextMessage>) messageList;
+            //如果有@QuickReply自動產生QuickReply物件
+            QuickReply quickReply = getQuickReplyMode(method);
+            List<Message> messages = textMessageList.stream()
+                    .map(x -> x.toBuilder().quickReply(quickReply).build())
+                    .map(Message.class::cast)
+                    .collect(Collectors.toList());
+            return this.reply(replyToken,messages);
+        } else if (messageList.stream().allMatch(LocationMessage.class::isInstance)){
+            List<LocationMessage> locationMessageList = (List<LocationMessage>) messageList;
+            //如果有@QuickReply自動產生QuickReply物件
+            QuickReply quickReply = getQuickReplyMode(method);
+            List<Message> messages = locationMessageList.stream()
+                    .map(x -> x.toBuilder().quickReply(quickReply).build())
+                    .map(Message.class::cast)
+                    .collect(Collectors.toList());
+            return this.reply(replyToken,messages);
+        }
+        return null;
+    }
+
 
     /**
      * 回應訊息(replyToken,Message物件)<br>
@@ -215,39 +262,59 @@ public class BaseMessageHandler implements LineMessageClientInterface {
      *  @param method Method
      *  @return QuickReply
      * */
-    public QuickReply getQuickReplyMode(Method method) {
-        QuickReplyMode quickReplyMode = method.getAnnotation(QuickReplyMode.class);
-        if (quickReplyMode == null) {
-            //不使用sign要自己寫QuickReply
-            return null;
+    private QuickReply getQuickReplyMode(Method method) {
+        MultiQuickReply multiQuickReply = method.getAnnotation(MultiQuickReply.class);
+        if (Objects.isNull(multiQuickReply)){//單一
+            QuickReplyMode quickReplyMode = method.getAnnotation(QuickReplyMode.class);
+            if (Objects.isNull(quickReplyMode)) {
+                //不使用sign要自己寫QuickReply
+                return null;
+            }
+            QuickReplyItem quickReplyItem = getQuickReply(quickReplyMode);
+            log.info("{} QuickReplyItem物件: {}",LOG_PREFIX,quickReplyItem);
+            return QuickReply.builder().item(quickReplyItem).build();
+        } else { //多個
+            List<QuickReplyItem> quickReplyItemList = new ArrayList<>();
+            for (QuickReplyMode quickReplyMode1 : multiQuickReply.value()){
+                QuickReplyItem item = getQuickReply(quickReplyMode1);
+                log.info("{} 多重註解裡的@QuickReplyMode {}",LOG_PREFIX,item);
+                quickReplyItemList.add(item);
+            }
+            return QuickReply.builder().items(quickReplyItemList).build();
         }
+    }
+
+
+    private QuickReplyItem getQuickReply(QuickReplyMode quickReplyMode){
+        ActionMode mode = quickReplyMode.mode();
         String label = quickReplyMode.label();
         String data = quickReplyMode.data();
         String displayText = quickReplyMode.displayText();
-        log.info("getQuickReplyMode ==> label: {} data: {} displaytext: {}",label,data,displayText);
-        if (ActionMode.POSTBACK.equals(quickReplyMode.mode())){
-            List<QuickReplyItem> items = Arrays.<QuickReplyItem>asList(
-                    QuickReplyItem.builder()
-                            .action(PostbackAction.builder()
-                                    .label(label)
-                                    .data(data)
-                                    .displayText(displayText)
-                                    .build())
-                            .build()
-            );
-            return QuickReply.items(items);
-        } else if (ActionMode.LOCATION.equals(quickReplyMode.mode())) {
-            List<QuickReplyItem> items = Arrays.<QuickReplyItem>asList(
-                    QuickReplyItem.builder()
-                            .action(LocationAction.withLabel(label))
-                            .build()
-            );
-            return QuickReply.items(items);
-        } else if (ActionMode.MESSAGE.equals(quickReplyMode.mode())) {
-            //TODO MESSAGE Action 尚未實作
+        String text = quickReplyMode.text();
+        log.info("{} @QuickReplyMode註解裡的參數 mode: {}, label: {}, data: {}, displayText: {},text: {}",LOG_PREFIX,mode,label,data,displayText,text);
+        //回傳QuickReplyItem陣列
+        switch (mode){
+            case POSTBACK:
+                QuickReplyItem item =QuickReplyItem.builder()
+                        .action(PostbackAction.builder()
+                                .label(label)
+                                .data(data)
+                                .displayText(displayText)
+                                .build())
+                        .build();
+                return item;
+            case LOCATION:
+                QuickReplyItem item2 = QuickReplyItem.builder()
+                        .action(LocationAction.withLabel(label))
+                        .build();
+                return item2;
+            case MESSAGE:
+                QuickReplyItem item3 = QuickReplyItem.builder()
+                        .action(new MessageAction(label,text))
+                        .build();
+                return item3;
         }
         return null;
     }
-
 
 }

@@ -1,16 +1,16 @@
 package com.infotran.springboot.linebot.controller;
 
 import com.infotran.springboot.linebot.service.BaseMessageHandler;
+import com.linecorp.bot.model.event.MessageEvent;
+import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
+import com.linecorp.bot.model.event.message.MessageContent;
+import com.linecorp.bot.model.event.message.StickerMessageContent;
+import com.linecorp.bot.spring.boot.annotation.EventMapping;
+import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import com.linecorp.bot.model.event.MessageEvent;
-import com.linecorp.bot.model.event.PostbackEvent;
-import com.linecorp.bot.model.event.message.StickerMessageContent;
-import com.linecorp.bot.model.event.message.TextMessageContent;
-import com.linecorp.bot.spring.boot.annotation.EventMapping;
-import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 
 import javax.annotation.Resource;
 
@@ -42,6 +42,7 @@ public class EchoApplication {
      * */
     @EventMapping
     public void handleLocationMessageEvent(MessageEvent<LocationMessageContent> event) throws Exception {
+        log.info("LocationMessageContent 地址資訊event物件: {}",event.toString());
         baseMessageHandler.handleMessageEvent(event);
     }
 
@@ -50,7 +51,7 @@ public class EchoApplication {
      * @param event MessageEvent<TextMessageContent>
      * */
     @EventMapping
-    public void handleTextMessageEvent(MessageEvent<TextMessageContent> event) throws Exception {
+    public <T extends MessageContent> void handleTextMessageEvent(MessageEvent<T> event) throws Exception {
         baseMessageHandler.handleMessageEvent(event);
     }
 

@@ -1,6 +1,7 @@
 package com.infotran.springboot.annotation;
 
 import com.infotran.springboot.annotation.quickreplyenum.ActionMode;
+import org.springframework.scheduling.annotation.Schedules;
 
 import java.lang.annotation.*;
 
@@ -12,7 +13,7 @@ import java.lang.annotation.*;
  * */
 @Target({ElementType.TYPE,ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-@Documented
+@Repeatable(MultiQuickReply.class)
 public @interface QuickReplyMode {
 
     /**
@@ -45,7 +46,6 @@ public @interface QuickReplyMode {
      *  @return
      * */
     String text() default "";
-
 
 
 }
