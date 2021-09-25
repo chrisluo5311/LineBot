@@ -1,13 +1,15 @@
 package com.infotran.springboot.confirmcase.controller;
 
-import java.io.IOException;
-import java.time.LocalDate;
-import java.util.Map;
-
+import com.infotran.springboot.confirmcase.model.ConfirmCase;
+import com.infotran.springboot.confirmcase.service.ConfirmCaseService;
 import com.infotran.springboot.util.ClientUtil;
-import com.infotran.springboot.util.TimeUtil;
 import com.infotran.springboot.util.SSLHelper;
-import com.infotran.springboot.annotation.LogInfo;
+import com.infotran.springboot.util.TimeUtil;
+import lombok.extern.slf4j.Slf4j;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -18,14 +20,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 
-import com.infotran.springboot.confirmcase.model.ConfirmCase;
-import com.infotran.springboot.confirmcase.service.ConfirmCaseService;
-
-import lombok.extern.slf4j.Slf4j;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Request;
-import okhttp3.Response;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.Map;
 
 @Controller
 @Slf4j
@@ -108,7 +105,6 @@ public class CrawlCovidNumbers implements ClientUtil, CommandLineRunner {
 	 * Parse the detailed news body
 	 * Save the confirmed numbers
 	 */
-	@LogInfo(warning = "每日確診文章用字可能會更改!!!請定期檢查!!!")
 	private void parseBody(String detailedURL) {
 		try {
 			Document doc = SSLHelper.getConnection(detailedURL).timeout(3000).maxBodySize(0).get();
