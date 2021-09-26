@@ -167,7 +167,7 @@ public abstract class BaseMessageHandler implements BaseMessageInterface,LineCli
     };
 
     /**
-     * 解析@QuickReply並合併回Message集合後回覆<br>
+     * 解析@QuickReply、合併Message集合並調用reply回覆<br>
      * @param method
      * @param messageList
      * @param replyToken
@@ -178,7 +178,7 @@ public abstract class BaseMessageHandler implements BaseMessageInterface,LineCli
         if(messageList.stream().allMatch(TextMessage.class::isInstance)) {
             List<TextMessage> textMessageList = (List<TextMessage>) messageList;
             //如果有@QuickReply自動產生QuickReply物件
-            QuickReply quickReply = getQuickReplyMode(method);
+            QuickReply quickReply = getQuickReply(method);
             List<Message> messages = textMessageList.stream()
                     .map(x -> x.toBuilder().quickReply(quickReply).build())
                     .map(Message.class::cast)
@@ -187,7 +187,7 @@ public abstract class BaseMessageHandler implements BaseMessageInterface,LineCli
         } else if (messageList.stream().allMatch(LocationMessage.class::isInstance)){
             List<LocationMessage> locationMessageList = (List<LocationMessage>) messageList;
             //如果有@QuickReply自動產生QuickReply物件
-            QuickReply quickReply = getQuickReplyMode(method);
+            QuickReply quickReply = getQuickReply(method);
             List<Message> messages = locationMessageList.stream()
                     .map(x -> x.toBuilder().quickReply(quickReply).build())
                     .map(Message.class::cast)
@@ -238,27 +238,30 @@ public abstract class BaseMessageHandler implements BaseMessageInterface,LineCli
     }
 
     /**
-     * 回應文字訊息(限998字)
+     * 回應文字訊息(小於1000字)
      * @param replyToken String
      * @param message String
      * */
-    protected void replyText(@NonNull String replyToken, @NonNull String message) {
+    protected BotApiResponse replyText(@NonNull String replyToken, @NonNull String message) {
         if (replyToken.isEmpty()) {
             throw new IllegalArgumentException("replyToken must not be empty");
         }
         if (message.length() > 1000) {
             message = message.substring(0, 1000 - 2) + "……";
         }
-        this.reply(replyToken, new TextMessage(message));
+        return this.reply(replyToken, new TextMessage(message));
     }
 
 
     /**
-     *  取得註解QuickReplyMode並建立QuickReply物件
+     *  先檢查是否有 @MultiQuickReply <br>
+     *  再取註解 QuickReplyMode 並建立一個或多個 QuickReplyItem <br>
+     *  最後回傳 QuickReply 物件
+     *
      *  @param method Method
      *  @return QuickReply
      * */
-    private QuickReply getQuickReplyMode(Method method) {
+    private QuickReply getQuickReply(Method method) {
         MultiQuickReply multiQuickReply = method.getAnnotation(MultiQuickReply.class);
         if (Objects.isNull(multiQuickReply)){//單一
             QuickReplyMode quickReplyMode = method.getAnnotation(QuickReplyMode.class);
@@ -288,7 +291,7 @@ public abstract class BaseMessageHandler implements BaseMessageInterface,LineCli
         String displayText = quickReplyMode.displayText();
         String text = quickReplyMode.text();
         log.info("{} @QuickReplyMode註解裡的參數 mode: {}, label: {}, data: {}, displayText: {},text: {}",LOG_PREFIX,mode,label,data,displayText,text);
-        //回傳QuickReplyItem陣列
+        //回傳QuickReplyItem
         switch (mode){
             case POSTBACK:
                 QuickReplyItem item =QuickReplyItem.builder()
