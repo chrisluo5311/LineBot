@@ -71,7 +71,7 @@ public class HandleLocationMessage extends BaseMessageHandler {
      */
     @MultiQuickReply(value = {
             @QuickReplyMode(mode=ActionMode.MESSAGE,label = "下五間",text = "下五間"),
-            @QuickReplyMode(mode=ActionMode.POSTBACK,label="重新整理",data="refreshfuntion2",displayText="重新整理")
+            @QuickReplyMode(mode=ActionMode.POSTBACK,label="重新定位",data="refreshfuntion2",displayText="重新定位")
     })
     @Override
     public List<LocationMessage> handleLocationMessageReply(LocationMessageContent event) {

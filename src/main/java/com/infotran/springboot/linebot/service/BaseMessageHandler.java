@@ -102,6 +102,9 @@ public abstract class BaseMessageHandler implements BaseMessageInterface,LineCli
                 List<Message> textList = textMessageReply(event).stream().collect(Collectors.toList());
                 botApiResponse = this.reply(replyToken,textList);
                 break;
+            case "refreshfuntion2":
+
+                break;
         }
         return botApiResponse;
     }
@@ -113,7 +116,6 @@ public abstract class BaseMessageHandler implements BaseMessageInterface,LineCli
     @Override
     public final <T extends MessageContent> BotApiResponse handleMessageEvent(MessageEvent<T> event) throws Exception{
         BotApiResponse botApiResponse = null;
-        List<Message> replyMessageList = new ArrayList<>();
         //replyToken
         String replyToken = event.getReplyToken();
         if(event.getMessage() instanceof TextMessageContent){
@@ -134,7 +136,6 @@ public abstract class BaseMessageHandler implements BaseMessageInterface,LineCli
             //處理貼圖(如果是官方貼圖，預設回覆一樣)
             handleSticker(replyToken, (StickerMessageContent) event.getMessage());
         }
-        log.info("{} 回覆物件botApiResponse: {}",LOG_PREFIX,botApiResponse);
         return botApiResponse;
     }
 
