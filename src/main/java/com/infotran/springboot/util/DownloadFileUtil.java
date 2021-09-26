@@ -128,8 +128,7 @@ public class DownloadFileUtil {
      *  @return URI
      * */
     public static URI file2URI(String path) {
-        if (path==null) return null;
-        return new File(path).toURI();
+        return (path==null)?null:new File(path).toURI();
     }
 
     /**
@@ -138,8 +137,7 @@ public class DownloadFileUtil {
      *  @return URI
      * */
     public static URI path2URI(String path){
-        if (path==null) return null;
-        return Paths.get(path).toUri();
+        return (path==null)?null:Paths.get(path).toUri();
     }
 
 
