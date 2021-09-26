@@ -1,28 +1,28 @@
 package com.infotran.springboot.exception;
 
-import com.infotran.springboot.exception.exceptionenum.LineBotExceptionCode;
+import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
 
 public class LineBotException extends Exception{
 
-    private LineBotExceptionCode lineBotExceptionCodeCode;
+    private LineBotExceptionEnums lineBotExceptionCodeCode;
 
-    public LineBotException(LineBotExceptionCode lineBotExceptionCodeCode, Object message, Throwable cause){
+    public LineBotException(LineBotExceptionEnums lineBotExceptionCodeCode, Object message, Throwable cause){
         super(lineBotExceptionCodeCode.getStatus() + "->" + message,cause);
         this.lineBotExceptionCodeCode = lineBotExceptionCodeCode;
     }
 
-    public LineBotException(LineBotExceptionCode lineBotExceptionCodeCode, Object message){
+    public LineBotException(LineBotExceptionEnums lineBotExceptionCodeCode, Object message){
         super(lineBotExceptionCodeCode.getStatus() + "->" + message);
         this.lineBotExceptionCodeCode = lineBotExceptionCodeCode;
     }
 
 
-    public LineBotException(LineBotExceptionCode lineBotExceptionCodeCode){
+    public LineBotException(LineBotExceptionEnums lineBotExceptionCodeCode){
         super(lineBotExceptionCodeCode.getStatus());
         this.lineBotExceptionCodeCode = lineBotExceptionCodeCode;
     }
 
-    public LineBotExceptionCode getWebCrawlerCode(){
+    public LineBotExceptionEnums getWebCrawlerCode(){
         return this.lineBotExceptionCodeCode;
     }
 }

@@ -1,27 +1,22 @@
 package com.infotran.springboot.linebot.controller;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-
 import com.infotran.springboot.linebot.model.MenuID;
 import com.infotran.springboot.linebot.service.LineClientInterface;
 import com.infotran.springboot.linebot.service.MenuIdService;
 import com.linecorp.bot.model.action.LocationAction;
 import com.linecorp.bot.model.action.MessageAction;
+import com.linecorp.bot.model.action.PostbackAction;
+import com.linecorp.bot.model.response.BotApiResponse;
 import com.linecorp.bot.model.richmenu.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import com.linecorp.bot.model.action.PostbackAction;
-import com.linecorp.bot.model.response.BotApiResponse;
 import org.springframework.core.annotation.Order;
 
 import javax.annotation.Resource;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @SpringBootApplication
 @Order(1)
@@ -77,21 +72,25 @@ public class CreateRichMenu implements LineClientInterface, CommandLineRunner {
 	
 	private  List<RichMenuArea> createRichMenuArea(){
 		List<RichMenuArea> area = new ArrayList<>();
-//		PostbackAction action01 = PostbackAction.builder().label("今日確診").data("1").displayText("今日確診").build();
+		//action01
 		MessageAction messageAction = new MessageAction("今日確診","查詢今日確診");
 		RichMenuArea todayNum = new RichMenuArea(new RichMenuBounds(0, 0, 836, 846),messageAction);
-//		PostbackAction action02 = PostbackAction.builder().label("買口罩").data("2").displayText("買口罩").build();
+		//action2
 		LocationAction action02=  LocationAction.builder().label("查看所在位置口罩剩餘狀態").build();
 		RichMenuArea BuyMask = new RichMenuArea(new RichMenuBounds(833, 2, 836, 844),action02);
-//		PostbackAction action03 = PostbackAction.builder().label("位置狀況").data("3").displayText("位置狀況").build();
+		//action3
 		LocationAction action03=  LocationAction.builder().label("查看所在位置與確診足跡").build();
 		RichMenuArea locationStatus = new RichMenuArea(new RichMenuBounds(1666, 3, 834, 843),action03);
-		PostbackAction action04 = PostbackAction.builder().label("國內外疫情").data("4").displayText("國內外疫情").build();
+		//action4
+		PostbackAction action04 = PostbackAction.builder().label("國內外疫情").data("國內外疫情").displayText("國內外疫情").build();
 		RichMenuArea globalStatus = new RichMenuArea(new RichMenuBounds(0, 846, 835, 840),action04);
-		PostbackAction action05 = PostbackAction.builder().label("施打疫苗統計").data("5").displayText("施打疫苗統計").build();
+		//action5
+		PostbackAction action05 = PostbackAction.builder().label("施打疫苗統計").data("施打疫苗統計").displayText("施打疫苗統計").build();
 		RichMenuArea vaccineReport = new RichMenuArea(new RichMenuBounds(833, 846, 833, 840),action05);
-		PostbackAction action06 = PostbackAction.builder().label("其他").data("6").displayText("其他").build();
+		//action6
+		PostbackAction action06 = PostbackAction.builder().label("其他").data("其他").displayText("其他").build();
 		RichMenuArea others = new RichMenuArea(new RichMenuBounds(1663, 843, 835, 843),action06);
+
 		area.add(todayNum);
 		area.add(BuyMask);
 		area.add(locationStatus);

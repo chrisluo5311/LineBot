@@ -74,7 +74,7 @@ public abstract class BaseMessageHandler implements BaseMessageInterface,LineCli
     }
 
     /**
-     * 處理文字訊息<br>
+     * 處理TextMessageContent文字訊息<br>
      * 可搭配使用的annotation : {@link QuickReplyMode}
      *
      * @param event MessageEvent
@@ -84,7 +84,7 @@ public abstract class BaseMessageHandler implements BaseMessageInterface,LineCli
     protected abstract List<TextMessage> textMessageReply(TextMessageContent event,String replyToken);
 
     /**
-     * 處理文字訊息<br>
+     * 處理PostbackEvent文字訊息<br>
      * 可搭配使用的annotation : {@link QuickReplyMode}
      *
      * @param event PostbackEvent
@@ -101,27 +101,23 @@ public abstract class BaseMessageHandler implements BaseMessageInterface,LineCli
     protected abstract <T extends MessageContent> List<LocationMessage> handleLocationMessageReply(LocationMessageContent event);
 
     @Override
-    public Map<String,String> postBackReply(PostbackEvent event) throws IOException, NoSuchMethodException {
-        Map<String,String> param = new HashMap<>();
+    public BotApiResponse postBackReply(PostbackEvent event) throws IOException, NoSuchMethodException {
+        BotApiResponse botApiResponse = null;
         String replyToken = event.getReplyToken();
         String data = event.getPostbackContent().getData();
         StringBuilder message = new StringBuilder();
         log.info("{} event data: {}",LOG_PREFIX,data);
         switch (data){
-            case "4" :
+            case "國內外疫情" :
                 break;
-            case "5" :
+            case "施打疫苗統計" :
                 break;
-            case "6" :
+            case "其他" :
                 List<Message> textList = textMessageReply(event).stream().collect(Collectors.toList());
-                this.reply(replyToken,textList);
+                botApiResponse = this.reply(replyToken,textList);
                 break;
-            default:
-                param.put(replyToken,data);
-                log.info("PostBack event in default -> {}",param);
-                return param;
         }
-        return param;
+        return botApiResponse;
     }
 
     /**
