@@ -1,11 +1,14 @@
 package com.infotran.springboot.linebot.controller;
 
-import com.infotran.springboot.linebot.service.BaseMessageHandler;
+import com.infotran.springboot.linebot.service.BaseMessageInterface;
+import com.infotran.springboot.linebot.service.BaseMessagePool;
+import com.infotran.springboot.linebot.service.messagehandler.enums.HandlerEnum;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
 import com.linecorp.bot.model.event.message.MessageContent;
-import com.linecorp.bot.model.event.message.StickerMessageContent;
+import com.linecorp.bot.model.event.message.TextMessageContent;
+import com.linecorp.bot.model.response.BotApiResponse;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -23,9 +26,12 @@ public class EchoApplication {
         SpringApplication.run(EchoApplication.class, args);
     }
 
-    @Resource
-    BaseMessageHandler baseMessageHandler;
+    private static final String LOG_PREFIX = "EchoApplication";
 
+    @Resource
+    BaseMessagePool baseMessagePool;
+
+    BaseMessageInterface baseMessageInterface = null;
 
     /**
      * 處理目錄
@@ -33,36 +39,49 @@ public class EchoApplication {
      * */
     @EventMapping
     public void handlePostBackEvent(PostbackEvent event) throws Exception {
-        baseMessageHandler.postBackReply(event);
+        String data = event.getPostbackContent().getData();
+        switch (data){
+            case "國內外疫情":
+                break;
+            case "施打疫苗統計":
+                break;
+            case "其他":
+                baseMessageInterface = baseMessagePool.getMethod(HandlerEnum.getHandlerName(6));
+        }
+        BotApiResponse botApiResponse = baseMessageInterface.postBackReply(event);
+        log.info("{} 處理PostbackEvent方法 回傳物件: {}",LOG_PREFIX,botApiResponse);
     }
 
-    /**
-     * 處理使用者位置
-     * @param event MessageEvent<LocationMessageContent>
-     * */
-    @EventMapping
-    public void handleLocationMessageEvent(MessageEvent<LocationMessageContent> event) throws Exception {
-        log.info("LocationMessageContent 地址資訊event物件: {}",event.toString());
-        baseMessageHandler.handleMessageEvent(event);
-    }
 
     /**
-     * 測試-接收使用者文字訊息
-     * @param event MessageEvent<TextMessageContent>
+     * 處理MessageEvent
+     * @param event MessageEvent<T>
      * */
     @EventMapping
-    public <T extends MessageContent> void handleTextMessageEvent(MessageEvent<T> event) throws Exception {
-        baseMessageHandler.handleMessageEvent(event);
+    public <T extends MessageContent> void handleMessageEvent(MessageEvent<T> event) throws Exception {
+        if (event.getMessage() instanceof TextMessageContent) {
+            String text =((TextMessageContent) event.getMessage()).getText();
+            switch (text){
+                case "查詢今日確診":
+                case "昨日確診數":
+                    baseMessageInterface = baseMessagePool.getMethod(HandlerEnum.getHandlerName(1));
+                    break;
+                case "下五間":
+                    baseMessageInterface = baseMessagePool.getMethod(HandlerEnum.getHandlerName(2));
+                    break;
+                default:
+                    //測試
+                    baseMessageInterface = baseMessagePool.getMethod(HandlerEnum.getHandlerName(0));
+                    break;
+            }
+        } else if (event.getMessage() instanceof LocationMessageContent){
+            baseMessageInterface = baseMessagePool.getMethod(HandlerEnum.getHandlerName(2));
+        }
+
+        BotApiResponse botApiResponse = baseMessageInterface.handleMessageEvent(event);
+        log.info("{} handleMessageEvent方法 BotApiResponse回傳物件: {}",LOG_PREFIX,botApiResponse);
     }
 
-    /**
-     * 測試-接收使用者貼圖訊息
-     * @param event MessageEvent<StickerMessageContent>
-     * */
-    @EventMapping
-    public void handleStickerMessageEvent(MessageEvent<StickerMessageContent> event) throws Exception {
-        baseMessageHandler.handleMessageEvent(event);
-    }
 
 
 }

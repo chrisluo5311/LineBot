@@ -4,7 +4,7 @@ package com.infotran.springboot.exception.exceptionenum;
 * 爬蟲狀態
 *
 * */
-public enum LineBotExceptionCode {
+public enum LineBotExceptionEnums {
 
     SUCCESS("000","爬蟲成功"),
 
@@ -16,15 +16,15 @@ public enum LineBotExceptionCode {
 
     NEWS_KEYWORD_CHANGE("C01","新聞關鍵字改變"),
 
-    FAIL_ON_SAVING_RESPONSE("D01","資料庫儲存失敗");
+    FAIL_ON_SAVING_RESPONSE("D01","資料庫儲存失敗"),
 
-
+    FAIL_ON_IMPLEMENT_GETCLASSNAME("E01","實現類未實作getClassName()方法");
 
     private String code;
     private String status;
 
 
-    LineBotExceptionCode(String code, String status) {
+    LineBotExceptionEnums(String code, String status) {
         this.code = code;
         this.status = status;
     }

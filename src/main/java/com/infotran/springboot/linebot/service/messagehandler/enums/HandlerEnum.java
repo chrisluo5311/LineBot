@@ -5,8 +5,6 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Getter
@@ -14,7 +12,7 @@ import java.util.stream.Stream;
 public enum HandlerEnum {
 
     //新增功能類別要對應功能enum
-    HANDLE_TEXT_MESSAGE(0,"處理文字"),
+    HANDLE_TEXT_MESSAGE(0,"處理測試文字"),
     HANDLE_TODAYAMOUNT_MESSAGE(1,"處理今日確診數"),
     HANDLE_LOCATION_MESSAGE(2,"處理藥局地點"),
     HANDLE_OTHER_MESSAGE(6,"處理其他");

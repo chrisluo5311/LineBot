@@ -1,6 +1,6 @@
 package com.infotran.springboot.medicinestore.controller;
 
-import com.infotran.springboot.exception.exceptionenum.LineBotExceptionCode;
+import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
 import com.infotran.springboot.exception.LineBotException;
 import com.infotran.springboot.util.ClientUtil;
 import com.infotran.springboot.medicinestore.model.MedicineStore;
@@ -136,7 +136,7 @@ public class GetMaskJsonController implements ClientUtil, CommandLineRunner {
         List<MedicineStore> response = medicinetoreService.saveAll(medList);
 //        log.info("{} 儲存DB後的response物件 {}",LOG_PREFIX,response);
         if (response==null) {
-            throw new LineBotException(LineBotExceptionCode.FAIL_ON_SAVING_RESPONSE);
+            throw new LineBotException(LineBotExceptionEnums.FAIL_ON_SAVING_RESPONSE);
         }
     }
 
