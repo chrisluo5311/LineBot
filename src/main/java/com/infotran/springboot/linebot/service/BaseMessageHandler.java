@@ -6,10 +6,6 @@ import com.infotran.springboot.annotation.MultiQuickReply;
 import com.infotran.springboot.annotation.QuickReplyMode;
 import com.infotran.springboot.annotation.quickreplyenum.ActionMode;
 import com.infotran.springboot.confirmcase.service.ConfirmCaseService;
-import com.infotran.springboot.linebot.service.messagehandler.HandleLocationMessage;
-import com.infotran.springboot.linebot.service.messagehandler.HandleOtherMessage;
-import com.infotran.springboot.linebot.service.messagehandler.HandleTextMessage;
-import com.infotran.springboot.linebot.service.messagehandler.HandleTodayAmountMessage;
 import com.infotran.springboot.medicinestore.service.MedicineStoreService;
 import com.linecorp.bot.model.ReplyMessage;
 import com.linecorp.bot.model.action.LocationAction;
@@ -35,7 +31,10 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
@@ -54,19 +53,6 @@ public abstract class BaseMessageHandler implements BaseMessageInterface,LineCli
 
     @Resource
     private ObjectMapper objectMapper;
-
-    @Resource
-    private HandleLocationMessage LocationReply;
-
-    @Resource
-    private HandleTextMessage testReplyMessageHandler;
-
-    @Resource
-    private HandleTodayAmountMessage handleTodayAmount;
-
-    @Resource
-    private HandleOtherMessage handleOtherMessage;
-
 
     @Override
     public boolean canSupport(String className) {
