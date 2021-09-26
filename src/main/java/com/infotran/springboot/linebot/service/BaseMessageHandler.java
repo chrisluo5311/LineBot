@@ -252,7 +252,7 @@ public abstract class BaseMessageHandler implements BaseMessageInterface,LineCli
         if (Objects.isNull(multiQuickReply)){//單一
             QuickReplyMode quickReplyMode = method.getAnnotation(QuickReplyMode.class);
             if (Objects.isNull(quickReplyMode)) {
-                //不使用sign要自己寫QuickReply
+                //不使用註解要自己寫QuickReply
                 return null;
             }
             QuickReplyItem quickReplyItem = getQuickReply(quickReplyMode);
