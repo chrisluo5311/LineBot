@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -24,7 +23,7 @@ public class BaseMessagePool implements InitializingBean, ApplicationContextAwar
 
     private List<String> methodList = new ArrayList<>();
 
-    private List<BaseMessageInterface> baseInterfaceList = new ArrayList<>();
+    private List<BaseMessageInterface> baseInterfaceList;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -34,7 +33,11 @@ public class BaseMessagePool implements InitializingBean, ApplicationContextAwar
     @Override
     public void afterPropertiesSet() throws Exception {
         methodList = HandlerEnum.getAllEnums();
-        baseInterfaceList = applicationContext.getBeansOfType(BaseMessageInterface.class).values().stream().collect(Collectors.toList());
+        log.info("HandlerEnum 全部名字: {}", methodList);
+        baseInterfaceList = new ArrayList<>(applicationContext.getBeansOfType(BaseMessageInterface.class).values());
+        for(BaseMessageInterface base : baseInterfaceList){
+            log.info("載入 Added BaseMessageInterface實現類: {}",base);
+        }
     }
 
     /**
@@ -51,6 +54,7 @@ public class BaseMessagePool implements InitializingBean, ApplicationContextAwar
         }
         throw new LineBotException(LineBotExceptionEnums.FAIL_ON_IMPLEMENT_GETCLASSNAME);
     }
+
 
 
 

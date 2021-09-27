@@ -42,6 +42,7 @@ public class GetMaskJsonController implements ClientUtil, CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        log.info("{} run方法",LOG_PREFIX);
         executeMaskCrawl();
         scheduledSaving();
     }

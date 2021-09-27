@@ -6,7 +6,6 @@ import com.infotran.springboot.linebot.service.messagehandler.enums.HandlerEnum;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
-import com.linecorp.bot.model.event.message.MessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
 import com.linecorp.bot.model.response.BotApiResponse;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
@@ -58,7 +57,8 @@ public class EchoApplication {
      * @param event MessageEvent<T>
      * */
     @EventMapping
-    public <T extends MessageContent> void handleMessageEvent(MessageEvent<T> event) throws Exception {
+    public void handleMessageEvent(MessageEvent event) throws Exception {
+        log.info("handleMessageEvent方法");
         if (event.getMessage() instanceof TextMessageContent) {
             String text =((TextMessageContent) event.getMessage()).getText();
             switch (text){

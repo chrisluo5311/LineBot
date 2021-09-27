@@ -57,7 +57,7 @@ public class HandleTodayAmountMessage extends BaseMessageHandler {
                         message.append("本日確診數量尚未公布。");
                         log.info("{} 本日新增不存在", LOG_PREFIX);
                     }
-                    textMessage.toBuilder().text(message.toString()).build();
+                    textMessage = new TextMessage(message.toString());
                     return Collections.singletonList(textMessage);
                 case "昨日確診數":
                     confirmCase = caseService.findByConfirmTime(LocalDate.now().minusDays(1));
@@ -69,7 +69,7 @@ public class HandleTodayAmountMessage extends BaseMessageHandler {
                         message.append("昨日資訊異常。");
                         log.warn("{} 昨日新增不存在", LOG_PREFIX);
                     }
-                    textMessage.toBuilder().text(message.toString()).build();
+                    textMessage = new TextMessage(message.toString());
                     return Collections.singletonList(textMessage);
             }
         return null;
