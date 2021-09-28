@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -35,8 +36,11 @@ public class HandleLocationMessage extends BaseMessageHandler {
 
     private static final String LOG_PREFIX = "HandleLocationMessageReply";
 
-    private static final String REDIS_KEY = "sortedLocationMessageList";
+    private static String REDIS_KEY = "sortedLocationMessageList";//須加上使用者id
 
+    //Reids Timeout
+    private static Integer TIMEOUT = 3;//3分鐘
+    
     @Resource
     RedisTemplate<Object, LocationMessage> locationMessageRedisTemplate;
 
@@ -46,13 +50,31 @@ public class HandleLocationMessage extends BaseMessageHandler {
     }
 
     @Override
-    protected  List<TextMessage> textMessageReply(TextMessageContent event,String replyToken) {
+    protected  List<TextMessage> textMessageReply(TextMessageContent event,String replyToken,String userId) {
+        REDIS_KEY += userId;
         String receivedMessage = event.getText();
         switch (receivedMessage){
             case "下五間":
-                List<LocationMessage> locationList = locationMessageRedisTemplate.opsForList().range(REDIS_KEY,0,-1);
-                List<Message> messageList = locationList.stream().map(Message.class::cast).collect(Collectors.toList());
-                reply(replyToken,messageList);
+                if(locationMessageRedisTemplate.hasKey(REDIS_KEY)){
+                    List<LocationMessage> locationList = locationMessageRedisTemplate.opsForList().range(REDIS_KEY,0,-1);
+                    List<Message> messageList;
+                    if(locationList.size()==5){
+                        messageList = locationList.stream().map(Message.class::cast).collect(Collectors.toList());
+                    }else{
+                        messageList = locationList.subList(0, 5).stream().map(Message.class::cast).collect(Collectors.toList());
+                    }
+                    reply(replyToken, messageList);
+                    //刪除redis key
+                    locationMessageRedisTemplate.delete(REDIS_KEY);
+                }else { //key過期了來點 重新定位
+                    TextMessage textMessage = openMap();
+                    reply(replyToken,textMessage);
+                }
+                break;
+            case "查看所在位置口罩剩餘狀態":
+            case "重新定位":
+                TextMessage textMessage = openMap();
+                reply(replyToken,textMessage);
                 break;
         }
         return null;
@@ -71,14 +93,15 @@ public class HandleLocationMessage extends BaseMessageHandler {
      */
     @MultiQuickReply(value = {
             @QuickReplyMode(mode=ActionMode.MESSAGE,label = "下五間",text = "下五間"),
-            @QuickReplyMode(mode=ActionMode.POSTBACK,label="重新定位",data="refreshfuntion2",displayText="重新定位")
+            @QuickReplyMode(mode=ActionMode.MESSAGE,label="重新定位",text = "重新定位")
     })
     @Override
-    public List<LocationMessage> handleLocationMessageReply(LocationMessageContent event) {
+    public List<LocationMessage> handleLocationMessageReply(LocationMessageContent event,String userId) {
+        REDIS_KEY += userId;
         Double lat1,long1,lat2,long2;
         lat1 = event.getLatitude();
         long1 = event.getLongitude();
-        //藥局map
+        //藥局map 儲存距離與店家
         Map<Double,MedicineStore> medicineStoreMap = new HashMap<>();
         List<MedicineStore> medStoreList = mService.findAll();
         for (int i = 0 ; i < medStoreList.size(); i ++) {
@@ -89,10 +112,11 @@ public class HandleLocationMessage extends BaseMessageHandler {
             medicineStoreMap.put(dist,store);
         }
 
-        log.info("{} medStoreList 排序前 : {}",LOG_PREFIX,medStoreList);
+        //按距離排序
         TreeMap<Double,MedicineStore> medStoreTreeMap = new TreeMap<>(medicineStoreMap);
-        log.info("{} TreeMap medStoreTreeMap 排序後 : {}",LOG_PREFIX,medStoreTreeMap);
+//        log.info("{} TreeMap medStoreTreeMap 排序後 : {}",LOG_PREFIX,medStoreTreeMap);
 
+        //取出店家存進LinkedList
         LinkedList<LocationMessage> locationlinkedList = new LinkedList<>();
         LocationMessage locationMessage = null;
         for (Map.Entry entry : medStoreTreeMap.entrySet()){
@@ -112,6 +136,7 @@ public class HandleLocationMessage extends BaseMessageHandler {
         //save to redis
         List<LocationMessage> listToRedis = locationlinkedList.stream().skip(5).limit(5).collect(Collectors.toList());
         locationMessageRedisTemplate.opsForList().leftPushAll(REDIS_KEY,listToRedis);
+        locationMessageRedisTemplate.expire(REDIS_KEY,TIMEOUT, TimeUnit.MINUTES);
         List<LocationMessage> locationList = locationlinkedList.stream().limit(5).collect(Collectors.toList());
         return locationList;
     }

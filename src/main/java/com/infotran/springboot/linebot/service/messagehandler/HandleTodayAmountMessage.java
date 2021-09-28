@@ -41,7 +41,7 @@ public class HandleTodayAmountMessage extends BaseMessageHandler {
      */
     @Override
     @QuickReplyMode(mode = ActionMode.MESSAGE,label="昨日確診數",text="昨日確診數")
-    protected List<TextMessage> textMessageReply(TextMessageContent event,String replyToken) {
+    protected List<TextMessage> textMessageReply(TextMessageContent event,String replyToken,String userId) {
             String receivedMessage = event.getText();
             StringBuilder message = new StringBuilder();
             TextMessage textMessage = null;
@@ -82,7 +82,7 @@ public class HandleTodayAmountMessage extends BaseMessageHandler {
     }
 
     @Override
-    protected List<LocationMessage> handleLocationMessageReply(LocationMessageContent event) {
+    protected List<LocationMessage> handleLocationMessageReply(LocationMessageContent event,String userId) {
         //不使用
         return null;
     }

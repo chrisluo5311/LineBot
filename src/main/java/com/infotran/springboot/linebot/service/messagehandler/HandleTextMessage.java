@@ -49,7 +49,7 @@ public class HandleTextMessage extends BaseMessageHandler {
 	}
 
 	@Override
-	public List<TextMessage> textMessageReply(TextMessageContent event,String replyToken){
+	public List<TextMessage> textMessageReply(TextMessageContent event,String replyToken,String userId){
 			BotApiResponse botApiResponse = null;
 			String receivedMessage = event.getText();
 			switch (receivedMessage) {
@@ -124,7 +124,7 @@ public class HandleTextMessage extends BaseMessageHandler {
 	}
 
 	@Override
-	protected List<LocationMessage> handleLocationMessageReply(LocationMessageContent event) {
+	protected List<LocationMessage> handleLocationMessageReply(LocationMessageContent event,String userId) {
 		//不使用
 		return null;
 	}

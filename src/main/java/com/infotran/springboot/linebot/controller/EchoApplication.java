@@ -66,7 +66,9 @@ public class EchoApplication {
                 case "昨日確診數":
                     baseMessageInterface = baseMessagePool.getMethod(HandlerEnum.getHandlerName(1));
                     break;
+                case "查看所在位置口罩剩餘狀態":
                 case "下五間":
+                case "重新定位":
                     baseMessageInterface = baseMessagePool.getMethod(HandlerEnum.getHandlerName(2));
                     break;
                 default:

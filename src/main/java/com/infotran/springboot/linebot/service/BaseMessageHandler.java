@@ -17,6 +17,7 @@ import com.linecorp.bot.model.event.message.LocationMessageContent;
 import com.linecorp.bot.model.event.message.MessageContent;
 import com.linecorp.bot.model.event.message.StickerMessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
+import com.linecorp.bot.model.event.source.Source;
 import com.linecorp.bot.model.message.LocationMessage;
 import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.StickerMessage;
@@ -31,10 +32,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
@@ -67,7 +65,7 @@ public abstract class BaseMessageHandler implements BaseMessageInterface,LineCli
      * @return
      *
      * */
-    protected abstract List<TextMessage> textMessageReply(TextMessageContent event,String replyToken);
+    protected abstract List<TextMessage> textMessageReply(TextMessageContent event,String replyToken,String userId);
 
     /**
      * 處理PostbackEvent文字訊息<br>
@@ -84,7 +82,7 @@ public abstract class BaseMessageHandler implements BaseMessageInterface,LineCli
      *
      * @param event  MessageEvent
      */
-    protected abstract <T extends MessageContent> List<LocationMessage> handleLocationMessageReply(LocationMessageContent event);
+    protected abstract <T extends MessageContent> List<LocationMessage> handleLocationMessageReply(LocationMessageContent event,String userId);
 
     @Override
     public BotApiResponse postBackReply(PostbackEvent event) throws IOException, NoSuchMethodException {
@@ -118,18 +116,23 @@ public abstract class BaseMessageHandler implements BaseMessageInterface,LineCli
         BotApiResponse botApiResponse = null;
         //replyToken
         String replyToken = event.getReplyToken();
+        //source
+        Source source = event.getSource();
+        String userId = source.getUserId();
+        log.info("{} 使用者id: {}",LOG_PREFIX,userId);
+
         if(event.getMessage() instanceof TextMessageContent){
             //1. 處理文字(可null)
-            List<TextMessage> textMessageList = textMessageReply((TextMessageContent)event.getMessage(),replyToken);
+            List<TextMessage> textMessageList = textMessageReply((TextMessageContent)event.getMessage(),replyToken,userId);
             if (Objects.nonNull(textMessageList)){
                 Method textMethod = this.getClass().getDeclaredMethod("textMessageReply",TextMessageContent.class,String.class);
                 botApiResponse =execute(textMethod,textMessageList,replyToken);
             }
         } else if (event.getMessage() instanceof LocationMessageContent) {
             //2. 功能訊息-(處理使用者地址並回傳藥局資訊/可null)
-            List<LocationMessage> locationMessageList = handleLocationMessageReply((LocationMessageContent) event.getMessage());
+            List<LocationMessage> locationMessageList = handleLocationMessageReply((LocationMessageContent) event.getMessage(),userId);
             if(Objects.nonNull(locationMessageList)){
-                Method locationMethod = this.getClass().getDeclaredMethod("handleLocationMessageReply",MessageEvent.class);
+                Method locationMethod = this.getClass().getDeclaredMethod("handleLocationMessageReply",LocationMessageContent.class);
                 botApiResponse = execute(locationMethod,locationMessageList,replyToken);
             }
         } else if (event.getMessage() instanceof  StickerMessageContent) {
@@ -302,5 +305,25 @@ public abstract class BaseMessageHandler implements BaseMessageInterface,LineCli
         }
         return null;
     }
+
+    /**
+     * 打開地圖
+     *
+     * @return TestMessage 訊息帶打開地圖動作的QuickReply
+     *
+     * */
+    public TextMessage openMap() {
+        final List<QuickReplyItem> items = Arrays.<QuickReplyItem>asList(
+                QuickReplyItem.builder()
+                        .action(LocationAction.withLabel("打開定位"))
+                        .build()
+        );
+
+        final QuickReply quickReply = QuickReply.items(items);
+
+        TextMessage textMessage = TextMessage.builder().text("點選下方打開地圖").quickReply(quickReply).build();
+        return textMessage;
+    }
+
 
 }

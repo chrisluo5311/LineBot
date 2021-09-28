@@ -3,7 +3,6 @@ package com.infotran.springboot.linebot.controller;
 import com.infotran.springboot.linebot.model.MenuID;
 import com.infotran.springboot.linebot.service.LineClientInterface;
 import com.infotran.springboot.linebot.service.MenuIdService;
-import com.linecorp.bot.model.action.LocationAction;
 import com.linecorp.bot.model.action.MessageAction;
 import com.linecorp.bot.model.action.PostbackAction;
 import com.linecorp.bot.model.response.BotApiResponse;
@@ -76,10 +75,10 @@ public class CreateRichMenu implements LineClientInterface, CommandLineRunner {
 		MessageAction messageAction = new MessageAction("今日確診","查詢今日確診");
 		RichMenuArea todayNum = new RichMenuArea(new RichMenuBounds(0, 0, 836, 846),messageAction);
 		//action2
-		LocationAction action02=  LocationAction.builder().label("查看所在位置口罩剩餘狀態").build();
+		MessageAction action02 = new MessageAction("查看所在位置口罩剩餘狀態","查看所在位置口罩剩餘狀態");
 		RichMenuArea BuyMask = new RichMenuArea(new RichMenuBounds(833, 2, 836, 844),action02);
 		//action3
-		LocationAction action03=  LocationAction.builder().label("查看所在位置與確診足跡").build();
+		MessageAction action03 = new MessageAction("查看所在位置與確診足跡","查看所在位置與確診足跡");
 		RichMenuArea locationStatus = new RichMenuArea(new RichMenuBounds(1666, 3, 834, 843),action03);
 		//action4
 		PostbackAction action04 = PostbackAction.builder().label("國內外疫情").data("國內外疫情").displayText("國內外疫情").build();
@@ -101,8 +100,12 @@ public class CreateRichMenu implements LineClientInterface, CommandLineRunner {
 	}
 
 	/**
-	 * false:no rich menu;
-	 * true:rich menu exist;
+	 * false:沒有目錄<br>
+	 * true:有目錄
+	 *
+	 * @return boolean
+	 * @throws ExecutionException
+	 * @throws InterruptedException
 	 */
 	private static boolean isRichMenuExists() throws ExecutionException, InterruptedException {
 		List<RichMenuResponse> richmenuresponse = client.getRichMenuList().get().getRichMenus();
@@ -110,7 +113,7 @@ public class CreateRichMenu implements LineClientInterface, CommandLineRunner {
 		for (RichMenuResponse res : richmenuresponse){
 			 ans = res.getRichMenuId();
 		}
-		return (ans.equals(""))?false:true;
+		return (ans.length()==0)?false:true;
 	}
 
 

@@ -48,7 +48,8 @@ public class GetMaskJsonController implements ClientUtil, CommandLineRunner {
     }
 
     /**
-     * 執行異步請求
+     * 執行異步請求<br>
+     * (每小時執行一次)
      * */
     @Scheduled(cron = "0 0 0/1 * * ?")
     public void executeMaskCrawl() throws IOException {
@@ -122,7 +123,13 @@ public class GetMaskJsonController implements ClientUtil, CommandLineRunner {
             medList.add(medicineStore);
         }
 //        log.info("{} 藥局List物件 {}",LOG_PREFIX,medList);
-        medicineStoreRedisTemplate.opsForList().leftPushAll(REDIS_KEY,medList);
+        if(medicineStoreRedisTemplate.hasKey(REDIS_KEY)){
+            medicineStoreRedisTemplate.delete(REDIS_KEY);
+        }else {
+            medicineStoreRedisTemplate.opsForList().leftPushAll(REDIS_KEY,medList);
+            medicineStoreRedisTemplate.expire(REDIS_KEY,60, java.util.concurrent.TimeUnit.MINUTES);
+        }
+
     }
 
     /**
