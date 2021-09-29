@@ -125,11 +125,9 @@ public class GetMaskJsonController implements ClientUtil, CommandLineRunner {
 //        log.info("{} 藥局List物件 {}",LOG_PREFIX,medList);
         if(medicineStoreRedisTemplate.hasKey(REDIS_KEY)){
             medicineStoreRedisTemplate.delete(REDIS_KEY);
-        }else {
-            medicineStoreRedisTemplate.opsForList().leftPushAll(REDIS_KEY,medList);
-            medicineStoreRedisTemplate.expire(REDIS_KEY,60, java.util.concurrent.TimeUnit.MINUTES);
         }
-
+        medicineStoreRedisTemplate.opsForList().leftPushAll(REDIS_KEY,medList);
+        medicineStoreRedisTemplate.expire(REDIS_KEY,60, java.util.concurrent.TimeUnit.MINUTES);
     }
 
     /**

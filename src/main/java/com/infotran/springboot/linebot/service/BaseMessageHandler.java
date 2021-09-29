@@ -90,7 +90,7 @@ public abstract class BaseMessageHandler implements BaseMessageInterface,LineCli
         String replyToken = event.getReplyToken();
         String data = event.getPostbackContent().getData();
         StringBuilder message = new StringBuilder();
-        log.info("{} event data: {}",LOG_PREFIX,data);
+        log.info("[{}] postBackReply方法的event data: {}",LOG_PREFIX,data);
         switch (data){
             case "國內外疫情" :
                 break;
@@ -119,20 +119,20 @@ public abstract class BaseMessageHandler implements BaseMessageInterface,LineCli
         //source
         Source source = event.getSource();
         String userId = source.getUserId();
-        log.info("{} 使用者id: {}",LOG_PREFIX,userId);
+        log.info("[{}] 使用者id: {}",LOG_PREFIX,userId);
 
         if(event.getMessage() instanceof TextMessageContent){
             //1. 處理文字(可null)
             List<TextMessage> textMessageList = textMessageReply((TextMessageContent)event.getMessage(),replyToken,userId);
             if (Objects.nonNull(textMessageList)){
-                Method textMethod = this.getClass().getDeclaredMethod("textMessageReply",TextMessageContent.class,String.class);
+                Method textMethod = this.getClass().getDeclaredMethod("textMessageReply",TextMessageContent.class,String.class,String.class);
                 botApiResponse =execute(textMethod,textMessageList,replyToken);
             }
         } else if (event.getMessage() instanceof LocationMessageContent) {
             //2. 功能訊息-(處理使用者地址並回傳藥局資訊/可null)
             List<LocationMessage> locationMessageList = handleLocationMessageReply((LocationMessageContent) event.getMessage(),userId);
             if(Objects.nonNull(locationMessageList)){
-                Method locationMethod = this.getClass().getDeclaredMethod("handleLocationMessageReply",LocationMessageContent.class);
+                Method locationMethod = this.getClass().getDeclaredMethod("handleLocationMessageReply",LocationMessageContent.class,String.class);
                 botApiResponse = execute(locationMethod,locationMessageList,replyToken);
             }
         } else if (event.getMessage() instanceof  StickerMessageContent) {
@@ -217,10 +217,12 @@ public abstract class BaseMessageHandler implements BaseMessageInterface,LineCli
                        @NonNull List<Message> messages,
                        boolean notificationDisabled) {
         try {
+            log.info("======================發送post請求==========================");
             BotApiResponse apiResponse = client
                     .replyMessage(new ReplyMessage(replyToken, messages, notificationDisabled))
                     .get();
-            log.info("{} replyMessage物件: {}",LOG_PREFIX,apiResponse);
+            log.info("========================請求結束============================");
+            log.info("[{}] 送出給使用者的訊息: {}",LOG_PREFIX,messages);
             return apiResponse;
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
@@ -260,13 +262,13 @@ public abstract class BaseMessageHandler implements BaseMessageInterface,LineCli
                 return null;
             }
             QuickReplyItem quickReplyItem = getQuickReply(quickReplyMode);
-            log.info("{} QuickReplyItem物件: {}",LOG_PREFIX,quickReplyItem);
+            log.info("[{}] 回傳單一的QuickReplyItem物件: {}",LOG_PREFIX,quickReplyItem);
             return QuickReply.builder().item(quickReplyItem).build();
         } else { //多個
             List<QuickReplyItem> quickReplyItemList = new ArrayList<>();
             for (QuickReplyMode quickReplyMode1 : multiQuickReply.value()){
                 QuickReplyItem item = getQuickReply(quickReplyMode1);
-                log.info("{} 多重註解裡的@QuickReplyMode {}",LOG_PREFIX,item);
+                log.info("[{}] 回傳多個的QuickReplyItem物件: {}",LOG_PREFIX,item);
                 quickReplyItemList.add(item);
             }
             return QuickReply.builder().items(quickReplyItemList).build();
@@ -280,7 +282,7 @@ public abstract class BaseMessageHandler implements BaseMessageInterface,LineCli
         String data = quickReplyMode.data();
         String displayText = quickReplyMode.displayText();
         String text = quickReplyMode.text();
-        log.info("{} @QuickReplyMode註解裡的參數 mode: {}, label: {}, data: {}, displayText: {},text: {}",LOG_PREFIX,mode,label,data,displayText,text);
+        log.info("[{}] @QuickReplyMode註解裡的參數 mode: {}, label: {}, data: {}, displayText: {},text: {}",LOG_PREFIX,mode,label,data,displayText,text);
         //回傳QuickReplyItem
         switch (mode){
             case POSTBACK:
