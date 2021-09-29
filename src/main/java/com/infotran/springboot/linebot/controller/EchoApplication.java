@@ -1,6 +1,5 @@
 package com.infotran.springboot.linebot.controller;
 
-import com.infotran.springboot.annotation.LogExecutionTime;
 import com.infotran.springboot.linebot.service.BaseMessageInterface;
 import com.infotran.springboot.linebot.service.BaseMessagePool;
 import com.infotran.springboot.linebot.service.messagehandler.enums.HandlerEnum;
@@ -37,9 +36,9 @@ public class EchoApplication {
      * 處理目錄
      * @param event PostbackEvent
      * */
-    @LogExecutionTime
     @EventMapping
     public void handlePostBackEvent(PostbackEvent event) throws Exception {
+        log.info("======================回覆開始==========================");
         BotApiResponse botApiResponse = null;
         String data = event.getPostbackContent().getData();
         switch (data){
@@ -51,7 +50,7 @@ public class EchoApplication {
                 baseMessageInterface = baseMessagePool.getMethod(HandlerEnum.getHandlerName(6));
                 botApiResponse = baseMessageInterface.postBackReply(event);
         }
-        log.info("[{}] 處理PostbackEvent方法 回傳物件: {}",LOG_PREFIX,botApiResponse);
+        log.info("======================回覆結束==========================");
     }
 
 
@@ -61,6 +60,7 @@ public class EchoApplication {
      * */
     @EventMapping
     public void handleMessageEvent(MessageEvent event) throws Exception {
+        log.info("======================回覆開始==========================");
         if (event.getMessage() instanceof TextMessageContent) {
             String text =((TextMessageContent) event.getMessage()).getText();
             switch (text){
@@ -82,7 +82,7 @@ public class EchoApplication {
             baseMessageInterface = baseMessagePool.getMethod(HandlerEnum.getHandlerName(2));
         }
         BotApiResponse botApiResponse = baseMessageInterface.handleMessageEvent(event);
-        log.info("[{}] 處理MessageEvent方法 BotApiResponse回傳物件: {}",LOG_PREFIX,botApiResponse);
+        log.info("======================回覆結束==========================");
     }
 
 
