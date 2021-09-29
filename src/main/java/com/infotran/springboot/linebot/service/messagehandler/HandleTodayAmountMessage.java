@@ -25,7 +25,7 @@ import java.util.List;
  *
  * */
 @Slf4j
-@Component(value = "HandleTodayAmount")
+@Component
 public class HandleTodayAmountMessage extends BaseMessageHandler {
 
     private static final String LOG_PREFIX = "HandleTodayAmount";

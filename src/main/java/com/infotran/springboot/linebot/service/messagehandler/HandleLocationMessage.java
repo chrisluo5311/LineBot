@@ -25,13 +25,12 @@ import java.util.stream.Collectors;
  * @author chris
  * 第二功能
  * 編號: 2 <br>
- * 1.打開地圖
- * 2.處理使用者回傳位置訊息
- * 3.搜尋最近的藥局並回傳: 第一次回傳五間，按快捷鍵再回傳五個
+ * 1.處理使用者回傳位置訊息
+ * 2.搜尋最近的藥局並回傳: 第一次回傳五間，按快捷鍵再回傳五個
  *
  * */
 @Slf4j
-@Component(value = "HandleLocationMessageReply")
+@Component
 public class HandleLocationMessage extends BaseMessageHandler {
 
     private static final String LOG_PREFIX = "HandleLocationMessageReply";

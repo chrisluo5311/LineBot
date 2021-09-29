@@ -36,7 +36,7 @@ import java.util.List;
  *
  * */
 @Slf4j
-@Component(value = "TestReplyMessageHandler")
+@Component
 public class HandleTextMessage extends BaseMessageHandler {
 
 	private ReplyMessage replyMessage = null;

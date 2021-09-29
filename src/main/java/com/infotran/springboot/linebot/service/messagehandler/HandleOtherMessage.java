@@ -21,7 +21,7 @@ import java.util.List;
  *
  * */
 @Slf4j
-@Component(value = "HandleOtherMessage")
+@Component
 public class HandleOtherMessage extends BaseMessageHandler {
 
     @Override
