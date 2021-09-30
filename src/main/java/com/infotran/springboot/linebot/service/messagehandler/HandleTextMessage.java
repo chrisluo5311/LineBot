@@ -10,6 +10,7 @@ import com.linecorp.bot.model.action.URIAction;
 import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
+import com.linecorp.bot.model.message.ImagemapMessage;
 import com.linecorp.bot.model.message.LocationMessage;
 import com.linecorp.bot.model.message.TemplateMessage;
 import com.linecorp.bot.model.message.TextMessage;
@@ -120,6 +121,12 @@ public class HandleTextMessage extends BaseMessageHandler {
 
 	@Override
 	protected List<TextMessage> textMessageReply(PostbackEvent event) {
+		return null;
+	}
+
+	@Override
+	protected List<ImagemapMessage> handleImagemapMessageReply(PostbackEvent event) {
+		//不使用
 		return null;
 	}
 

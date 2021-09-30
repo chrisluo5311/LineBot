@@ -5,6 +5,7 @@ import com.infotran.springboot.linebot.service.messagehandler.enums.HandlerEnum;
 import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
+import com.linecorp.bot.model.message.ImagemapMessage;
 import com.linecorp.bot.model.message.LocationMessage;
 import com.linecorp.bot.model.message.TextMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -58,6 +59,12 @@ public class HandleOtherMessage extends BaseMessageHandler {
                 "(_／");
         TextMessage text = TextMessage.builder().text(message.toString()).build();
         return Collections.singletonList(text);
+    }
+
+    @Override
+    protected List<ImagemapMessage> handleImagemapMessageReply(PostbackEvent event) {
+        //不使用
+        return null;
     }
 
     @Override

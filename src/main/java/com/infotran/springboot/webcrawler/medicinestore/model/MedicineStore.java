@@ -1,4 +1,4 @@
-package com.infotran.springboot.medicinestore.model;
+package com.infotran.springboot.webcrawler.medicinestore.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

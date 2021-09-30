@@ -1,6 +1,6 @@
-package com.infotran.springboot.confirmcase.dao;
+package com.infotran.springboot.webcrawler.confirmcase.dao;
 
-import com.infotran.springboot.confirmcase.model.ConfirmCase;
+import com.infotran.springboot.webcrawler.confirmcase.model.ConfirmCase;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.CrudRepository;
 

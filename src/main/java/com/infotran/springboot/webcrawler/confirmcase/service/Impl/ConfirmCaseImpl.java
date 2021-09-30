@@ -1,9 +1,10 @@
-package com.infotran.springboot.confirmcase.service.Impl;
+package com.infotran.springboot.webcrawler.confirmcase.service.Impl;
 
-import com.infotran.springboot.confirmcase.dao.ConfirmCaseRepository;
-import com.infotran.springboot.confirmcase.model.ConfirmCase;
-import com.infotran.springboot.confirmcase.service.ConfirmCaseService;
+import com.infotran.springboot.webcrawler.confirmcase.dao.ConfirmCaseRepository;
+import com.infotran.springboot.webcrawler.confirmcase.model.ConfirmCase;
+import com.infotran.springboot.webcrawler.confirmcase.service.ConfirmCaseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -14,6 +15,7 @@ public class ConfirmCaseImpl implements ConfirmCaseService {
 	@Autowired
 	private ConfirmCaseRepository conRepo;
 
+	@CachePut(value = "今日確診")
 	@Override
 	public ConfirmCase save (ConfirmCase fcase) {
 		ConfirmCase cfc = findByConfirmTime(LocalDate.now());

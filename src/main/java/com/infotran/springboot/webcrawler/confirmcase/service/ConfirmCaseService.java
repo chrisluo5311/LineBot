@@ -1,6 +1,6 @@
-package com.infotran.springboot.confirmcase.service;
+package com.infotran.springboot.webcrawler.confirmcase.service;
 
-import com.infotran.springboot.confirmcase.model.ConfirmCase;
+import com.infotran.springboot.webcrawler.confirmcase.model.ConfirmCase;
 
 import java.time.LocalDate;
 

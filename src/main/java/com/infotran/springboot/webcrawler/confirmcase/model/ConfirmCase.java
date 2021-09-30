@@ -1,4 +1,4 @@
-package com.infotran.springboot.confirmcase.model;
+package com.infotran.springboot.webcrawler.confirmcase.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,6 +33,8 @@ public class ConfirmCase {
 	private Integer releasedQuarantine; //解除14天隔離數目(沒用到)
 	
 	private LocalDate confirmTime;//更新時間(now)
+
+	private String newsUrl;//新聞網址
 	
 	@PrePersist
 	protected void createConfirmTime() {

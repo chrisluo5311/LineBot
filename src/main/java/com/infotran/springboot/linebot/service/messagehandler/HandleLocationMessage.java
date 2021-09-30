@@ -1,14 +1,16 @@
 package com.infotran.springboot.linebot.service.messagehandler;
 
+import com.infotran.springboot.annotation.LogExecutionTime;
 import com.infotran.springboot.annotation.MultiQuickReply;
 import com.infotran.springboot.annotation.QuickReplyMode;
 import com.infotran.springboot.annotation.quickreplyenum.ActionMode;
 import com.infotran.springboot.linebot.service.BaseMessageHandler;
 import com.infotran.springboot.linebot.service.messagehandler.enums.HandlerEnum;
-import com.infotran.springboot.medicinestore.model.MedicineStore;
+import com.infotran.springboot.webcrawler.medicinestore.model.MedicineStore;
 import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
+import com.linecorp.bot.model.message.ImagemapMessage;
 import com.linecorp.bot.model.message.LocationMessage;
 import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.TextMessage;
@@ -37,8 +39,8 @@ public class HandleLocationMessage extends BaseMessageHandler {
 
     private static String REDIS_KEY_PREFIX = "sortedLocationMessageList";//須加上使用者id
 
-    //Reids Timeout
-    private static Integer TIMEOUT = 3;//3分鐘
+    //Reids Timeout 1分鐘
+    private static Integer TIMEOUT = 1;
     
     @Resource
     RedisTemplate<Object, LocationMessage> locationMessageRedisTemplate;
@@ -93,11 +95,18 @@ public class HandleLocationMessage extends BaseMessageHandler {
         return null;
     }
 
+    @Override
+    protected List<ImagemapMessage> handleImagemapMessageReply(PostbackEvent event) {
+        //不使用
+        return null;
+    }
+
     /**
      * 處理使用者回傳的現在位置
      *
      * @param event  MessageEvent
      */
+    @LogExecutionTime
     @MultiQuickReply(value = {
             @QuickReplyMode(mode=ActionMode.MESSAGE,label = "下五間",text = "下五間"),
             @QuickReplyMode(mode=ActionMode.MESSAGE,label="重新定位",text = "重新定位")

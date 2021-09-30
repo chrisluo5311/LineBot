@@ -1,9 +1,8 @@
-package com.infotran.springboot.medicinestore.dao;
+package com.infotran.springboot.webcrawler.medicinestore.dao;
 
-import com.infotran.springboot.medicinestore.model.MedicineStore;
+import com.infotran.springboot.webcrawler.medicinestore.model.MedicineStore;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface MedicineStoreRepository extends JpaRepository<MedicineStore, String> {

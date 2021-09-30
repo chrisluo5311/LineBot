@@ -1,9 +1,8 @@
-package com.infotran.springboot.medicinestore.service;
+package com.infotran.springboot.webcrawler.medicinestore.service;
 
-import com.infotran.springboot.medicinestore.model.MedicineStore;
+import com.infotran.springboot.webcrawler.medicinestore.model.MedicineStore;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 
 @Service

@@ -1,9 +1,8 @@
-package com.infotran.springboot.medicinestore.service.Impl;
+package com.infotran.springboot.webcrawler.medicinestore.service.Impl;
 
-import com.infotran.springboot.medicinestore.dao.MedicineStoreRepository;
-import com.infotran.springboot.medicinestore.model.MedicineStore;
-import com.infotran.springboot.medicinestore.service.MedicineStoreService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.infotran.springboot.webcrawler.medicinestore.dao.MedicineStoreRepository;
+import com.infotran.springboot.webcrawler.medicinestore.model.MedicineStore;
+import com.infotran.springboot.webcrawler.medicinestore.service.MedicineStoreService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

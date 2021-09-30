@@ -1,14 +1,15 @@
-package com.infotran.springboot.medicinestore.controller;
+package com.infotran.springboot.webcrawler.medicinestore.controller;
 
 import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
 import com.infotran.springboot.exception.LineBotException;
 import com.infotran.springboot.util.ClientUtil;
-import com.infotran.springboot.medicinestore.model.MedicineStore;
-import com.infotran.springboot.medicinestore.service.MedicineStoreService;
+import com.infotran.springboot.webcrawler.medicinestore.model.MedicineStore;
+import com.infotran.springboot.webcrawler.medicinestore.service.MedicineStoreService;
 import com.infotran.springboot.schedular.TimeUnit;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONException;
@@ -27,7 +28,8 @@ import java.util.*;
 public class GetMaskJsonController implements ClientUtil, CommandLineRunner {
 
     //口罩即時url
-    private String Mask_URL = "https://raw.githubusercontent.com/kiang/pharmacies/master/json/points.json";
+    @Value("${Mask.URL}")
+    private String MASK_URL;
 
     private static final String LOG_PREFIX = "GetMaskJsonController";
 
@@ -53,7 +55,7 @@ public class GetMaskJsonController implements ClientUtil, CommandLineRunner {
      * */
     @Scheduled(cron = "0 0 0/1 * * ?")
     public void executeMaskCrawl() throws IOException {
-        Request request = new Request.Builder().url(Mask_URL).get().build(); // get
+        Request request = new Request.Builder().url(MASK_URL).get().build(); // get
         Call call = client.newCall(request);
         call.enqueue(new Callback() {
             @Override

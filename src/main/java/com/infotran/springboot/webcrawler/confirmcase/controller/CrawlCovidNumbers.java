@@ -1,7 +1,7 @@
-package com.infotran.springboot.confirmcase.controller;
+package com.infotran.springboot.webcrawler.confirmcase.controller;
 
-import com.infotran.springboot.confirmcase.model.ConfirmCase;
-import com.infotran.springboot.confirmcase.service.ConfirmCaseService;
+import com.infotran.springboot.webcrawler.confirmcase.model.ConfirmCase;
+import com.infotran.springboot.webcrawler.confirmcase.service.ConfirmCaseService;
 import com.infotran.springboot.util.ClientUtil;
 import com.infotran.springboot.util.SSLHelper;
 import com.infotran.springboot.util.TimeUtil;
@@ -15,6 +15,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -28,9 +29,12 @@ import java.util.Map;
 @Slf4j
 public class CrawlCovidNumbers implements ClientUtil, CommandLineRunner {
 
-	private final String CDC_URL = "http://at.cdc.tw/YEc68Q";// 新聞首頁
+	// 新聞首頁
+	@Value("${CDC.URL}")
+	private String CDC_URL;
 
-	private String CDC_NewsDetail = "";// 進入新聞
+	// 進入新聞
+	private String CDC_NewsDetail = "";
 
 	private final String titleName = "指揮中心公布新增";
 	
@@ -123,9 +127,10 @@ public class CrawlCovidNumbers implements ClientUtil, CommandLineRunner {
 										 .returnAmount(reNum)
 										 .totalAmount(totalNum)
 										 .deathAmount(deathNum)
+										 .newsUrl(detailedURL)
 										 .build();
 			log.info("{} 今日確診物件 {}",LOG_PREFIX,cfc);
-			confirmCaseRedisTemplate.opsForValue().set("今日確診",cfc);
+//			confirmCaseRedisTemplate.opsForValue().set("今日確診",cfc);
 			cService.save(cfc);
 		} catch (IOException e) {
 			e.printStackTrace();

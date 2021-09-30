@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.infotran.springboot.annotation.MultiQuickReply;
 import com.infotran.springboot.annotation.QuickReplyMode;
 import com.infotran.springboot.annotation.quickreplyenum.ActionMode;
-import com.infotran.springboot.confirmcase.service.ConfirmCaseService;
-import com.infotran.springboot.medicinestore.service.MedicineStoreService;
+import com.infotran.springboot.webcrawler.confirmcase.service.ConfirmCaseService;
+import com.infotran.springboot.webcrawler.medicinestore.service.MedicineStoreService;
 import com.linecorp.bot.model.ReplyMessage;
 import com.linecorp.bot.model.action.LocationAction;
 import com.linecorp.bot.model.action.MessageAction;
@@ -18,10 +18,7 @@ import com.linecorp.bot.model.event.message.MessageContent;
 import com.linecorp.bot.model.event.message.StickerMessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
 import com.linecorp.bot.model.event.source.Source;
-import com.linecorp.bot.model.message.LocationMessage;
-import com.linecorp.bot.model.message.Message;
-import com.linecorp.bot.model.message.StickerMessage;
-import com.linecorp.bot.model.message.TextMessage;
+import com.linecorp.bot.model.message.*;
 import com.linecorp.bot.model.message.quickreply.QuickReply;
 import com.linecorp.bot.model.message.quickreply.QuickReplyItem;
 import com.linecorp.bot.model.response.BotApiResponse;
@@ -83,6 +80,9 @@ public abstract class BaseMessageHandler implements BaseMessageInterface,LineCli
      * @param event  MessageEvent
      */
     protected abstract <T extends MessageContent> List<LocationMessage> handleLocationMessageReply(LocationMessageContent event,String userId);
+
+
+    protected abstract List<ImagemapMessage> handleImagemapMessageReply(PostbackEvent event);
 
     @Override
     public BotApiResponse postBackReply(PostbackEvent event) throws IOException, NoSuchMethodException {
