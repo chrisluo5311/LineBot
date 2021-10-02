@@ -41,6 +41,12 @@ server.port=9090
 3. 緩存 
 > Redis
 
+4. 相關依賴套件 
+
+|  套件  |  版本  |   相關文檔及說明   |
+|:------:|:--------:|:------------:|
+|  Apache Batik  | 11.0.10 | [Batik官網與文檔](https://xmlgraphics.apache.org/batik/) |
+
 ### 測試須知
 1. [ngrok下載請點我](https://ngrok.com/download "ngrok")
 2. 開啟ngrok，登入ngrok的網站
