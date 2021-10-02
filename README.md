@@ -52,8 +52,9 @@ server.port=9090
 ### 參考網站
 1. [衛福部疾管署](https://www.cdc.gov.tw/ "link") 
 2. [全球疫情地圖](https://covid-19.nchc.org.tw/ "全球疫情地圖")
-3. [健保特約機構口罩剩餘數量明細](https://data.gov.tw/dataset/116285 "口罩link") 或 [口罩即時查](https://wenyo.github.io/maskmap/ "口罩即時查")(帶經緯度)
-4. [台灣電子地圖服務網](https://www.map.com.tw/ "台灣電子地圖服務網")
-5. [LINE Messaging API SDK for Java](https://github.com/line/line-bot-sdk-java "LineBot API SDK")
-6. [Messaging API reference](https://developers.line.biz/en/reference/messaging-api/ "LineBot API 文件")
+3. [疫苗接種統計圖](https://covid-19.nchc.org.tw/dt_002-csse_covid_19_daily_reports_vaccine_city2.php "疫苗接種統計圖")
+4. [健保特約機構口罩剩餘數量明細](https://data.gov.tw/dataset/116285 "口罩link") 或 [口罩即時查](https://wenyo.github.io/maskmap/ "口罩即時查")(帶經緯度)
+5. [台灣電子地圖服務網](https://www.map.com.tw/ "台灣電子地圖服務網")
+6. [LINE Messaging API SDK for Java](https://github.com/line/line-bot-sdk-java "LineBot API SDK")
+7. [Messaging API reference](https://developers.line.biz/en/reference/messaging-api/ "LineBot API 文件")
 
