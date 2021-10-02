@@ -38,14 +38,16 @@ spring.datasource.password=P@ssw0rd
 server.port=9090
 ```
 
-3. 緩存 
-> Redis
 
-4. 相關依賴套件 
+3. 相關Maven依賴 
 
 |  套件  |  版本  |   相關文檔及說明   |
 |:------:|:--------:|:------------:|
-|  Apache Batik  | 11.0.10 | [Batik官網與文檔](https://xmlgraphics.apache.org/batik/) |
+|  okhttp  | 3.14.9 |  |
+|  jsoup  | 1.13.1 |  |
+|  Apache Batik  | 1.7 | [Batik官網與文檔](https://xmlgraphics.apache.org/batik/) |
+|  Redis  | 5.0.10 |  |
+|  lombok  | 1.18.20 |  |
 
 ### 測試須知
 1. [ngrok下載請點我](https://ngrok.com/download "ngrok")
