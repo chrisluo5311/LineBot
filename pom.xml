@@ -141,6 +141,13 @@
 			<artifactId>jackson-datatype-jsr310</artifactId>
 			<version>2.12.3</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-java</artifactId>
+			<version>3.141.59</version>
+		</dependency>
+
 	</dependencies>
 	
 	

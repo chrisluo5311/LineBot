@@ -66,7 +66,7 @@ public class GetMaskJsonController implements ClientUtil, CommandLineRunner {
             @SneakyThrows
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                log.info("@@@@@@ {} Mask爬蟲成功 @@@@@@",LOG_PREFIX);
+                log.info("@@@@@@ {} Mask爬蟲開始 @@@@@@",LOG_PREFIX);
                 String jsonBody = response.body().string();
                 parseMaskInfo(jsonBody);
             }

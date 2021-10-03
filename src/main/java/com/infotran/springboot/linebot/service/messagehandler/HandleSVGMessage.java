@@ -10,7 +10,6 @@ import com.linecorp.bot.model.message.ImagemapMessage;
 import com.linecorp.bot.model.message.LocationMessage;
 import com.linecorp.bot.model.message.TextMessage;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -26,8 +25,8 @@ import java.util.List;
 @Component
 public class HandleSVGMessage extends BaseMessageHandler {
 
-    @Value("${VACCINE.URL}")
-    private String VACCINE_URL;
+    private String LOG_PREFFIX = "HandleSVGMessage";
+
 
     @Override
     public String getClassName() {
@@ -58,6 +57,7 @@ public class HandleSVGMessage extends BaseMessageHandler {
         }
         return null;
     }
+
 
 
 }

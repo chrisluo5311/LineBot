@@ -42,6 +42,7 @@ public class MyRedisConfig {
         return template;
     }
 
+
     @Bean
     public RedisTemplate<Object, ConfirmCase> confirmCaseRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<Object, ConfirmCase> template = new RedisTemplate<Object, ConfirmCase>();
