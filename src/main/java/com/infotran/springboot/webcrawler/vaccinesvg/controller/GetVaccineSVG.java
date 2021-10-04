@@ -1,5 +1,6 @@
 package com.infotran.springboot.webcrawler.vaccinesvg.controller;
 
+import com.infotran.springboot.annotation.ChromeWebDriver;
 import com.infotran.springboot.schedular.TimeUnit;
 import com.infotran.springboot.util.ClientUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -23,27 +24,20 @@ public class GetVaccineSVG implements ClientUtil,CommandLineRunner {
     @Value("${VACCINE.URL}")
     private String VACCINE_URL;
 
-    @Value("${screenshot.token}")
-    private String screenShotToken;
-
     private String VACCINE_IMG_URL = "https://infogram.com/f25f5a66-bd5e-4272-b4b4-be1258a276a8";
-
-    private static final String fileName = "疫苗統計圖(各廠牌別).svg";
-
-    private static String CHARSET = "UTF-8";
 
     @Override
     public void run(String... args) throws Exception {
-        executeVaccineScreeShot();
     }
 
     @Scheduled(fixedRate = 12* TimeUnit.HOUR)
-    public void executeVaccineScreeShot() throws IOException, InterruptedException {
+    public void executeVaccineScreeShot() throws InterruptedException {
         System.setProperty("webdriver.chrome.driver","E:\\javalib\\selenium\\webdrivers\\chromedriver.exe");
-        WebDriver driver= new ChromeDriver();
+        WebDriver driver = new ChromeDriver();
         driver.get(VACCINE_IMG_URL);
         driver.manage().window().setSize(new Dimension(886,500));
         Thread.sleep(2000);
+        //截图: 累计接踵人次
         ((JavascriptExecutor)driver).executeScript("window.scrollTo(0,1068);");
         ((JavascriptExecutor)driver).executeScript("return document.body.style.overflow = 'hidden';");
         Thread.sleep(2000);
