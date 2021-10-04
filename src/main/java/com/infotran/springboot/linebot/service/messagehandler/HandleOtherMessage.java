@@ -7,6 +7,7 @@ import com.linecorp.bot.model.event.message.LocationMessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
 import com.linecorp.bot.model.message.ImagemapMessage;
 import com.linecorp.bot.model.message.LocationMessage;
+import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.TextMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -62,7 +63,7 @@ public class HandleOtherMessage extends BaseMessageHandler {
     }
 
     @Override
-    protected List<ImagemapMessage> handleImagemapMessageReply(PostbackEvent event) {
+    protected List<Message> handleImagemapMessageReply(PostbackEvent event) {
         //不使用
         return null;
     }

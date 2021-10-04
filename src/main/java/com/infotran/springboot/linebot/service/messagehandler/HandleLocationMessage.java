@@ -4,6 +4,7 @@ import com.infotran.springboot.annotation.LogExecutionTime;
 import com.infotran.springboot.annotation.MultiQuickReply;
 import com.infotran.springboot.annotation.QuickReplyMode;
 import com.infotran.springboot.annotation.quickreplyenum.ActionMode;
+import com.infotran.springboot.config.RedisLock;
 import com.infotran.springboot.linebot.service.BaseMessageHandler;
 import com.infotran.springboot.linebot.service.messagehandler.enums.HandlerEnum;
 import com.infotran.springboot.webcrawler.medicinestore.model.MedicineStore;
@@ -39,6 +40,9 @@ public class HandleLocationMessage extends BaseMessageHandler {
 
     private static String REDIS_KEY_PREFIX = "sortedLocationMessageList";//須加上使用者id
 
+    @Resource
+    private RedisLock redisLock;
+
     //Reids Timeout 1分鐘
     private static Integer TIMEOUT = 1;
     
@@ -58,7 +62,7 @@ public class HandleLocationMessage extends BaseMessageHandler {
     @Override
     protected  List<TextMessage> textMessageReply(TextMessageContent event,String replyToken,String userId) {
         //redis key 對應使用者
-        keySB = new StringBuilder();
+        StringBuilder keySB = new StringBuilder();
         keySB.append(REDIS_KEY_PREFIX).append(userId);
         log.info("[{}] userid: {} 融合後redis key: {}",LOG_PREFIX,userId, keySB.toString());
         String receivedMessage = event.getText();
@@ -74,8 +78,8 @@ public class HandleLocationMessage extends BaseMessageHandler {
                     }
                     reply(replyToken, messageList);
                     //刪除redis key
-                    locationMessageRedisTemplate.delete(keySB);
-                }else { //redis key 2分鐘Timeout點會重新定位
+                    redisLock.unlock(keySB.toString());
+                }else { //redis key 2分鐘Timeout才點會启动重新定位的方法
                     TextMessage textMessage = openMap();
                     reply(replyToken,textMessage);
                 }
@@ -96,7 +100,7 @@ public class HandleLocationMessage extends BaseMessageHandler {
     }
 
     @Override
-    protected List<ImagemapMessage> handleImagemapMessageReply(PostbackEvent event) {
+    protected List<Message> handleImagemapMessageReply(PostbackEvent event) {
         //不使用
         return null;
     }
@@ -128,6 +132,7 @@ public class HandleLocationMessage extends BaseMessageHandler {
         if(medStoreList==null){
             medStoreList = mService.findAll();
         }
+        //两点公式算距离
         for (int i = 0 ; i < medStoreList.size(); i ++) {
             MedicineStore store = medStoreList.get(i);
             lat2 = store.getLatitude();
@@ -160,7 +165,8 @@ public class HandleLocationMessage extends BaseMessageHandler {
         //存後5家進redis
         List<LocationMessage> listToRedis = locationlinkedList.stream().skip(5).limit(5).collect(Collectors.toList());
         locationMessageRedisTemplate.opsForList().leftPushAll(keySB,listToRedis);
-        //設定Timeout:2分鐘
+        redisLock.lock(TIMEOUT,keySB.toString());
+        //設定Timeout:1分鐘
         locationMessageRedisTemplate.expire(keySB,TIMEOUT, TimeUnit.MINUTES);
         //回覆前5家
         List<LocationMessage> locationList = locationlinkedList.stream().limit(5).collect(Collectors.toList());

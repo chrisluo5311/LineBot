@@ -81,8 +81,12 @@ public abstract class BaseMessageHandler implements BaseMessageInterface,LineCli
      */
     protected abstract <T extends MessageContent> List<LocationMessage> handleLocationMessageReply(LocationMessageContent event,String userId);
 
-
-    protected abstract List<ImagemapMessage> handleImagemapMessageReply(PostbackEvent event);
+    /**
+     * 處理疫苗统计图回复
+     *
+     * @param event  PostbackEvent
+     */
+    protected abstract List<Message> handleImagemapMessageReply(PostbackEvent event);
 
     @Override
     public BotApiResponse postBackReply(PostbackEvent event) throws IOException, NoSuchMethodException {
@@ -95,6 +99,8 @@ public abstract class BaseMessageHandler implements BaseMessageInterface,LineCli
             case "國內外疫情" :
                 break;
             case "施打疫苗統計" :
+                List<Message> imageList = handleImagemapMessageReply(event);
+                this.reply(replyToken,imageList);
                 break;
             case "其他" :
                 List<Message> textList = textMessageReply(event).stream().collect(Collectors.toList());

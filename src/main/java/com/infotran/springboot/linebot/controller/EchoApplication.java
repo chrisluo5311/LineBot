@@ -45,6 +45,7 @@ public class EchoApplication {
             case "國內外疫情":
                 break;
             case "施打疫苗統計":
+
                 break;
             case "其他":
                 baseMessageInterface = baseMessagePool.getMethod(HandlerEnum.getHandlerName(6));
