@@ -41,11 +41,11 @@ server.port=9090
 
 3. 相關Maven依賴 
 
-|  套件  |  版本  |   相關文檔及說明   |
+|  套件  |  版本  |   备注   |
 |:------:|:--------:|:------------:|
 |  okhttp  | 3.14.9 |  |
 |  jsoup  | 1.13.1 |  |
-|  Apache Batik  | 1.7 | [Batik官網與文檔](https://xmlgraphics.apache.org/batik/) |
+| Selenium | 3.141.59 |  |
 |  Redis  | 5.0.10 |  |
 |  lombok  | 1.18.20 |  |
 
