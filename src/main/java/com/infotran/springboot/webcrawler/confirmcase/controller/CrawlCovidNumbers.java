@@ -1,10 +1,10 @@
 package com.infotran.springboot.webcrawler.confirmcase.controller;
 
-import com.infotran.springboot.webcrawler.confirmcase.model.ConfirmCase;
-import com.infotran.springboot.webcrawler.confirmcase.service.ConfirmCaseService;
 import com.infotran.springboot.util.ClientUtil;
 import com.infotran.springboot.util.SSLHelper;
 import com.infotran.springboot.util.TimeUtil;
+import com.infotran.springboot.webcrawler.confirmcase.model.ConfirmCase;
+import com.infotran.springboot.webcrawler.confirmcase.service.ConfirmCaseService;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -16,7 +16,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
@@ -27,7 +26,7 @@ import java.util.Map;
 
 @Controller
 @Slf4j
-public class CrawlCovidNumbers implements ClientUtil, CommandLineRunner {
+public class CrawlCovidNumbers implements ClientUtil {
 
 	// 新聞首頁
 	@Value("${CDC.URL}")
@@ -52,14 +51,11 @@ public class CrawlCovidNumbers implements ClientUtil, CommandLineRunner {
 	@Autowired
 	RedisTemplate<Object, ConfirmCase> confirmCaseRedisTemplate;
 
-	@Override
-	public void run(String... args) throws Exception {
-		executeCrawlCovid();
-	}
 
-	/*
-	 * 執行爬蟲
-	 */
+	/**
+	 * 執行當日確診爬蟲
+	 *
+	 * */
 	@Scheduled(cron = "0 0/5 14 * * ?")
 	public void executeCrawlCovid() throws IOException {
 		ConfirmCase confirmCase = cService.findByConfirmTime(LocalDate.now());
@@ -130,7 +126,10 @@ public class CrawlCovidNumbers implements ClientUtil, CommandLineRunner {
 										 .newsUrl(detailedURL)
 										 .build();
 			log.info("{} 今日確診物件 {}",LOG_PREFIX,cfc);
-//			confirmCaseRedisTemplate.opsForValue().set("今日確診",cfc);
+			if(confirmCaseRedisTemplate.hasKey("今日確診")){
+				confirmCaseRedisTemplate.delete("今日確診");
+			}
+			confirmCaseRedisTemplate.opsForValue().set("今日確診",cfc);
 			cService.save(cfc);
 		} catch (IOException e) {
 			e.printStackTrace();

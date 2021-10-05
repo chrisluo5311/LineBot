@@ -1,16 +1,18 @@
 package com.infotran.springboot.webcrawler.medicinestore.controller;
 
-import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
 import com.infotran.springboot.exception.LineBotException;
+import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
+import com.infotran.springboot.schedular.TimeUnit;
 import com.infotran.springboot.util.ClientUtil;
 import com.infotran.springboot.webcrawler.medicinestore.model.MedicineStore;
 import com.infotran.springboot.webcrawler.medicinestore.service.MedicineStoreService;
-import com.infotran.springboot.schedular.TimeUnit;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.*;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
@@ -18,14 +20,16 @@ import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
+
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @Slf4j
 @Order(2)
-public class GetMaskJsonController implements ClientUtil, CommandLineRunner {
+public class GetMaskJsonController implements ClientUtil {
 
     //口罩即時url
     @Value("${Mask.URL}")
@@ -42,18 +46,12 @@ public class GetMaskJsonController implements ClientUtil, CommandLineRunner {
     @Resource
     RedisTemplate<Object, MedicineStore> medicineStoreRedisTemplate;
 
-    @Override
-    public void run(String... args) throws Exception {
-        log.info("{} run方法",LOG_PREFIX);
-        executeMaskCrawl();
-        scheduledSaving();
-    }
 
     /**
      * 執行異步請求<br>
      * (每小時執行一次)
      * */
-    @Scheduled(cron = "0 0 0/1 * * ?")
+//    @Scheduled(cron = "0 0 0/1 * * ?")
     public void executeMaskCrawl() throws IOException {
         Request request = new Request.Builder().url(MASK_URL).get().build(); // get
         Call call = client.newCall(request);

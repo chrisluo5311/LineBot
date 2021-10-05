@@ -9,14 +9,18 @@ import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
 import com.linecorp.bot.model.event.message.MessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
-import com.linecorp.bot.model.message.ImagemapMessage;
+import com.linecorp.bot.model.message.ImageMessage;
 import com.linecorp.bot.model.message.LocationMessage;
 import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.TextMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author chris
@@ -61,12 +65,26 @@ public class HandleVaccineIMGMessage extends BaseMessageHandler {
         String data = event.getPostbackContent().getData();
         switch (data){
             case "施打疫苗統計":
-
-                break;
+                List<ImageMessage> imgList = new ArrayList<>();
+                URI vaccineImgURI1 = createUri("/static/cumulativeVaccined.jpg");
+                URI vaccineImgURI2 = createUri("/static/eachBatchCoverage.jpg");
+                ImageMessage imgMessage = ImageMessage.builder().previewImageUrl(vaccineImgURI1).originalContentUrl(vaccineImgURI1).build();
+                ImageMessage imgMessage2 = ImageMessage.builder().previewImageUrl(vaccineImgURI2).originalContentUrl(vaccineImgURI2).build();
+                imgList.add(imgMessage);
+                imgList.add(imgMessage2);
+                List<Message> replyList = imgList.stream().map(Message.class::cast)
+                        .collect(Collectors.toList());
+                return replyList;
         }
         return null;
     }
 
+    private static URI createUri(String path) {
+        return ServletUriComponentsBuilder.fromCurrentContextPath()
+                .scheme("https")
+                .path(path).build()
+                .toUri();
+    }
 
 
 

@@ -99,8 +99,9 @@ public abstract class BaseMessageHandler implements BaseMessageInterface,LineCli
             case "國內外疫情" :
                 break;
             case "施打疫苗統計" :
-                List<Message> imageList = handleImagemapMessageReply(event);
-                this.reply(replyToken,imageList);
+                handleImagemapMessageReply(event);
+                //TODO 配置QuickReply
+                this.reply(replyToken, handleImagemapMessageReply(event));
                 break;
             case "其他" :
                 List<Message> textList = textMessageReply(event).stream().collect(Collectors.toList());

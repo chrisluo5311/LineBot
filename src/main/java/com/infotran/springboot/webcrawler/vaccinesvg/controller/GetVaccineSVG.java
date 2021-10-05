@@ -9,7 +9,6 @@ import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 
@@ -18,7 +17,7 @@ import java.io.IOException;
 
 @Slf4j
 @Controller
-public class GetVaccineSVG implements ClientUtil,CommandLineRunner {
+public class GetVaccineSVG implements ClientUtil {
 
     private static final String LOG_PREFIX = "[GetVaccineSVG]";
 
@@ -38,10 +37,6 @@ public class GetVaccineSVG implements ClientUtil,CommandLineRunner {
 
     private static final String coverFileName = "eachBatchCoverage.jpg";
 
-    @Override
-    public void run(String... args) throws Exception {
-        executeVaccineScreeShot();
-    }
 
     @Scheduled(fixedRate = 12* TimeUnit.HOUR)
     public void executeVaccineScreeShot() throws InterruptedException {
