@@ -17,8 +17,6 @@ import java.util.List;
 @Slf4j
 public class BaseMessagePool implements InitializingBean, ApplicationContextAware {
 
-
-
     private ApplicationContext applicationContext;
 
     private List<String> methodList = new ArrayList<>();
@@ -54,8 +52,5 @@ public class BaseMessagePool implements InitializingBean, ApplicationContextAwar
         }
         throw new LineBotException(LineBotExceptionEnums.FAIL_ON_IMPLEMENT_GETCLASSNAME);
     }
-
-
-
 
 }

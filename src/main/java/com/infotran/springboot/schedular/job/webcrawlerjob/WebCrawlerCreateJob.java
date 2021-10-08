@@ -31,25 +31,22 @@ import java.util.List;
 @Component
 public class WebCrawlerCreateJob implements ClientUtil {
 
-    private static final String LOG_PREFIX = "[WebCrawlerCreateJob]";
+    private static final String LOG_PREFIX = "[WebCrawlerCreateJob定時任務]";
 
     @Resource
-    GetCovidNumService getCovidNumController;
+    GetCovidNumService getCovidNumService;
 
     @Resource
-    GetMaskJsonService getMaskJsonController;
-
-    @Resource
-    GetVaccinedInfoService getVaccineSVGController;
+    GetMaskJsonService getMaskJsonService;
 
     @Resource
     RedisTemplate<Object, MedicineStore> medicineStoreRedisTemplate;
 
     @Autowired
-    private ConfirmCaseService cService;
+    private ConfirmCaseService confirmCaseService;
 
     @Resource
-    private MedicineStoreService medicinetoreService;
+    private MedicineStoreService medicineStoreService;
 
     /**
      * 執行 [當日新增確診數] 爬蟲
@@ -58,7 +55,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * */
     @Scheduled(cron = "0 0/5 14 * * ?")
     public void executeCrawlCovid() throws IOException {
-        ConfirmCase confirmCase = cService.findByConfirmTime(LocalDate.now());
+        ConfirmCase confirmCase = confirmCaseService.findByConfirmTime(LocalDate.now());
         if (confirmCase!=null) return;
         Request request = new Request.Builder().url(GetCovidNumService.CDC_URL).get().build(); // get post put 等
         Call call = client.newCall(request);
@@ -73,8 +70,8 @@ public class WebCrawlerCreateJob implements ClientUtil {
             public void onResponse(Call call, Response response) throws IOException {
                 log.info("@@@@@@ {} 執行 [當日新增確診數] 爬蟲 @@@@@@",LOG_PREFIX);
                 String body = response.body().string();//整頁內容
-                String detailUrl = getCovidNumController.getURLOfNewsDetail(body);
-                getCovidNumController.parseBody(detailUrl);
+                String detailUrl = getCovidNumService.getURLOfNewsDetail(body);
+                getCovidNumService.parseBody(detailUrl);
             }
         });
     }
@@ -100,7 +97,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
             public void onResponse(Call call, Response response) throws IOException {
                 log.info("@@@@@@ {} 執行 [剩餘口罩數] 爬蟲 @@@@@@",LOG_PREFIX);
                 String jsonBody = response.body().string();
-                getMaskJsonController.parseMaskInfo(jsonBody);
+                getMaskJsonService.parseMaskInfo(jsonBody);
             }
         });
     }
@@ -114,10 +111,11 @@ public class WebCrawlerCreateJob implements ClientUtil {
     private void scheduledSaving () throws Exception {
         log.info("@@@@@@ {} 執行 [定時新增至資料庫] @@@@@@");
         List<MedicineStore> medList = medicineStoreRedisTemplate.opsForList().range(GetMaskJsonService.REDIS_KEY, 0, -1);
-//        log.info("{} 從redis 取出所有藥局 {}",LOG_PREFIX,medList);
-        List<MedicineStore> response = medicinetoreService.saveAll(medList);
-//        log.info("{} 儲存DB後的response物件 {}",LOG_PREFIX,response);
+        log.info("{} 從redis 取出所有藥局數量 {}",LOG_PREFIX,medList.size());
+        List<MedicineStore> response = medicineStoreService.saveAll(medList);
+        log.info("{} 儲存DB後的response物件數量 {}",LOG_PREFIX,response.size());
         if (response==null) {
+            log.warn("@@@@@@ {} 執行 [定時新增至資料庫] 失敗!!! @@@@@@");
             throw new LineBotException(LineBotExceptionEnums.FAIL_ON_SAVING_RESPONSE);
         }
     }
