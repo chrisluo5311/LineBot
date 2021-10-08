@@ -17,7 +17,7 @@ import java.io.IOException;
 
 @Slf4j
 @Controller
-public class GetVaccineSVG implements ClientUtil {
+public class GetVaccineSVGController implements ClientUtil {
 
     private static final String LOG_PREFIX = "[GetVaccineSVG]";
 
@@ -29,12 +29,16 @@ public class GetVaccineSVG implements ClientUtil {
     @Value("${VACCINE.IMG.URL}")
     private String VACCINE_IMG_URL;
 
+    //selenium使用的driver
     private static final String SYSTEM_DRIVER = "webdriver.chrome.driver";
 
+    //chromedirver系统路径
     private static final String SYSTEM_PATH = "E:\\javalib\\selenium\\webdrivers\\chromedriver.exe";
 
+    //累计接踵人次截圖
     private static final String cumuFileName = "cumulativeVaccined.jpg";
 
+    //各梯次疫苗涵蓋率图
     private static final String coverFileName = "eachBatchCoverage.jpg";
 
 
@@ -71,6 +75,7 @@ public class GetVaccineSVG implements ClientUtil {
                 fullPath.append(DownloadFileUtil.filePath).append(cumuFileName);
                 FileUtils.copyFile(cumulativeVaccinedFile,new File(fullPath.toString()));
             } catch (IOException e) {
+                log.info("{} 截取[累计接踵人次截圖] 失败! ",LOG_PREFIX);
                 e.printStackTrace();
             }
             driver.quit();
@@ -106,6 +111,20 @@ public class GetVaccineSVG implements ClientUtil {
             }
             driver.quit();
         }
+    }
+
+    /**
+     * 取得各疫苗接踵累计人次
+     *
+     */
+    public class getVaccinedTypeAmount implements Runnable,ClientUtil{
+
+        @Override
+        public void run() {
+
+        }
+
+
     }
 
 }

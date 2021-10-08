@@ -28,7 +28,6 @@ import java.util.List;
 
 @Controller
 @Slf4j
-@Order(2)
 public class GetMaskJsonController implements ClientUtil {
 
     //口罩即時url
@@ -51,7 +50,7 @@ public class GetMaskJsonController implements ClientUtil {
      * 執行異步請求<br>
      * (每小時執行一次)
      * */
-//    @Scheduled(cron = "0 0 0/1 * * ?")
+    @Scheduled(cron = "0 0 0/1 * * ?")
     public void executeMaskCrawl() throws IOException {
         Request request = new Request.Builder().url(MASK_URL).get().build(); // get
         Call call = client.newCall(request);

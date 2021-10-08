@@ -26,7 +26,7 @@ import java.util.Map;
 
 @Controller
 @Slf4j
-public class CrawlCovidNumbers implements ClientUtil {
+public class GetCovidNumController implements ClientUtil {
 
 	// 新聞首頁
 	@Value("${CDC.URL}")
@@ -54,6 +54,7 @@ public class CrawlCovidNumbers implements ClientUtil {
 
 	/**
 	 * 執行當日確診爬蟲
+	 * 每天14:00開始到14:55，每五分鐘執行一次
 	 *
 	 * */
 	@Scheduled(cron = "0 0/5 14 * * ?")
@@ -78,9 +79,11 @@ public class CrawlCovidNumbers implements ClientUtil {
 		});
 	}
 
-	/*
+	/**
 	 * Parse first CDC URL
 	 * Get detailed news URL
+	 * @param body 疾管局新闻首页的连结
+	 *
 	 */
 	private String getURLOfNewsDetail(String body) {
 		StringBuilder res = new StringBuilder("https://www.cdc.gov.tw");
@@ -101,9 +104,11 @@ public class CrawlCovidNumbers implements ClientUtil {
 		return res.toString();
 	}
 
-	/*
+	/**
 	 * Parse the detailed news body
 	 * Save the confirmed numbers
+	 * @param detailedURL 当日新增确诊数目的新闻连结
+	 *
 	 */
 	private void parseBody(String detailedURL) {
 		try {

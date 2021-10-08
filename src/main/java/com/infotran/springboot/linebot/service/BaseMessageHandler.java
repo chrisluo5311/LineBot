@@ -93,7 +93,6 @@ public abstract class BaseMessageHandler implements BaseMessageInterface,LineCli
         BotApiResponse botApiResponse = null;
         String replyToken = event.getReplyToken();
         String data = event.getPostbackContent().getData();
-        StringBuilder message = new StringBuilder();
         log.info("[{}] postBackReply方法的event data: {}",LOG_PREFIX,data);
         switch (data){
             case "國內外疫情" :

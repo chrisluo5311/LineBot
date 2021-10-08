@@ -1,16 +1,13 @@
 package com.infotran.springboot.linebot.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name="MenuID")
+@Table(name = "MenuID")
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
