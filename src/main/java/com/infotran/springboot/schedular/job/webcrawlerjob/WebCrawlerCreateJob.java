@@ -1,27 +1,139 @@
 package com.infotran.springboot.schedular.job.webcrawlerjob;
 
-import com.infotran.springboot.webcrawler.confirmcase.controller.GetCovidNumController;
-import com.infotran.springboot.webcrawler.medicinestore.controller.GetMaskJsonController;
-import com.infotran.springboot.webcrawler.vaccinesvg.controller.GetVaccineSVGController;
+import com.infotran.springboot.exception.LineBotException;
+import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
+import com.infotran.springboot.schedular.TimeUnit;
+import com.infotran.springboot.util.ClientUtil;
+import com.infotran.springboot.webcrawler.confirmcase.service.GetCovidNumService;
+import com.infotran.springboot.webcrawler.confirmcase.model.ConfirmCase;
+import com.infotran.springboot.webcrawler.confirmcase.service.ConfirmCaseService;
+import com.infotran.springboot.webcrawler.medicinestore.model.MedicineStore;
+import com.infotran.springboot.webcrawler.medicinestore.service.GetMaskJsonService;
+import com.infotran.springboot.webcrawler.medicinestore.service.MedicineStoreService;
+import com.infotran.springboot.webcrawler.vaccinesvg.service.GetVaccinedInfoService;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Request;
+import okhttp3.Response;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
 
 @Slf4j
 @Component
-public class WebCrawlerCreateJob {
+public class WebCrawlerCreateJob implements ClientUtil {
+
+    private static final String LOG_PREFIX = "[WebCrawlerCreateJob]";
 
     @Resource
-    GetCovidNumController getCovidNumController;
+    GetCovidNumService getCovidNumController;
 
     @Resource
-    GetMaskJsonController getMaskJsonController;
+    GetMaskJsonService getMaskJsonController;
 
     @Resource
-    GetVaccineSVGController getVaccineSVGController;
+    GetVaccinedInfoService getVaccineSVGController;
+
+    @Resource
+    RedisTemplate<Object, MedicineStore> medicineStoreRedisTemplate;
+
+    @Autowired
+    private ConfirmCaseService cService;
+
+    @Resource
+    private MedicineStoreService medicinetoreService;
+
+    /**
+     * 執行 [當日新增確診數] 爬蟲
+     * 每天14:00開始到14:55，每五分鐘執行一次
+     *
+     * */
+    @Scheduled(cron = "0 0/5 14 * * ?")
+    public void executeCrawlCovid() throws IOException {
+        ConfirmCase confirmCase = cService.findByConfirmTime(LocalDate.now());
+        if (confirmCase!=null) return;
+        Request request = new Request.Builder().url(GetCovidNumService.CDC_URL).get().build(); // get post put 等
+        Call call = client.newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                log.warn("@@@@@@ {} 執行 [當日新增確診數] 爬蟲 失敗!!! @@@@@@");
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                log.info("@@@@@@ {} 執行 [當日新增確診數] 爬蟲 @@@@@@",LOG_PREFIX);
+                String body = response.body().string();//整頁內容
+                String detailUrl = getCovidNumController.getURLOfNewsDetail(body);
+                getCovidNumController.parseBody(detailUrl);
+            }
+        });
+    }
 
 
+    /**
+     * 執行 [剩餘口罩數] 爬蟲<br>
+     * (每小時執行一次)
+     * */
+    @Scheduled(cron = "0 0 0/1 * * ?")
+    public void executeMaskCrawl() throws IOException {
+        Request request = new Request.Builder().url(GetMaskJsonService.MASK_URL).get().build(); // get
+        Call call = client.newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                log.warn("@@@@@@ {} 執行 [剩餘口罩數] 爬蟲 失敗!!! @@@@@@");
+                e.printStackTrace();
+            }
 
+            @SneakyThrows
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                log.info("@@@@@@ {} 執行 [剩餘口罩數] 爬蟲 @@@@@@",LOG_PREFIX);
+                String jsonBody = response.body().string();
+                getMaskJsonController.parseMaskInfo(jsonBody);
+            }
+        });
+    }
+
+    /**
+     * 定時新增至資料庫(每個小時)<p>
+     * 使用自定義hibernate.jdbc.batch_size=1000
+     * Batch Size是設定對資料庫進行批量刪除，批量更新和批量插入的時候的批次大小
+     * */
+    @Scheduled(fixedRate = 1* TimeUnit.HOUR)
+    private void scheduledSaving () throws Exception {
+        log.info("@@@@@@ {} 執行 [定時新增至資料庫] @@@@@@");
+        List<MedicineStore> medList = medicineStoreRedisTemplate.opsForList().range(GetMaskJsonService.REDIS_KEY, 0, -1);
+//        log.info("{} 從redis 取出所有藥局 {}",LOG_PREFIX,medList);
+        List<MedicineStore> response = medicinetoreService.saveAll(medList);
+//        log.info("{} 儲存DB後的response物件 {}",LOG_PREFIX,response);
+        if (response==null) {
+            throw new LineBotException(LineBotExceptionEnums.FAIL_ON_SAVING_RESPONSE);
+        }
+    }
+
+    /**
+     * 執行 [截图: 累计接踵人次 & 各梯次疫苗涵蓋率 & 取得各疫苗接踵累计人次] 爬蟲<br>
+     * (每小時執行一次)
+     * */
+    @Scheduled(fixedRate = 12* TimeUnit.HOUR)
+    public void executeVaccineScreeShot() throws InterruptedException {
+        log.info("@@@@@@ {} 執行 [截图: 累计接踵人次 & 各梯次疫苗涵蓋率 & 取得各疫苗接踵累计人次] 爬蟲 @@@@@@",LOG_PREFIX);
+        GetVaccinedInfoService.CumulativeVaccineImg cumulativeVaccineImg = new GetVaccinedInfoService.CumulativeVaccineImg();
+        GetVaccinedInfoService.EachBatchCoverage eachBatchCoverage = new GetVaccinedInfoService.EachBatchCoverage();
+        cumulativeVaccineImg.start();
+        eachBatchCoverage.start();
+        //todo 取得各疫苗接踵累计人次
+    }
 
 }

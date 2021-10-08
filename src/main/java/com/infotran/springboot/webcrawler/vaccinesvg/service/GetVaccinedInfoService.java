@@ -1,6 +1,5 @@
-package com.infotran.springboot.webcrawler.vaccinesvg.controller;
+package com.infotran.springboot.webcrawler.vaccinesvg.service;
 
-import com.infotran.springboot.schedular.TimeUnit;
 import com.infotran.springboot.util.ClientUtil;
 import com.infotran.springboot.util.DownloadFileUtil;
 import lombok.SneakyThrows;
@@ -9,25 +8,24 @@ import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
 
 @Slf4j
-@Controller
-public class GetVaccineSVGController implements ClientUtil {
+@Service
+public class GetVaccinedInfoService implements ClientUtil {
 
     private static final String LOG_PREFIX = "[GetVaccineSVG]";
 
     //全球疫情地圖之疫苗接種統計圖
     @Value("${VACCINE.URL}")
-    private String VACCINE_URL;
+    private static String VACCINE_URL;
 
     //疫苗施打統計(infogram)標題:誰打了疫苗
     @Value("${VACCINE.IMG.URL}")
-    private String VACCINE_IMG_URL;
+    private static String VACCINE_IMG_URL;
 
     //selenium使用的driver
     private static final String SYSTEM_DRIVER = "webdriver.chrome.driver";
@@ -35,27 +33,18 @@ public class GetVaccineSVGController implements ClientUtil {
     //chromedirver系统路径
     private static final String SYSTEM_PATH = "E:\\javalib\\selenium\\webdrivers\\chromedriver.exe";
 
-    //累计接踵人次截圖
+    //累计接踵人次截圖FileName
     private static final String cumuFileName = "cumulativeVaccined.jpg";
 
-    //各梯次疫苗涵蓋率图
+    //各梯次疫苗涵蓋率图FileName
     private static final String coverFileName = "eachBatchCoverage.jpg";
-
-
-    @Scheduled(fixedRate = 12* TimeUnit.HOUR)
-    public void executeVaccineScreeShot() throws InterruptedException {
-        CumulativeVaccineImg cumulativeVaccineImg = new CumulativeVaccineImg();
-        EachBatchCoverage eachBatchCoverage = new EachBatchCoverage();
-        cumulativeVaccineImg.start();
-        eachBatchCoverage.start();
-    }
 
     /**
      * 前往疫苗施打統計(infogram 標題:誰打了疫苗)<br>
      * 取得累计接踵人次截圖
      *
      * */
-    public class CumulativeVaccineImg extends Thread{
+    public static class CumulativeVaccineImg extends Thread{
 
         @SneakyThrows
         public void run(){
@@ -87,7 +76,7 @@ public class GetVaccineSVGController implements ClientUtil {
      * 取得各梯次疫苗涵蓋率
      *
      * */
-    public class EachBatchCoverage extends Thread{
+    public static class EachBatchCoverage extends Thread{
 
         @SneakyThrows
         public void run(){
@@ -115,9 +104,9 @@ public class GetVaccineSVGController implements ClientUtil {
 
     /**
      * 取得各疫苗接踵累计人次
-     *
+     * todo 取得各疫苗接踵累计人次(解析pdf)
      */
-    public class getVaccinedTypeAmount implements Runnable,ClientUtil{
+    public static class getVaccinedTypeAmount implements Runnable{
 
         @Override
         public void run() {

@@ -1,79 +1,41 @@
-package com.infotran.springboot.webcrawler.medicinestore.controller;
+package com.infotran.springboot.webcrawler.medicinestore.service;
 
-import com.infotran.springboot.exception.LineBotException;
-import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
-import com.infotran.springboot.schedular.TimeUnit;
 import com.infotran.springboot.util.ClientUtil;
 import com.infotran.springboot.webcrawler.medicinestore.model.MedicineStore;
-import com.infotran.springboot.webcrawler.medicinestore.service.MedicineStoreService;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Request;
-import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
-import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Controller;
-
+import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Controller
+@Service
 @Slf4j
-public class GetMaskJsonController implements ClientUtil {
+public class GetMaskJsonService implements ClientUtil {
 
     //口罩即時url
     @Value("${Mask.URL}")
-    private String MASK_URL;
+    public static String MASK_URL;
 
     private static final String LOG_PREFIX = "GetMaskJsonController";
 
     //redis key值
-    private static final String REDIS_KEY = "medicineStore";
-
-    @Resource
-    private MedicineStoreService medicinetoreService;
+    public static final String REDIS_KEY = "medicineStore";
 
     @Resource
     RedisTemplate<Object, MedicineStore> medicineStoreRedisTemplate;
 
-
-    /**
-     * 執行異步請求<br>
-     * (每小時執行一次)
-     * */
-    @Scheduled(cron = "0 0 0/1 * * ?")
-    public void executeMaskCrawl() throws IOException {
-        Request request = new Request.Builder().url(MASK_URL).get().build(); // get
-        Call call = client.newCall(request);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-            }
-
-            @SneakyThrows
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                log.info("@@@@@@ {} Mask爬蟲開始 @@@@@@",LOG_PREFIX);
-                String jsonBody = response.body().string();
-                parseMaskInfo(jsonBody);
-            }
-        });
-    }
-
     /**
      * 解析口罩即時資訊的JSON
+     * @param jsonBody
+     * @throws JSONException
+     *
      * */
-    private void parseMaskInfo (String jsonBody) throws JSONException {
+    public void parseMaskInfo (String jsonBody) throws JSONException {
         JSONObject jsonObject = new JSONObject(jsonBody);
         JSONArray jsonArray = jsonObject.getJSONArray("features");
         List<MedicineStore> medList = new ArrayList<>();
@@ -128,23 +90,5 @@ public class GetMaskJsonController implements ClientUtil {
         medicineStoreRedisTemplate.opsForList().leftPushAll(REDIS_KEY,medList);
         medicineStoreRedisTemplate.expire(REDIS_KEY,60, java.util.concurrent.TimeUnit.MINUTES);
     }
-
-    /**
-     * 定時新增至資料庫(每個小時)<p>
-     * 使用自定義hibernate.jdbc.batch_size=1000
-     * Batch Size是設定對資料庫進行批量刪除，批量更新和批量插入的時候的批次大小
-     * */
-    @Scheduled(fixedRate = 1*TimeUnit.HOUR)
-    private void scheduledSaving () throws Exception {
-        List<MedicineStore> medList = medicineStoreRedisTemplate.opsForList().range(REDIS_KEY, 0, -1);
-//        log.info("{} 從redis 取出所有藥局 {}",LOG_PREFIX,medList);
-        List<MedicineStore> response = medicinetoreService.saveAll(medList);
-//        log.info("{} 儲存DB後的response物件 {}",LOG_PREFIX,response);
-        if (response==null) {
-            throw new LineBotException(LineBotExceptionEnums.FAIL_ON_SAVING_RESPONSE);
-        }
-    }
-
-
 
 }

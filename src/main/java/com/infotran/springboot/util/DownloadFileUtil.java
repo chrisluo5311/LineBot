@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.*;
 import java.net.URI;
@@ -182,5 +183,40 @@ public class DownloadFileUtil {
     private static InputStream convertStr2InputStreamWithIO(String str) throws IOException {
         return IOUtils.toInputStream(str,CHARSET);
     }
+
+    /**
+     * 轉換File到Byte陣列
+     * @param filePath 檔案路徑
+     * @return byte[]
+     *
+     * */
+    public static byte[] file2Byte(String filePath) {
+        byte[] buffer = null;
+        try {
+            FileInputStream fis = new FileInputStream(new File(filePath));
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            byte[] b = new byte[81920];
+            int len = 0;
+            while ((len = fis.read(b)) != -1) {
+                baos.write(b, 0, len);
+            }
+            fis.close();
+            baos.close();
+            buffer = baos.toByteArray();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return buffer;
+    }
+
+    public static URI createUri(String path) {
+        return ServletUriComponentsBuilder.fromCurrentContextPath()
+                .scheme("https")
+                .path(path).build()
+                .toUri();
+    }
+
 
 }
