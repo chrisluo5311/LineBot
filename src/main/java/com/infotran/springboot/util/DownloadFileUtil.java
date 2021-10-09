@@ -27,7 +27,7 @@ import java.util.concurrent.Future;
 public class DownloadFileUtil {
 
     //檔案路徑
-    public static final String filePath = "/static/";
+    public static final String filePath = "D:/IdeaProject/LineBot/src/main/resources/static/";
 
     private static final String CHARSET = "UTF-8";
 

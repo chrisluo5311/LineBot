@@ -3,12 +3,12 @@ package com.infotran.springboot.webcrawler.medicinestore.service;
 import com.infotran.springboot.util.ClientUtil;
 import com.infotran.springboot.webcrawler.medicinestore.model.MedicineStore;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ public class GetMaskJsonService implements ClientUtil {
 
     //口罩即時url
     @Value("${Mask.URL}")
-    public static String MASK_URL;
+    public String MASK_URL;
 
     private static final String LOG_PREFIX = "GetMaskJsonController";
 

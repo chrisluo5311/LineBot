@@ -13,7 +13,7 @@ public class LinebotWebMvcConfigurer implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         //配置靜態資源
         registry.addResourceHandler("/static/**")
-                .addResourceLocations("classpath:/static/",
-                                      "file:/D:/IdeaProject/LineBot/src/main/resources/static/");
+                .addResourceLocations("classpath:/static/");
+        // "file:/D:/IdeaProject/LineBot/src/main/resources/static/"
     }
 }

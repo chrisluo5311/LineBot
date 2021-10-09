@@ -24,7 +24,7 @@ public class GetCovidNumService implements ClientUtil {
 	private static final String LOG_PREFIX = "CrawlCovidNumbers";
 
 	@Value("${CDC.URL}")
-	public static String CDC_URL;// 新聞首頁
+	public String CDC_URL;// 新聞首頁
 
 	private final String titleName = "指揮中心公布新增";
 	
