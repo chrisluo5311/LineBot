@@ -60,10 +60,11 @@ server.port=9090
 ### 參考網站
 1. [衛福部疾管署](https://www.cdc.gov.tw/ "link") 
 2. [全球疫情地圖](https://covid-19.nchc.org.tw/ "全球疫情地圖")
-3. [全球疫情地圖之疫苗接種統計圖](https://covid-19.nchc.org.tw/dt_002-csse_covid_19_daily_reports_vaccine_city2.php "疫苗接種統計圖")
-4. [疫苗累計施打人數統計圖&各縣市覆蓋率](https://infogram.com/f25f5a66-bd5e-4272-b4b4-be1258a276a8 "疫苗統計圖")
-5. [健保特約機構口罩剩餘數量明細](https://data.gov.tw/dataset/116285 "口罩link") 或 [口罩即時查](https://wenyo.github.io/maskmap/ "口罩即時查")(帶經緯度)
-6. [台灣電子地圖服務網](https://www.map.com.tw/ "台灣電子地圖服務網")
-7. [LINE Messaging API SDK for Java](https://github.com/line/line-bot-sdk-java "LineBot API SDK")
-8. [Messaging API reference](https://developers.line.biz/en/reference/messaging-api/ "LineBot API 文件")
+3. [疫苗接種統計圖](https://covid-19.nchc.org.tw/dt_002-csse_covid_19_daily_reports_vaccine_city2.php "疫苗接種統計圖")
+4. [Infogram_疫苗累計施打人數統計圖&各縣市覆蓋率](https://infogram.com/f25f5a66-bd5e-4272-b4b4-be1258a276a8 "疫苗統計圖")
+5. [CDC疫苗統計資料pdf](https://www.cdc.gov.tw/Category/Page/9jFXNbCe-sFK9EImRRi2Og "疫苗統計pdf")
+6. [健保特約機構口罩剩餘數量明細](https://data.gov.tw/dataset/116285 "口罩link") 或 [口罩即時查](https://wenyo.github.io/maskmap/ "口罩即時查")(帶經緯度)
+7. [台灣電子地圖服務網](https://www.map.com.tw/ "台灣電子地圖服務網")
+8. [LINE Messaging API SDK for Java](https://github.com/line/line-bot-sdk-java "LineBot API SDK")
+9. [Messaging API reference](https://developers.line.biz/en/reference/messaging-api/ "LineBot API 文件")
 
