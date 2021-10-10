@@ -140,7 +140,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
 //        eachBatchCoverage.start();
         /********************************** 取得各疫苗接踵累计人次 ***************************/
         GetVaccinedInfoService.VaccinedTypeAmount vaccinedTypeAmount = getVaccinedInfoService.new VaccinedTypeAmount();
-        vaccinedTypeAmount.run();
+        vaccinedTypeAmount.crawlVaccinedAmount();
     }
 
 }

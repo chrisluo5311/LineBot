@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -123,21 +124,20 @@ public class GetVaccinedInfoService implements ClientUtil {
      * todo 取得各疫苗接踵累计人次(解析pdf)
      */
     @Component
-    public class VaccinedTypeAmount implements Runnable{
+    public class VaccinedTypeAmount {
 
         //衛福部COVID-19疫苗統計資料PDF網址
         @Value("${PDF.URL}")
         private String VACCINED_STATISTICS_PDF_URL;
 
-        //衛福部COVID-19疫苗統計資料PDF
+        //衛福部COVID-19疫苗統計資料PDF的fileName
         private static final String pdfFileName = "statisticPdfFileName.pdf";
 
         //疫苗統計資料PDF網址前綴
         private static final String CDC_URL_PREFIX = "https://www.cdc.gov.tw";
 
-        @Override
         @PostConstruct
-        public void run() {
+        public void crawlVaccinedAmount() {
             log.info("疫苗統計資料PDF網址 VACCINED_STATISTICS_PDF_URL: {} ",VACCINED_STATISTICS_PDF_URL);
             Request request = new Request.Builder().url(VACCINED_STATISTICS_PDF_URL).get().build(); // get post put 等
             Call call = client.newCall(request);
@@ -158,18 +158,37 @@ public class GetVaccinedInfoService implements ClientUtil {
                     Element firstP = doc.getElementsByClass("download").get(0).child(1);
                     log.info("{} 第一個下載連結源碼: {}",LOG_PREFIX,firstP.toString());
                     Element ancherPdf = firstP.child(1);
-                    //todo 判別日期
-                    String suffixUrl = ancherPdf.attr("href");
-                    log.info("{} pdf下載連結url: {}",LOG_PREFIX,ancherPdf.toString(),suffixUrl);
-                    fullUrl.append(CDC_URL_PREFIX).append(suffixUrl);
-                    String content = PDFBoxUtil.readPDF(fullUrl.toString());
-                    //todo 解析pdf內容
+                    //判別是否為日期
+                    String title = ancherPdf.attr("title");
+                    String dateNum = verifyDate(title);//只判別是否為數字因為非日更
+
+                    if(Objects.nonNull(dateNum)){
+                        String suffixUrl = ancherPdf.attr("href");
+                        log.info("{} pdf下載連結url: {}",LOG_PREFIX,ancherPdf.toString(),suffixUrl);
+                        fullUrl.append(CDC_URL_PREFIX).append(suffixUrl);
+                        String content = PDFBoxUtil.readPDF(fullUrl.toString());
+                        //todo 解析pdf內容
+                    }else{
+                        log.info("pdf檔尚未更新或非統計資料表");
+                    }
+
 
                 }
             });
         }
 
-
+        /**
+         * 返回日期
+         * @param title 下載標題
+         * */
+        private String verifyDate(String title){
+            Integer index = 0;
+            while (Character.isDigit(title.charAt(index))) {
+                index = index*10 + Character.getNumericValue(title.charAt(index));
+                index++;
+            }
+            return index==0?null:String.valueOf(index);
+        }
 
     }
 
