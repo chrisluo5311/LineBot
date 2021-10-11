@@ -54,7 +54,7 @@ public abstract class BaseMessageUtil implements LineClientInterface {
      * @param messages
      * @param notificationDisabled
      * */
-    protected BotApiResponse reply(@NonNull String replyToken,
+    private BotApiResponse reply(@NonNull String replyToken,
                                    @NonNull List<Message> messages,
                                    boolean notificationDisabled) {
         try {

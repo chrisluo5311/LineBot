@@ -15,7 +15,6 @@ public class PDFBoxUtil {
 
     private static final String LOG_PREFIX = "PdfBoxUtil";
 
-
     public static String readPDF(String urlPath) throws IOException {
         URL pdfUrl = new URL(urlPath);
         InputStream inputStream = pdfUrl.openStream();
@@ -31,10 +30,6 @@ public class PDFBoxUtil {
         //Closing the document
         document.close();
         return text;
-    }
-
-    public void createPDF(String fileName){
-
     }
 
 }

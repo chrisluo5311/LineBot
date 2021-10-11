@@ -22,12 +22,10 @@ public class VaccineTypePeople {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer Id;
 
-    private String AzAmount;//AZ疫苗累计接踵人次
+    private String body;//內文
 
-    private String ModernaAmount;//Moderna疫苗累计接踵人次
+    private String resourceUrl;//資料來源
 
-    private String MvcAmount;//高端疫苗累计接踵人次
-
-    private String BntAmount;//BNT疫苗累计接踵人次
+    private String createTime;//新建時間
 
 }

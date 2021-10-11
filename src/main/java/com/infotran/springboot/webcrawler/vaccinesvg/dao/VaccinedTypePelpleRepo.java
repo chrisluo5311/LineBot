@@ -6,4 +6,5 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface VaccinedTypePelpleRepo extends JpaRepository<VaccineTypePeople, Integer>, CrudRepository<VaccineTypePeople, Integer> {
 
+    public VaccineTypePeople findByCreateTime(String createTime);
 }

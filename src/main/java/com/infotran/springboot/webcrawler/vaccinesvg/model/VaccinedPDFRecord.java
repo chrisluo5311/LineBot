@@ -17,7 +17,7 @@ import javax.persistence.*;
 @Component
 public class VaccinedPDFRecord {
 
-    @javax.persistence.Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer Id;
 

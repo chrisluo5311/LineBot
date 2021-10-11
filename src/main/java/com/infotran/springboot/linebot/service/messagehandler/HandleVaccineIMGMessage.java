@@ -1,11 +1,11 @@
 package com.infotran.springboot.linebot.service.messagehandler;
 
-import com.infotran.springboot.annotation.MultiQuickReply;
-import com.infotran.springboot.annotation.QuickReplyMode;
-import com.infotran.springboot.annotation.quickreplyenum.ActionMode;
 import com.infotran.springboot.linebot.service.BaseMessageHandler;
 import com.infotran.springboot.linebot.service.messagehandler.enums.HandlerEnum;
 import com.infotran.springboot.util.DownloadFileUtil;
+import com.infotran.springboot.webcrawler.vaccinesvg.model.VaccineTypePeople;
+import com.infotran.springboot.webcrawler.vaccinesvg.service.VaccinedPeopleService;
+import com.linecorp.bot.model.action.MessageAction;
 import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
 import com.linecorp.bot.model.event.message.MessageContent;
@@ -14,13 +14,15 @@ import com.linecorp.bot.model.message.ImageMessage;
 import com.linecorp.bot.model.message.LocationMessage;
 import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.TextMessage;
+import com.linecorp.bot.model.message.quickreply.QuickReply;
+import com.linecorp.bot.model.message.quickreply.QuickReplyItem;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author chris
@@ -35,6 +37,9 @@ public class HandleVaccineIMGMessage extends BaseMessageHandler {
 
     private String LOG_PREFFIX = "[HandleVaccineIMGMessage]";
 
+    @Resource
+    VaccinedPeopleService vaccinedPeopleService;
+
     @Override
     public String getClassName() {
         //第五功能
@@ -47,29 +52,33 @@ public class HandleVaccineIMGMessage extends BaseMessageHandler {
     }
 
     @Override
-    @MultiQuickReply(value = {
-            @QuickReplyMode(mode= ActionMode.MESSAGE,label = "查看各梯次COVID-19公費疫苗涵盖率",text = "查看各梯次COVID-19公費疫苗涵盖率"),
-            @QuickReplyMode(mode=ActionMode.MESSAGE,label="各縣市COVID-19疫苗涵蓋率",text = "各縣市COVID-19疫苗涵蓋率")
-    })
     protected List<TextMessage> textMessageReply(TextMessageContent event, String replyToken, String userId) {
+        QuickReply quickReply = createQuickReplyItemList();
         String receivedMessage = event.getText();
         switch (receivedMessage){
             case "查看疫苗施打人數累計統計圖":
-                List<ImageMessage> imgList = new ArrayList<>();
+                //文字訊息
+                VaccineTypePeople vaccineTypePeople = vaccinedPeopleService.findAll();
+                StringBuilder content = new StringBuilder();
+                content.append("根據衛生福利部疾病管制署公佈: \n")
+                        .append("COVID-19疫苗接種人次，")
+                        .append(vaccineTypePeople.getBody())
+                        .append("\n\n資料來源: "+vaccineTypePeople.getResourceUrl()+"。");
+                TextMessage textMessage = TextMessage.builder().text(content.toString()).quickReply(quickReply).build();
+                //圖片訊息
                 URI vaccineImgURI1 = DownloadFileUtil.createUri("/static/cumulativeVaccined.jpg");
                 URI vaccineImgURI2 = DownloadFileUtil.createUri("/static/eachBatchCoverage.jpg");
                 ImageMessage imgMessage = ImageMessage.builder().previewImageUrl(vaccineImgURI1).originalContentUrl(vaccineImgURI1).build();
                 ImageMessage imgMessage2 = ImageMessage.builder().previewImageUrl(vaccineImgURI2).originalContentUrl(vaccineImgURI2).build();
-                imgList.add(imgMessage);
-                imgList.add(imgMessage2);
-                List<Message> replyList = imgList.stream().map(Message.class::cast)
-                        .collect(Collectors.toList());
+                List<Message> replyList = new ArrayList<Message>();
+                replyList.add(textMessage);
+                replyList.add(imgMessage);
+                replyList.add(imgMessage2);
+                reply(replyToken,replyList);
                 break;
         }
         return null;
     }
-
-
 
     @Override
     protected <T extends MessageContent> List<LocationMessage> handleLocationMessageReply(LocationMessageContent event, String userId) {
@@ -80,6 +89,22 @@ public class HandleVaccineIMGMessage extends BaseMessageHandler {
     @Override
     protected List<Message> handleImagemapMessageReply(PostbackEvent event) {
         return null;
+    }
+
+    /**
+     * 混和行回復需自行生成QuickReply物件
+     *
+     * @return QuickReply
+     * */
+    private QuickReply createQuickReplyItemList(){
+        List<QuickReplyItem> quickReplyItemList = new ArrayList<>();
+        String label = "查看各縣市COVID-19疫苗涵蓋率";
+        String text = "查看各縣市COVID-19疫苗涵蓋率";
+        QuickReplyItem item = QuickReplyItem.builder()
+                .action(new MessageAction(label,text))
+                .build();
+        quickReplyItemList.add(item);
+        return QuickReply.builder().items(quickReplyItemList).build();
     }
 
 }

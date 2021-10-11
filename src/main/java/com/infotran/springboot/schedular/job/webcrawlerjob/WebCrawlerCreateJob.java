@@ -4,7 +4,6 @@ import com.infotran.springboot.exception.LineBotException;
 import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
 import com.infotran.springboot.schedular.TimeUnit;
 import com.infotran.springboot.util.ClientUtil;
-import com.infotran.springboot.webcrawler.confirmcase.model.ConfirmCase;
 import com.infotran.springboot.webcrawler.confirmcase.service.ConfirmCaseService;
 import com.infotran.springboot.webcrawler.confirmcase.service.GetCovidNumService;
 import com.infotran.springboot.webcrawler.medicinestore.model.MedicineStore;
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -56,11 +54,8 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * 每天14:00開始到14:55，每五分鐘執行一次
      *
      * */
-    @Scheduled(cron = "0 0/5 14 * * ?")
+    @Scheduled(fixedRate = 1* TimeUnit.HOUR)
     public void executeCrawlCovid() throws IOException {
-        ConfirmCase confirmCase = confirmCaseService.findByConfirmTime(LocalDate.now());
-        if (confirmCase!=null) return;
-        log.info("{} CDC_URL 新聞首頁: {} ",LOG_PREFIX,getCovidNumService.CDC_URL);
         Request request = new Request.Builder().url(getCovidNumService.CDC_URL).get().build(); // get post put 等
         Call call = client.newCall(request);
         call.enqueue(new Callback() {
@@ -72,7 +67,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                log.info("@@@@@@ {} 執行 [當日新增確診數] 爬蟲 @@@@@@",LOG_PREFIX);
+                log.info("@@@@@@@@@@@@@@@ {} 執行 [當日新增確診數] 爬蟲 @@@@@@@@@@@@@@@",LOG_PREFIX);
                 String body = response.body().string();//整頁內容
                 String detailUrl = getCovidNumService.getURLOfNewsDetail(body);
                 getCovidNumService.parseBody(detailUrl);
@@ -87,7 +82,6 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * */
     @Scheduled(fixedRate = 1* TimeUnit.HOUR)
     public void executeMaskCrawl() throws IOException {
-        log.info("{} MASK_URL: {}",LOG_PREFIX,getMaskJsonService.MASK_URL);
         Request request = new Request.Builder().url(getMaskJsonService.MASK_URL).get().build(); // get
         Call call = client.newCall(request);
         call.enqueue(new Callback() {
@@ -100,7 +94,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
             @SneakyThrows
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                log.info("@@@@@@ {} 執行 [剩餘口罩數] 爬蟲 @@@@@@",LOG_PREFIX);
+                log.info("@@@@@@@@@@@@@@@ {} 執行 [剩餘口罩數] 爬蟲 @@@@@@@@@@@@@@@",LOG_PREFIX);
                 String jsonBody = response.body().string();
                 getMaskJsonService.parseMaskInfo(jsonBody);
             }
@@ -114,7 +108,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * */
     @Scheduled(fixedRate = 1* TimeUnit.HOUR)
     private void scheduledSaving () throws Exception {
-        log.info("@@@@@@ {} 執行 [定時新增至資料庫] @@@@@@");
+        log.info("@@@@@@@@@@@@@@@ {} 執行 [定時新增至資料庫] @@@@@@@@@@@@@@@");
         List<MedicineStore> medList = medicineStoreRedisTemplate.opsForList().range(GetMaskJsonService.REDIS_KEY, 0, -1);
         log.info("{} 從redis 取出所有藥局數量 {}",LOG_PREFIX,medList.size());
         List<MedicineStore> response = medicineStoreService.saveAll(medList);
@@ -126,21 +120,39 @@ public class WebCrawlerCreateJob implements ClientUtil {
     }
 
     /**
-     * 執行 [截图: 累计接踵人次 & 各梯次疫苗涵蓋率 & 取得各疫苗接踵累计人次] 爬蟲<br>
+     * 執行 [取得各疫苗接踵累计人次] 爬蟲<br>
+     * (每小時執行一次)
+     * */
+    @Scheduled(fixedRate = 12* TimeUnit.HOUR)
+    public void executeParsingPDF() throws InterruptedException {
+        log.info("@@@@@@@@@@@@@@@ {} 執行 [pdf 取得各疫苗接踵累计人次] 爬蟲 @@@@@@@@@@@@@@@",LOG_PREFIX);
+        Request request = new Request.Builder().url(getVaccinedInfoService.PDF_URL).get().build(); // get post put 等
+        Call call = client.newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                log.warn("@@@@@@ {} 執行 [當日新增確診數] 爬蟲 失敗!!! @@@@@@");
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String body = response.body().string();//整頁內容
+                getVaccinedInfoService.crawlVaccinedAmount(body);
+            }
+        });
+    }
+
+    /**
+     * 執行 [截图: 累计接踵人次 & 各梯次疫苗涵蓋率] 爬蟲<br>
      * (每小時執行一次)
      * */
     @Scheduled(fixedRate = 12* TimeUnit.HOUR)
     public void executeVaccineScreeShot() throws InterruptedException {
-        log.info("@@@@@@ {} 執行 [截图: 累计接踵人次 & 各梯次疫苗涵蓋率 & 取得各疫苗接踵累计人次] 爬蟲 @@@@@@",LOG_PREFIX);
-        GetVaccinedInfoService getVaccinedInfoService= new GetVaccinedInfoService();
+        log.info("@@@@@@@@@@@@@@@ {} 執行 [截图: 累计接踵人次 & 各梯次疫苗涵蓋率] 爬蟲 @@@@@@@@@@@@@@@",LOG_PREFIX);
+        getVaccinedInfoService.crawlCumulativeVaccineImg();
+        getVaccinedInfoService.crawlEachBatchCoverage();
 
-        GetVaccinedInfoService.CumulativeVaccineImg cumulativeVaccineImg = getVaccinedInfoService.new CumulativeVaccineImg();
-        GetVaccinedInfoService.EachBatchCoverage eachBatchCoverage = getVaccinedInfoService.new EachBatchCoverage();
-//        cumulativeVaccineImg.start();
-//        eachBatchCoverage.start();
-        /********************************** 取得各疫苗接踵累计人次 ***************************/
-        GetVaccinedInfoService.VaccinedTypeAmount vaccinedTypeAmount = getVaccinedInfoService.new VaccinedTypeAmount();
-        vaccinedTypeAmount.crawlVaccinedAmount();
     }
 
 }

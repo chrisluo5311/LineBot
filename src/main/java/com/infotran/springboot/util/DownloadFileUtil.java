@@ -8,13 +8,13 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.*;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -92,12 +92,10 @@ public class DownloadFileUtil {
         URL url = new URL(govURL);
         List<String> strFileContents = new ArrayList<>();
         try(InputStream inputStream = url.openStream()){
-            Files.copy(inputStream, Paths.get(filePath+fileName));
-            Files.readAllLines(Paths.get(url.toURI())).stream().map(String::trim).forEach(strFileContents::add);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
+            Files.copy(inputStream, Paths.get(filePath+fileName), StandardCopyOption.REPLACE_EXISTING);
+//                Files.readAllLines(Paths.get(url.toURI())).stream().map(String::trim).forEach(strFileContents::add);
         }
-        return strFileContents;
+        return null;
     }
 
     /**
@@ -135,7 +133,6 @@ public class DownloadFileUtil {
                 .uri(new URI(govURL))
                 .GET()
                 .build();
-
         Future<String> futureString =
                 httpClient
                         .sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString())
