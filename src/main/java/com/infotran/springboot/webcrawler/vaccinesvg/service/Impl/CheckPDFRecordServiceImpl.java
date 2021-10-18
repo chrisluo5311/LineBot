@@ -29,6 +29,7 @@ public class CheckPDFRecordServiceImpl implements CheckPDFRecordSevice {
     public String findByUploadTime(String uploadTime) {
         VaccinedPDFRecord vaccinedPDFRecord = vaccinedPDFRecordRepo.findByUploadTime(uploadTime);
         if(Objects.nonNull(vaccinedPDFRecord)){//代表重複 政府尚未更新pdf
+            log.info("VaccinedPDFRecord物件為:{}",vaccinedPDFRecord.toString());
             String time = vaccinedPDFRecord.getUploadTime();
             log.info("{} 上次上傳時間為: {}",LOG_PREFIX,time);
         } else {

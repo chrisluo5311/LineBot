@@ -26,7 +26,6 @@ public class PDFBoxUtil {
 
         //Retrieving text from PDF document
         String text = pdfStripper.getText(document);
-        log.info("{} 讀取pdf檔內容: {} ",LOG_PREFIX,text);
         //Closing the document
         document.close();
         return text;

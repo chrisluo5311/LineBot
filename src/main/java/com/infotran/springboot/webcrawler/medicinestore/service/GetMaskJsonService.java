@@ -29,6 +29,9 @@ public class GetMaskJsonService implements ClientUtil {
     @Resource
     RedisTemplate<Object, MedicineStore> medicineStoreRedisTemplate;
 
+    @Resource
+    private MedicineStoreService medicineStoreService;
+
     /**
      * 解析口罩即時資訊的JSON
      * @param jsonBody
@@ -88,6 +91,10 @@ public class GetMaskJsonService implements ClientUtil {
             medicineStoreRedisTemplate.delete(REDIS_KEY);
         }
         medicineStoreRedisTemplate.opsForList().leftPushAll(REDIS_KEY,medList);
+        List<MedicineStore> response = medicineStoreService.saveAll(medList);
+        if(response==null){
+            log.info("{} 新增至db失敗",LOG_PREFIX);
+        }
         medicineStoreRedisTemplate.expire(REDIS_KEY,60, java.util.concurrent.TimeUnit.MINUTES);
     }
 

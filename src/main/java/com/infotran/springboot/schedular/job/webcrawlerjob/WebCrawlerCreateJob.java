@@ -1,7 +1,5 @@
 package com.infotran.springboot.schedular.job.webcrawlerjob;
 
-import com.infotran.springboot.exception.LineBotException;
-import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
 import com.infotran.springboot.schedular.TimeUnit;
 import com.infotran.springboot.util.ClientUtil;
 import com.infotran.springboot.webcrawler.confirmcase.service.ConfirmCaseService;
@@ -21,9 +19,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @Slf4j
 @Component
@@ -48,6 +50,14 @@ public class WebCrawlerCreateJob implements ClientUtil {
 
     @Resource
     private MedicineStoreService medicineStoreService;
+
+    private static ExecutorService crawImgExecutor;
+
+    @PostConstruct
+    public void init(){
+        crawImgExecutor = new ThreadPoolExecutor(2,4,180,
+                                                java.util.concurrent.TimeUnit.SECONDS,new ArrayBlockingQueue<>(5),new ThreadPoolExecutor.AbortPolicy());
+    }
 
     /**
      * 執行 [當日新增確診數] 爬蟲
@@ -101,26 +111,10 @@ public class WebCrawlerCreateJob implements ClientUtil {
         });
     }
 
-    /**
-     * 定時新增至資料庫(每個小時)<p>
-     * 使用自定義hibernate.jdbc.batch_size=1000
-     * Batch Size是設定對資料庫進行批量刪除，批量更新和批量插入的時候的批次大小
-     * */
-    @Scheduled(fixedRate = 1* TimeUnit.HOUR)
-    private void scheduledSaving () throws Exception {
-        log.info("@@@@@@@@@@@@@@@ {} 執行 [定時新增至資料庫] @@@@@@@@@@@@@@@");
-        List<MedicineStore> medList = medicineStoreRedisTemplate.opsForList().range(GetMaskJsonService.REDIS_KEY, 0, -1);
-        log.info("{} 從redis 取出所有藥局數量 {}",LOG_PREFIX,medList.size());
-        List<MedicineStore> response = medicineStoreService.saveAll(medList);
-        log.info("{} 儲存DB後的response物件數量 {}",LOG_PREFIX,response.size());
-        if (response==null) {
-            log.warn("@@@@@@ {} 執行 [定時新增至資料庫] 失敗!!! @@@@@@");
-            throw new LineBotException(LineBotExceptionEnums.FAIL_ON_SAVING_RESPONSE);
-        }
-    }
+
 
     /**
-     * 執行 [取得各疫苗接踵累计人次] 爬蟲<br>
+     * 執行 [pdf 取得各疫苗接踵累计人次] 爬蟲<br>
      * (每小時執行一次)
      * */
     @Scheduled(fixedRate = 12* TimeUnit.HOUR)
@@ -150,8 +144,24 @@ public class WebCrawlerCreateJob implements ClientUtil {
     @Scheduled(fixedRate = 12* TimeUnit.HOUR)
     public void executeVaccineScreeShot() throws InterruptedException {
         log.info("@@@@@@@@@@@@@@@ {} 執行 [截图: 累计接踵人次 & 各梯次疫苗涵蓋率] 爬蟲 @@@@@@@@@@@@@@@",LOG_PREFIX);
-        getVaccinedInfoService.crawlCumulativeVaccineImg();
-        getVaccinedInfoService.crawlEachBatchCoverage();
+        String LOG_PREFIX = "executeVaccineScreeShot";
+        for(int i = 0; i < 2 ; i++){
+            int finalI = i;
+            crawImgExecutor.execute(() -> {
+                try {
+                    if(finalI ==0){
+                        getVaccinedInfoService.crawlCumulativeVaccineImg();
+                    }else {
+                        getVaccinedInfoService.crawlEachBatchCoverage();
+                    }
+                } catch (RejectedExecutionException | InterruptedException e){
+                    log.info("{} 截图: 累计接踵人次 & 各梯次疫苗涵蓋率 失敗",LOG_PREFIX);
+                } finally {
+
+                }
+            });
+        }
+
 
     }
 

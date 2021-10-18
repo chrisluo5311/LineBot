@@ -90,7 +90,6 @@ public class GetVaccinedInfoService implements ClientUtil {
         driver.quit();
     }
 
-
     /**
      * 全球疫情地圖之疫苗接種統計圖<br>
      * 取得各梯次疫苗涵蓋率
@@ -120,7 +119,8 @@ public class GetVaccinedInfoService implements ClientUtil {
     }
 
     /**
-     * 取得各疫苗接踵累计人次
+     * 解析pdf並取得各疫苗接踵累计人次
+     * @param body
      */
     public void crawlVaccinedAmount(String body) throws IOException {
         StringBuilder fullUrl = new StringBuilder();
@@ -133,7 +133,8 @@ public class GetVaccinedInfoService implements ClientUtil {
         //判別日期並回傳日期
         String dateNum = verifyDate(title);
         log.info("title的日期: {}",dateNum);
-        String isNew = checkPDFRecordService.findByUploadTime(title);
+        String isNew = checkPDFRecordService.findByUploadTime(dateNum);
+        log.info(isNew);
         if(Objects.nonNull(dateNum) && CheckPDFRecordServiceImpl.ISNEWPDF.equals(isNew)){
             //紀錄新的一筆
             VaccinedPDFRecord vaccinedPDFRecord = VaccinedPDFRecord.builder()
@@ -142,8 +143,8 @@ public class GetVaccinedInfoService implements ClientUtil {
             checkPDFRecordService.save(vaccinedPDFRecord);
             //提取url
             String suffixUrl = ancherPdf.attr("href");
-            log.info("{} pdf下載連結url: {}",LOG_PREFIX,ancherPdf.toString(),suffixUrl);
             fullUrl.append(CDC_URL_PREFIX).append(suffixUrl);
+            log.info("{} pdf下載連結url: {}",LOG_PREFIX,fullUrl.toString());
             //pdf轉換成文字
             String content = PDFBoxUtil.readPDF(fullUrl.toString());
             //解析內容
@@ -159,7 +160,7 @@ public class GetVaccinedInfoService implements ClientUtil {
             title += ".pdf";
             DownloadFileUtil.downloadWithFilesCopy(fullUrl.toString(),title);
         }else{ //為null代表非統計資料的pdf
-            log.info("[{} pdf檔尚未更新 或 此檔案非統計資料表]",LOG_PREFIX);
+            log.info("[{} pdf檔尚未更新 或 此檔案非統計資料表 或 此檔案已新增過 ]",LOG_PREFIX);
         }
     }
 

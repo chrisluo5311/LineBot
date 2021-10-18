@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Created-By: IntelliJ IDEA
+Built-By: chris
+Build-Jdk: 11.0.10
+Implementation-Title: LineBot
+Implementation-Version: 0.0.1-SNAPSHOT
+Implementation-Vendor-Id: com.infotran
+Main-Class: ${start-class}
+

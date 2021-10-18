@@ -6,5 +6,6 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface VaccinedPDFRecordRepo extends JpaRepository<VaccinedPDFRecord, Integer>, CrudRepository<VaccinedPDFRecord, Integer> {
 
+
     public VaccinedPDFRecord findByUploadTime(String uploadTime);
 }
