@@ -17,13 +17,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import javax.annotation.Resource;
 
 @LineMessageHandler
-@SpringBootApplication
 @Slf4j
 public class EchoApplication {
-
-    public static void main(String[] args) {
-        SpringApplication.run(EchoApplication.class, args);
-    }
 
     private static final String LOG_PREFIX = "EchoApplication";
 
