@@ -12,7 +12,6 @@ public class MgrFindVeiwController {
 
     @GetMapping(value="/")
     public String home(){
-        log.info("{} 進入首頁拉!!!",LOG_PREFIX);
         return "index";
     }
 }
