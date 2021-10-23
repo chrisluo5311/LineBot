@@ -120,7 +120,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
     @Scheduled(fixedRate = 12* TimeUnit.HOUR)
     public void executeParsingPDF() throws InterruptedException {
         log.info("@@@@@@@@@@@@@@@ {} 執行 [pdf 取得各疫苗接踵累计人次] 爬蟲 @@@@@@@@@@@@@@@",LOG_PREFIX);
-        Request request = new Request.Builder().url(getVaccinedInfoService.PDF_URL).get().build(); // get post put 等
+        Request request = new Request.Builder().url(getVaccinedInfoService.getPdfUrl()).get().build(); // get post put 等
         Call call = client.newCall(request);
         call.enqueue(new Callback() {
             @Override

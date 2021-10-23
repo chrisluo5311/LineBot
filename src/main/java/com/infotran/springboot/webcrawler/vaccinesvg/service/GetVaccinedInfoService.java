@@ -38,7 +38,8 @@ public class GetVaccinedInfoService implements ClientUtil {
     private String VACCINE_URL;
 
     //CDC疫苗統計資料pdf
-    public String PDF_URL = "https://www.cdc.gov.tw/Category/Page/9jFXNbCe-sFK9EImRRi2Og";
+    @Value("${PDF.URL}")
+    private String PDF_URL;
 
     //selenium使用的driver
     private static final String SYSTEM_DRIVER = "webdriver.chrome.driver";
@@ -53,13 +54,17 @@ public class GetVaccinedInfoService implements ClientUtil {
     private static final String coverFileName = "eachBatchCoverage.jpg";
 
     //疫苗統計資料PDF網址前綴
-    private static final String CDC_URL_PREFIX = "https://www.cdc.gov.tw";
+    private static final String CDC_PDF_URL_PREFIX = "https://www.cdc.gov.tw";
 
     @Resource
     CheckPDFRecordServiceImpl checkPDFRecordService;
 
     @Resource
     VaccinedPeopleServiceImpl vaccinedPeopleService;
+
+    public String getPdfUrl(){
+        return this.PDF_URL;
+    }
 
     /**
      * 前往疫苗施打統計(infogram 標題:誰打了疫苗)<br>
@@ -143,7 +148,7 @@ public class GetVaccinedInfoService implements ClientUtil {
             checkPDFRecordService.save(vaccinedPDFRecord);
             //提取url
             String suffixUrl = ancherPdf.attr("href");
-            fullUrl.append(CDC_URL_PREFIX).append(suffixUrl);
+            fullUrl.append(CDC_PDF_URL_PREFIX).append(suffixUrl);
             log.info("{} pdf下載連結url: {}",LOG_PREFIX,fullUrl.toString());
             //pdf轉換成文字
             String content = PDFBoxUtil.readPDF(fullUrl.toString());

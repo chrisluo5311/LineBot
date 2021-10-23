@@ -35,6 +35,7 @@ public class GetCovidNumService implements ClientUtil {
 	private final String DEATH_NUM = "確診個案中新增";
 
 
+
 	@Autowired
 	private ConfirmCaseService cService;
 
