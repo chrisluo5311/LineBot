@@ -54,7 +54,8 @@ public class GetVaccinedInfoService implements ClientUtil {
     private static final String coverFileName = "eachBatchCoverage.jpg";
 
     //疫苗統計資料PDF網址前綴
-    private static final String CDC_PDF_URL_PREFIX = "https://www.cdc.gov.tw";
+    @Value("${CDC_URL_PREFIX}")
+    private String CDC_URL_PREFIX;
 
     @Resource
     CheckPDFRecordServiceImpl checkPDFRecordService;
@@ -148,7 +149,7 @@ public class GetVaccinedInfoService implements ClientUtil {
             checkPDFRecordService.save(vaccinedPDFRecord);
             //提取url
             String suffixUrl = ancherPdf.attr("href");
-            fullUrl.append(CDC_PDF_URL_PREFIX).append(suffixUrl);
+            fullUrl.append(CDC_URL_PREFIX).append(suffixUrl);
             log.info("{} pdf下載連結url: {}",LOG_PREFIX,fullUrl.toString());
             //pdf轉換成文字
             String content = PDFBoxUtil.readPDF(fullUrl.toString());

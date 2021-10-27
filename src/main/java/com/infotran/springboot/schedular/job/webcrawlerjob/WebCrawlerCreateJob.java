@@ -1,5 +1,7 @@
 package com.infotran.springboot.schedular.job.webcrawlerjob;
 
+import com.infotran.springboot.exception.LineBotException;
+import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
 import com.infotran.springboot.schedular.TimeUnit;
 import com.infotran.springboot.util.ClientUtil;
 import com.infotran.springboot.webcrawler.confirmcase.service.ConfirmCaseService;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
@@ -64,23 +67,29 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * 每天14:00開始到14:55，每五分鐘執行一次
      *
      * */
-    @Scheduled(fixedRate = 1* TimeUnit.HOUR)
+    @Scheduled(cron = "0 0/5 14 * * ?")
     public void executeCrawlCovid() throws IOException {
         Request request = new Request.Builder().url(getCovidNumService.CDC_URL).get().build(); // get post put 等
         Call call = client.newCall(request);
         call.enqueue(new Callback() {
+            @SneakyThrows
             @Override
             public void onFailure(Call call, IOException e) {
                 log.warn("@@@@@@ {} 執行 [當日新增確診數] 爬蟲 失敗!!! @@@@@@");
-                e.printStackTrace();
+                throw new LineBotException(LineBotExceptionEnums.FAIL_ON_WEBCRAWLING,e.getMessage());
             }
 
+            @SneakyThrows
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 log.info("@@@@@@@@@@@@@@@ {} 執行 [當日新增確診數] 爬蟲 @@@@@@@@@@@@@@@",LOG_PREFIX);
                 String body = response.body().string();//整頁內容
-                String detailUrl = getCovidNumService.getURLOfNewsDetail(body);
-                getCovidNumService.parseBody(detailUrl);
+                if(!Objects.isNull(body)){
+                    String detailUrl = getCovidNumService.getURLOfNewsDetail(body);
+                    getCovidNumService.parseBody(detailUrl);
+                }else {
+                    throw new LineBotException(LineBotExceptionEnums.FAIL_ON_BODY_RESPONSE);
+                }
             }
         });
     }
@@ -89,6 +98,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
     /**
      * 執行 [剩餘口罩數] 爬蟲<br>
      * (每小時執行一次)
+     *
      * */
     @Scheduled(fixedRate = 1* TimeUnit.HOUR)
     public void executeMaskCrawl() throws IOException {

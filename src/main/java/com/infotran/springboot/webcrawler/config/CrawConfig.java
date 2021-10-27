@@ -5,8 +5,7 @@ import org.springframework.context.annotation.PropertySource;
 
 @Configuration
 @PropertySource({
-        "classpath:webcrawl.properties",
-        "classpath:application.properties"
+        "classpath:webcrawl.properties"
 })
 public class CrawConfig {
 

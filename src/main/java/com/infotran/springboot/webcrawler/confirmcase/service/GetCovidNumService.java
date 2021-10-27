@@ -1,5 +1,7 @@
 package com.infotran.springboot.webcrawler.confirmcase.service;
 
+import com.infotran.springboot.exception.LineBotException;
+import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
 import com.infotran.springboot.util.ClientUtil;
 import com.infotran.springboot.util.SSLHelper;
 import com.infotran.springboot.util.TimeUtil;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -25,19 +28,19 @@ public class GetCovidNumService implements ClientUtil {
 
 	@Value("${CDC.URL}")
 	public String CDC_URL;// 新聞首頁
-
-	private final String titleName = "指揮中心公布新增";
-	
-	private final String DOMESTIC_NEWNUM = "國內新增";
-	
-	private final String RETURN_NUM = "校正回歸本土個案";
-	
-	private final String DEATH_NUM = "確診個案中新增";
-
-
+	@Value("${CDC_URL_PREFIX}")
+	private StringBuilder CDC_URL_PREFIX;// CDC網站前綴
+	@Value("${TITLE_NAME}")
+	private String TITLE_NAME;
+	@Value("${DOMESTIC_NEWNUM}")
+	private String DOMESTIC_NEWNUM;
+	@Value("${RETURN_NUM}")
+	private String RETURN_NUM;
+	@Value("${DEATH_NUM}")
+	private String DEATH_NUM;
 
 	@Autowired
-	private ConfirmCaseService cService;
+	private ConfirmCaseService confirmCaseService;
 
 	@Autowired
 	RedisTemplate<Object, ConfirmCase> confirmCaseRedisTemplate;
@@ -48,8 +51,7 @@ public class GetCovidNumService implements ClientUtil {
 	 * @param body 疾管局新闻首页的连结
 	 *
 	 */
-	public String getURLOfNewsDetail(String body) {
-		StringBuilder res = new StringBuilder("https://www.cdc.gov.tw");
+	public String getURLOfNewsDetail(String body) throws LineBotException {
 		Document doc = Jsoup.parse(body);
 		Elements newslists = doc.select(".cbp-item");
 		Map<String, String> todayMap = TimeUtil.genTodayDate();
@@ -58,13 +60,16 @@ public class GetCovidNumService implements ClientUtil {
 			String date = element.select("p.icon-date").text();
 			String tname = element.select(".content-boxes-v3 > a").attr("title");
 			if (todayMap.containsKey(month) && todayMap.containsValue(date) && tname.indexOf("確定病例") != -1) {
-				log.info("[The rest of the news url is here : {} ]" , element.select(".content-boxes-v3 > a").attr("href"));
-				res.append(element.select(".content-boxes-v3 > a").attr("href"));
-				return res.toString();
+				log.info("{} 今日新聞後半url: {}" ,LOG_PREFIX,element.select(".content-boxes-v3 > a").attr("href"));
+				CDC_URL_PREFIX.append(element.select(".content-boxes-v3 > a").attr("href"));
+				log.info("{} 今日新聞全部url: {} ",LOG_PREFIX,CDC_URL_PREFIX.toString());
+				return CDC_URL_PREFIX.toString();
+			} else {
+				log.error("!!!!!!!! {} 找不到新聞標題:{} 有無確定病例字樣:{} !!!!!!!!",LOG_PREFIX,tname,tname.indexOf("確定病例"));
+				throw new LineBotException(LineBotExceptionEnums.NEWS_TITLE_CHANGE);
 			}
 		}
-		log.info("News detailed url: {} "+res.toString());
-		return res.toString();
+		throw new LineBotException(LineBotExceptionEnums.FAIL_ON_FIND_TODAY_COVIDNEWS);
 	}
 
 	/**
@@ -73,7 +78,7 @@ public class GetCovidNumService implements ClientUtil {
 	 * @param detailedURL 当日新增确诊数目的新闻连结
 	 *
 	 */
-	public ConfirmCase parseBody(String detailedURL) {
+	public ConfirmCase parseBody(String detailedURL) throws LineBotException {
 		ConfirmCase confirmCase = null;
 		try {
 			Document doc = SSLHelper.getConnection(detailedURL).timeout(3000).maxBodySize(0).get();
@@ -97,13 +102,15 @@ public class GetCovidNumService implements ClientUtil {
 										 .newsUrl(detailedURL)
 										 .build();
 			log.info("{} 今日確診物件: {}",LOG_PREFIX,cfc);
+			Boolean weiredStatus = Stream.of(newNum,reNum,totalNum,deathNum).allMatch(x->x==0);
+
 			if(confirmCaseRedisTemplate.hasKey("今日確診")){
 				confirmCaseRedisTemplate.delete("今日確診");
 			}
 			confirmCaseRedisTemplate.opsForValue().set("今日確診",cfc);
-			confirmCase= cService.save(cfc);
+			confirmCase= confirmCaseService.save(cfc);
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new LineBotException(LineBotExceptionEnums.FAIL_ON_SSLHELPER_CONNECTION,e.getMessage());
 		}
 		return confirmCase;
 	}
@@ -124,7 +131,7 @@ public class GetCovidNumService implements ClientUtil {
 		return target;
 	}
 
-	private int getNumberFromEachCategory(int index, String article) {
+	private Integer getNumberFromEachCategory(int index, String article) {
 		Integer sum = 0;
 		while (Character.isDigit(article.charAt(index))) {
 			sum = sum*10 + Character.getNumericValue(article.charAt(index));

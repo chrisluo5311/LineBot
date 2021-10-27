@@ -29,9 +29,7 @@ public class ConfirmCase {
 	private Integer todayAmount; //今日確診數目
 	
 	private Integer returnAmount; //校正回歸數
-	
-	private Integer releasedQuarantine; //解除14天隔離數目(沒用到)
-	
+
 	private LocalDate confirmTime;//更新時間(now)
 
 	private String newsUrl;//新聞網址

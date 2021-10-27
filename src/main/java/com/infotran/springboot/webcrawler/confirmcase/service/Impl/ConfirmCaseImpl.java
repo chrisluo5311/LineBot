@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Service
 public class ConfirmCaseImpl implements ConfirmCaseService {
@@ -16,9 +17,9 @@ public class ConfirmCaseImpl implements ConfirmCaseService {
 
 	@Override
 	public ConfirmCase save (ConfirmCase fcase) {
-		ConfirmCase cfc = findByConfirmTime(LocalDate.now());
-		if (cfc != null){
-			conRepo.delete(cfc);
+		ConfirmCase confirmCase = findByConfirmTime(LocalDate.now());
+		if (Objects.nonNull(confirmCase)){
+			conRepo.delete(confirmCase);
 		}
 		return conRepo.save(fcase);
 	}
