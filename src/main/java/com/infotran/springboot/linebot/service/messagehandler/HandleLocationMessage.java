@@ -79,7 +79,8 @@ public class HandleLocationMessage extends BaseMessageHandler {
                     reply(replyToken, messageList);
                     //刪除redis key
                     redisLock.unlock(keySB.toString());
-                }else { //redis key 2分鐘Timeout才點會启动重新定位的方法
+                }else {
+                    //redis key 2分鐘Timeout才點會启动重新定位的方法
                     TextMessage textMessage = openMap();
                     reply(replyToken,textMessage);
                 }
@@ -126,7 +127,7 @@ public class HandleLocationMessage extends BaseMessageHandler {
         long1 = event.getLongitude();
         //藥局map 儲存距離與店家
         Map<Double,MedicineStore> medicineStoreMap = new HashMap<>();
-        List<MedicineStore> medStoreList = new ArrayList<>();
+        List<MedicineStore> medStoreList = null;
         //從redis取出所有藥局
         medStoreList = medicineStoreRedisTemplate.opsForList().range("medicineStore",0,-1);
         if(medStoreList==null){
