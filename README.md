@@ -50,12 +50,8 @@ server.port=9090
 |  lombok  | 1.18.20 |  |
 
 ### 測試須知
-1. [ngrok下載請點我](https://ngrok.com/download "ngrok")
-2. 開啟ngrok，登入ngrok的網站
-3. 於ngrok輸入 **taskkill /f /im ngrok.exe**
-4. 再將ngrok網站上的authtoken複製到ngrok上面(**不要複製到斜線**)
-5. 再輸ngrok http 9090  
-6. 出現online連線成功
+1. [ngrok下載](https://ngrok.com/download "ngrok")
+2. ngrok http 9090  
 
 ### 參考網站
 1. [衛福部疾管署](https://www.cdc.gov.tw/ "link") 
