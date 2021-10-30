@@ -144,7 +144,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String body = response.body().string();//整頁內容
-                getVaccinedInfoService.crawlVaccinedAmount(body);
+                getVaccinedInfoService.crawlVaccinedAmount(body,new StringBuilder());
             }
         });
     }
