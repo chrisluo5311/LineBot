@@ -207,6 +207,17 @@
 					</excludes>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>11</source>	<!-- 原始碼使用的開發版本 -->
+					<target>11</target>	<!-- 需要生成的目標class檔案的編譯版本 -->
+					<!-- 一般而言，target與source是保持一致的，但是，有時候為了讓程式能在其他版本的jdk中執行(對於低版本目標jdk，原始碼中需要沒有使用低版本jdk中不支援的語法)，會存在target不同於source的情況 -->
+					<encoding>UTF-8</encoding>  <!-- 編譯是的字元編碼 -->
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 

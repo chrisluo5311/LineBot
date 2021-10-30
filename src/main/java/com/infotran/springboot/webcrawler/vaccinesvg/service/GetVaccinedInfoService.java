@@ -1,5 +1,7 @@
 package com.infotran.springboot.webcrawler.vaccinesvg.service;
 
+import com.infotran.springboot.exception.LineBotException;
+import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
 import com.infotran.springboot.util.ClientUtil;
 import com.infotran.springboot.util.DownloadFileUtil;
 import com.infotran.springboot.util.PDFBoxUtil;
@@ -72,10 +74,9 @@ public class GetVaccinedInfoService implements ClientUtil {
      * 取得累计接踵人次截圖
      *
      * */
-    public void crawlCumulativeVaccineImg() throws InterruptedException {
+    public void crawlCumulativeVaccineImg() throws InterruptedException, LineBotException {
         System.setProperty(SYSTEM_DRIVER,SYSTEM_PATH);
         WebDriver driver = new ChromeDriver();
-        log.info("{} 累计接踵人次截圖VACCINE_IMG_URL: {} ",LOG_PREFIX,VACCINE_IMG_URL);
         driver.get(VACCINE_IMG_URL);
         driver.manage().window().setSize(new Dimension(886,500));
         Thread.sleep(2000);
@@ -90,10 +91,10 @@ public class GetVaccinedInfoService implements ClientUtil {
             fullPath.append(DownloadFileUtil.filePath).append(cumuFileName);
             FileUtils.copyFile(cumulativeVaccinedFile,new File(fullPath.toString()));
         } catch (IOException e) {
-            log.info("{} 截取[累计接踵人次截圖] 失败! ",LOG_PREFIX);
-            e.printStackTrace();
+            throw new LineBotException(LineBotExceptionEnums.FAIL_ON_OUTPUT_FILE,e.getMessage());
+        } finally {
+            driver.quit();
         }
-        driver.quit();
     }
 
     /**
@@ -101,10 +102,9 @@ public class GetVaccinedInfoService implements ClientUtil {
      * 取得各梯次疫苗涵蓋率
      *
      * */
-    public void crawlEachBatchCoverage() throws InterruptedException {
+    public void crawlEachBatchCoverage() throws InterruptedException, LineBotException {
         System.setProperty(SYSTEM_DRIVER,SYSTEM_PATH);
         WebDriver driver = new ChromeDriver();
-        log.info("{} 各梯次疫苗涵蓋率VACCINE_URL: {} ",LOG_PREFIX,VACCINE_URL);
         driver.get(VACCINE_URL);
         driver.manage().window().setSize(new Dimension(1100,700));
         Thread.sleep(2000);
@@ -119,9 +119,10 @@ public class GetVaccinedInfoService implements ClientUtil {
             fullPath.append(DownloadFileUtil.filePath).append(coverFileName);
             FileUtils.copyFile(cumulativeVaccinedFile,new File(fullPath.toString()));
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new LineBotException(LineBotExceptionEnums.FAIL_ON_OUTPUT_FILE,e.getMessage());
+        } finally {
+            driver.quit();
         }
-        driver.quit();
     }
 
     /**

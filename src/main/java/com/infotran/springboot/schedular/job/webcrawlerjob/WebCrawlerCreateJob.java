@@ -75,14 +75,14 @@ public class WebCrawlerCreateJob implements ClientUtil {
             @SneakyThrows
             @Override
             public void onFailure(Call call, IOException e) {
-                log.warn("@@@@@@ {} 執行 [當日新增確診數] 爬蟲 失敗!!! @@@@@@");
+                log.warn("執行 [當日新增確診數] 爬蟲 失敗");
                 throw new LineBotException(LineBotExceptionEnums.FAIL_ON_WEBCRAWLING,e.getMessage());
             }
 
             @SneakyThrows
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                log.info("@@@@@@@@@@@@@@@ {} 執行 [當日新增確診數] 爬蟲 @@@@@@@@@@@@@@@",LOG_PREFIX);
+                log.info("{} 執行 [當日新增確診數] 爬蟲",LOG_PREFIX);
                 String body = response.body().string();//整頁內容
                 if(!Objects.isNull(body)){
                     String detailUrl = getCovidNumService.getURLOfNewsDetail(body);
@@ -105,16 +105,17 @@ public class WebCrawlerCreateJob implements ClientUtil {
         Request request = new Request.Builder().url(getMaskJsonService.MASK_URL).get().build(); // get
         Call call = client.newCall(request);
         call.enqueue(new Callback() {
+            @SneakyThrows
             @Override
             public void onFailure(Call call, IOException e) {
-                log.warn("@@@@@@ {} 執行 [剩餘口罩數] 爬蟲 失敗!!! @@@@@@");
-                e.printStackTrace();
+                log.warn("執行 [剩餘口罩數] 爬蟲 失敗");
+                throw new LineBotException(LineBotExceptionEnums.FAIL_ON_WEBCRAWLING,e.getMessage());
             }
 
             @SneakyThrows
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                log.info("@@@@@@@@@@@@@@@ {} 執行 [剩餘口罩數] 爬蟲 @@@@@@@@@@@@@@@",LOG_PREFIX);
+                log.info("執行 [剩餘口罩數] 爬蟲");
                 String jsonBody = response.body().string();
                 getMaskJsonService.parseMaskInfo(jsonBody);
             }
@@ -129,14 +130,15 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * */
     @Scheduled(fixedRate = 12* TimeUnit.HOUR)
     public void executeParsingPDF() throws InterruptedException {
-        log.info("@@@@@@@@@@@@@@@ {} 執行 [pdf 取得各疫苗接踵累计人次] 爬蟲 @@@@@@@@@@@@@@@",LOG_PREFIX);
+        log.info("執行 [pdf 取得各疫苗接踵累计人次] 爬蟲");
         Request request = new Request.Builder().url(getVaccinedInfoService.getPdfUrl()).get().build(); // get post put 等
         Call call = client.newCall(request);
         call.enqueue(new Callback() {
+            @SneakyThrows
             @Override
             public void onFailure(Call call, IOException e) {
-                log.warn("@@@@@@ {} 執行 [當日新增確診數] 爬蟲 失敗!!! @@@@@@");
-                e.printStackTrace();
+                log.warn("執行 [當日新增確診數] 爬蟲 失敗");
+                throw new LineBotException(LineBotExceptionEnums.FAIL_ON_WEBCRAWLING,e.getMessage());
             }
 
             @Override
@@ -153,7 +155,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * */
     @Scheduled(fixedRate = 12* TimeUnit.HOUR)
     public void executeVaccineScreeShot() throws InterruptedException {
-        log.info("@@@@@@@@@@@@@@@ {} 執行 [截图: 累计接踵人次 & 各梯次疫苗涵蓋率] 爬蟲 @@@@@@@@@@@@@@@",LOG_PREFIX);
+        log.info("執行 [截图: 累计接踵人次 & 各梯次疫苗涵蓋率] 爬蟲 ");
         String LOG_PREFIX = "executeVaccineScreeShot";
         for(int i = 0; i < 2 ; i++){
             int finalI = i;
@@ -164,8 +166,9 @@ public class WebCrawlerCreateJob implements ClientUtil {
                     }else {
                         getVaccinedInfoService.crawlEachBatchCoverage();
                     }
-                } catch (RejectedExecutionException | InterruptedException e){
+                } catch (RejectedExecutionException | InterruptedException | LineBotException e){
                     log.info("{} 截图: 累计接踵人次 & 各梯次疫苗涵蓋率 失敗",LOG_PREFIX);
+
                 } finally {
 
                 }

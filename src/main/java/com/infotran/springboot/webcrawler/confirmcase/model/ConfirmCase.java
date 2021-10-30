@@ -27,6 +27,8 @@ public class ConfirmCase {
 	private Integer deathAmount; //死亡數目
 	
 	private Integer todayAmount; //今日確診數目
+
+	private String domesticOrImportedCaseMemo;//確診案例中分佈(境外移入還是本土)
 	
 	private Integer returnAmount; //校正回歸數
 

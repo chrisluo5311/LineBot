@@ -21,7 +21,10 @@ public enum LineBotExceptionEnums {
 
     FAIL_ON_SAVING_RESPONSE("D01","資料庫儲存失敗"),
 
-    FAIL_ON_IMPLEMENT_GETCLASSNAME("E01","實現類未實作getClassName()方法");
+    FAIL_ON_IMPLEMENT_GETCLASSNAME("E01","實現類未實作getClassName()方法"),
+
+    FAIL_ON_OUTPUT_FILE("F01","檔案輸出失敗")
+    ;
 
     private String code;
     private String status;
