@@ -2,11 +2,32 @@
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
     <contextName>logback</contextName>
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
+        <encoder charset="UTF-8">
             <pattern>[%d{yyyy-MM-dd HH:mm:ss} %highlight(%-5p) %logger.%M\(%F:%L\)] %X{job} %X{consumer} %msg%n </pattern>
         </encoder>
     </appender>
+
+    <!-- 第一個檔案輸出,每天產生一個檔案 -->
+    <appender name="info" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/info.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 輸出檔案路徑+檔名 -->
+            <fileNamePattern>logs/%d{yyyy-MM-dd}/LineBot_Covid19.log</fileNamePattern>
+            <!-- 儲存10天的日誌 -->
+            <maxHistory>10</maxHistory>
+        </rollingPolicy>
+        <encoder charset="UTF-8">
+            <!-- 輸出日誌記錄格式 -->
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss} %highlight(%-5p) %logger.%M\(%F:%L\)] %X{job} %X{consumer} %msg%n</pattern>
+        </encoder>
+        <!--日志文件最大的大小-->
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>100MB</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+
     <root level="INFO">
         <appender-ref ref="console" />
+        <appender-ref ref="info" />
     </root>
 </configuration>
