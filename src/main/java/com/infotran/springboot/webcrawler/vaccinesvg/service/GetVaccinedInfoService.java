@@ -81,10 +81,10 @@ public class GetVaccinedInfoService implements ClientUtil {
         WebDriver driver = new ChromeDriver();
         try {
             driver.get(VACCINE_IMG_URL);
-            driver.manage().window().setSize(new Dimension(886,500));
+            driver.manage().window().setSize(new Dimension(886,550));
             Thread.sleep(1000);
             //截图: 累计接踵人次
-            ((JavascriptExecutor)driver).executeScript("window.scrollTo(0,1068);");
+            ((JavascriptExecutor)driver).executeScript("window.scrollTo(0,845);");
             ((JavascriptExecutor)driver).executeScript("return document.body.style.overflow = 'hidden';");
             Thread.sleep(1000);
             File cumulativeVaccinedFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
@@ -131,8 +131,8 @@ public class GetVaccinedInfoService implements ClientUtil {
      * 解析pdf並取得各疫苗接踵累计人次
      * @param body
      */
-    public void crawlVaccinedAmount(String body,StringBuilder fullUrl) {
-        log.info("{} pdf解析开始",LOG_PREFIX);
+    public void crawlPDFVaccinedAmount(String body) {
+        StringBuilder fullUrl = new StringBuilder();
         try {
             Document doc = Jsoup.parse(body);
             //只取得第一個<p>
@@ -160,8 +160,8 @@ public class GetVaccinedInfoService implements ClientUtil {
                 }
                 //记录新的一筆
                 VaccinedPDFRecord vaccinedPDFRecord = VaccinedPDFRecord.builder()
-                        .uploadTime(dateNum)
-                        .build();
+                                                                       .uploadTime(dateNum)
+                                                                       .build();
                 VaccinedPDFRecord pdfRecord = checkPDFRecordService.save(vaccinedPDFRecord);
                 if(Objects.isNull(pdfRecord)){
                     log.warn("pdf解析成功、pdf内文新增成功  pdf记录至db失败");
@@ -169,7 +169,7 @@ public class GetVaccinedInfoService implements ClientUtil {
                 //儲存至static resource
                 DownloadFileUtil.downloadWithFilesCopy(fullUrl.toString(),title.concat(".pdf"));
             }else{
-                log.warn("{} pdf檔尚未更新 或 此檔案非統計資料表 或 此檔案已新增過",LOG_PREFIX);
+                log.warn("{} pdf檔尚未更新 或 pdf檔非統計資料表 或 pdf檔已新增過",LOG_PREFIX);
             }
         } catch (IOException e) {
             log.error("pdf輸出失敗:{}", e.getMessage());

@@ -70,10 +70,12 @@ public class WebCrawlerCreateJob implements ClientUtil {
             @SneakyThrows
             @Override
             public void onResponse(Call call, Response response) {
-                MDC.put("job","當日新增確診數");
+                MDC.put("job","Confirm Case");
                 String body = response.body().string();//整頁內容
                 if(Objects.nonNull(body)){
                     rabbitMqService.sendConfirmCase(body);
+                }else {
+                    throw new LineBotException(LineBotExceptionEnums.FAIL_ON_BODY_RESPONSE);
                 }
                 MDC.remove("job");
             }
@@ -101,9 +103,13 @@ public class WebCrawlerCreateJob implements ClientUtil {
             @SneakyThrows
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                MDC.put("job","查詢剩餘口罩數");
+                MDC.put("job","Mask Info");
                 String jsonBody = response.body().string();
-                getMaskJsonService.parseMaskInfo(jsonBody);
+                if(Objects.nonNull(jsonBody)){
+                    rabbitMqService.sendMaskInfo(jsonBody);
+                }else {
+                    throw new LineBotException(LineBotExceptionEnums.FAIL_ON_BODY_RESPONSE);
+                }
                 MDC.remove("job");
             }
         });
@@ -127,11 +133,16 @@ public class WebCrawlerCreateJob implements ClientUtil {
                 throw new LineBotException(LineBotExceptionEnums.FAIL_ON_WEBCRAWLING,e.getMessage());
             }
 
+            @SneakyThrows
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                MDC.put("job","pdf 取得各疫苗接踵累计人次");
-                String body = response.body().string();//整頁內容
-                getVaccinedInfoService.crawlVaccinedAmount(body,new StringBuilder());
+                MDC.put("job","Vaccined PDF");
+                String jsonBody = response.body().string();
+                if(Objects.nonNull(jsonBody)){
+                    rabbitMqService.sendPDFVaccinedAmount(jsonBody);
+                }else {
+                    throw new LineBotException(LineBotExceptionEnums.FAIL_ON_BODY_RESPONSE);
+                }
                 MDC.remove("job");
             }
         });
@@ -143,21 +154,29 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * */
     @Scheduled(fixedRate = 12* TimeUnit.HOUR)
     public void executeVaccineScreeShot() throws InterruptedException {
-        MDC.put("job","累计接踵人次&各梯次疫苗涵蓋率截图");
-        crawImgExecutor.execute(() -> {
-                try {
-                    getVaccinedInfoService.crawlCumulativeVaccineImg();
-                } catch (InterruptedException e) {
-                    log.error("[累计接踵人次]截图輸出失敗 或 其他原因");
-                }
-        });
-        crawImgExecutor.execute(() -> {
-            try {
-                getVaccinedInfoService.crawlEachBatchCoverage();
-            } catch (InterruptedException e) {
-                log.error("[各梯次疫苗涵蓋率]截图輸出失敗 或 其他原因");
+        MDC.put("job","Selenium Snapshot");
+        Integer i = 0;
+        while(i<2){
+            if(i==0){
+                crawImgExecutor.execute(() -> {
+                    try {
+                        getVaccinedInfoService.crawlCumulativeVaccineImg();
+                    } catch (InterruptedException e) {
+                        log.error("[累计接踵人次]截图輸出失敗 或 其他原因");
+                    }
+                });
+                i++;
+            }else {
+                crawImgExecutor.execute(() -> {
+                    try {
+                        getVaccinedInfoService.crawlEachBatchCoverage();
+                    } catch (InterruptedException e) {
+                        log.error("[各梯次疫苗涵蓋率]截图輸出失敗 或 其他原因");
+                    }
+                });
+                i++;
             }
-        });
+        }
         MDC.remove("job");
     }
 

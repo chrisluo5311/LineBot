@@ -42,7 +42,7 @@ public class GetMaskJsonService implements ClientUtil {
     /**
      * 解析口罩即時資訊的JSON
      * @param jsonBody
-     * @throws JSONException
+     * @throws JSONException,LineBotException
      *
      * */
     public void parseMaskInfo (String jsonBody) throws JSONException, LineBotException {

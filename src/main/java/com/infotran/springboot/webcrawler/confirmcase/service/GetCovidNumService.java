@@ -65,10 +65,8 @@ public class GetCovidNumService implements ClientUtil {
 			String month = element.select("p.icon-year").text().substring(7);
 			String date = element.select("p.icon-date").text();
 			String tname = element.select(".content-boxes-v3 > a").attr("title");
-			log.info("m:{}d:{}t:{}",month,date,tname);
 			if (todayMap.containsKey(month) && todayMap.containsValue(date) && tname.indexOf(TITLE_NAME) != -1) {
 				CDC_URL_PREFIX.append(element.select(".content-boxes-v3 > a").attr("href"));
-				log.info("{} 今日新聞全部url: {} ",LOG_PREFIX,CDC_URL_PREFIX.toString());
 				return CDC_URL_PREFIX.toString();
 			}
 		}
@@ -98,7 +96,7 @@ public class GetCovidNumService implements ClientUtil {
 			Integer totalNum = newNum + reNum;
 			//死亡人數
 			Integer deathNum = getNumFromDivchild(DEATH_NUM);
-			log.info("新增數目:{},確診案例中分佈:{},校正回歸:{},總數:{},死亡數目:{}",newNum,domesticOrImportedCase,reNum,totalNum,deathNum);
+			log.info("當日新增數目:{},確診案例中分佈:{},校正回歸:{},總數:{},死亡數目:{}",newNum,domesticOrImportedCase,reNum,totalNum,deathNum);
 			ConfirmCase cfc = ConfirmCase.builder()
 										 .todayAmount(newNum)
 										 .domesticOrImportedCaseMemo(domesticOrImportedCase)
@@ -107,8 +105,9 @@ public class GetCovidNumService implements ClientUtil {
 										 .deathAmount(deathNum)
 										 .newsUrl(detailedURL)
 										 .build();
-			Boolean weiredStatus = Stream.of(newNum,reNum,totalNum,deathNum).allMatch(x->x==0);
-
+			if(Stream.of(newNum,reNum,totalNum,deathNum).allMatch(x->x==0)){
+				log.warn("當日指標皆為0，請手動確認");
+			}
 			confirmCaseRedisTemplate.delete(CONFIRMCASE_REDIS_KEY);
 			confirmCaseRedisTemplate.opsForValue().set(CONFIRMCASE_REDIS_KEY,cfc);
 			confirmCase = confirmCaseService.save(cfc);
