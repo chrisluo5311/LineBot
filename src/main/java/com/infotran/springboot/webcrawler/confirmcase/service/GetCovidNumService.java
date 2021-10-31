@@ -65,12 +65,11 @@ public class GetCovidNumService implements ClientUtil {
 			String date = element.select("p.icon-date").text();
 			String tname = element.select(".content-boxes-v3 > a").attr("title");
 			if (todayMap.containsKey(month) && todayMap.containsValue(date) && tname.indexOf(TITLE_NAME) != -1) {
-				log.info("{} 今日新聞後半url: {}" ,LOG_PREFIX,element.select(".content-boxes-v3 > a").attr("href"));
 				CDC_URL_PREFIX.append(element.select(".content-boxes-v3 > a").attr("href"));
 				log.info("{} 今日新聞全部url: {} ",LOG_PREFIX,CDC_URL_PREFIX.toString());
 				return CDC_URL_PREFIX.toString();
 			} else {
-				log.error("{} 找不到新聞標題:{} 有無確定病例字樣:{}",LOG_PREFIX,tname,tname.indexOf("確定病例"));
+				log.warn("{} 找不到新聞標題:{} 有無確定病例字樣:{}",LOG_PREFIX,tname,tname.indexOf("確定病例"));
 				throw new LineBotException(LineBotExceptionEnums.NEWS_TITLE_CHANGE);
 			}
 		}
@@ -146,19 +145,17 @@ public class GetCovidNumService implements ClientUtil {
 		return sum;
 	}
 
-	private String getDomesticOrImportedCase(String comma,String semicolon){
-		String memo = null;
+	private String getDomesticOrImportedCase(String comma,String semicolon) throws LineBotException {
 		Integer start = 0;//擷取起點
 		Integer end = 0;// 擷取終點
 		if(divchild.indexOf(comma)!=-1){
 			start = divchild.indexOf(comma)+ comma.length();
 			end = divchild.indexOf(semicolon);
-			memo = divchild.substring(start,end);
-			return memo;
+			return divchild.substring(start,end);
 		}else{
 			log.warn("新聞內容有改，請手動確認");
 		}
-		return memo;
+		throw new LineBotException(LineBotExceptionEnums.NEWS_CONTENT_CHANGE);
 	}
 
 }

@@ -15,19 +15,23 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Slf4j
 public class GetMaskJsonService implements ClientUtil {
 
-    private static final String LOG_PREFIX = "[GetMaskJsonController]";
-
     //口罩即時url
     @Value("${Mask.URL}")
     public String MASK_URL;
 
-    //redis key值
-    public static final String REDIS_KEY = "medicineStore";
+    private static final String LOG_PREFIX;
+    public static final String REDIS_KEY;
+
+    static {
+        LOG_PREFIX = "[GetMaskJsonController]";
+        REDIS_KEY = "medicineStore";
+    }
 
     @Resource
     RedisTemplate<Object, MedicineStore> medicineStoreRedisTemplate;
@@ -42,8 +46,7 @@ public class GetMaskJsonService implements ClientUtil {
      *
      * */
     public void parseMaskInfo (String jsonBody) throws JSONException, LineBotException {
-        JSONObject jsonObject = new JSONObject(jsonBody);
-        JSONArray jsonArray = jsonObject.getJSONArray("features");
+        JSONArray jsonArray = new JSONObject(jsonBody).getJSONArray("features");
         List<MedicineStore> medList = new ArrayList<>();
         for (int i = 0 ; i < jsonArray.length() ; i++){
             JSONObject Feature = jsonArray.getJSONObject(i);
@@ -89,15 +92,13 @@ public class GetMaskJsonService implements ClientUtil {
                                                       .build();
             medList.add(medicineStore);
         }
-        if(medicineStoreRedisTemplate.hasKey(REDIS_KEY)){
-            medicineStoreRedisTemplate.delete(REDIS_KEY);
-        }
-        medicineStoreRedisTemplate.opsForList().leftPushAll(REDIS_KEY,medList);
         List<MedicineStore> response = medicineStoreService.saveAll(medList);
-        if(response==null){
-            log.info("{} 新增至db失敗",LOG_PREFIX);
+        if(Objects.isNull(response)){
+            log.info("{} 口罩即時資訊json解析成功 新增至db失敗",LOG_PREFIX);
             throw new LineBotException(LineBotExceptionEnums.FAIL_ON_SAVING_RESPONSE);
         }
+        medicineStoreRedisTemplate.delete(REDIS_KEY);
+        medicineStoreRedisTemplate.opsForList().leftPushAll(REDIS_KEY,medList);
         medicineStoreRedisTemplate.expire(REDIS_KEY,60, java.util.concurrent.TimeUnit.MINUTES);
     }
 

@@ -147,7 +147,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String body = response.body().string();//整頁內容
-                getVaccinedInfoService.crawlVaccinedAmount(body);
+                getVaccinedInfoService.crawlVaccinedAmount(body,new StringBuilder());
             }
         });
     }
@@ -159,7 +159,6 @@ public class WebCrawlerCreateJob implements ClientUtil {
     @Scheduled(fixedRate = 12* TimeUnit.HOUR)
     public void executeVaccineScreeShot() throws InterruptedException {
         log.info("執行 [截图: 累计接踵人次 & 各梯次疫苗涵蓋率] 爬蟲 ");
-        String LOG_PREFIX = "executeVaccineScreeShot";
         for(int i = 0; i < 2 ; i++){
             int finalI = i;
             crawImgExecutor.execute(() -> {
@@ -170,7 +169,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
                         getVaccinedInfoService.crawlEachBatchCoverage();
                     }
                 } catch (RejectedExecutionException | InterruptedException | LineBotException e){
-                    log.info("{} 截图: 累计接踵人次 & 各梯次疫苗涵蓋率 失敗",LOG_PREFIX);
+                    log.info("截图: 累计接踵人次 & 各梯次疫苗涵蓋率 失敗");
 
                 } finally {
 
