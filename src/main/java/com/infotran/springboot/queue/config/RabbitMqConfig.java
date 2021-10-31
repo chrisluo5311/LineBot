@@ -1,12 +1,12 @@
-package com.infotran.springboot.Queue.config;
+package com.infotran.springboot.queue.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.infotran.springboot.queue.receiver.ConfirmCaseReceiver;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
-import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,15 +34,9 @@ public class RabbitMqConfig {
     @Value("${spring.rabbitmq.port:5672}")
     Integer port;
 
-
     @Bean
-    public ConnectionFactory connectionFactory(){
-        CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
-        connectionFactory.setAddresses(address);
-        connectionFactory.setUsername(username);
-        connectionFactory.setPassword(password);
-        connectionFactory.setPort(port);
-        return connectionFactory;
+    MessageListenerAdapter listenerAdapter(ConfirmCaseReceiver receiver) {
+        return new MessageListenerAdapter(receiver, "receiveMessage");
     }
 
     /**

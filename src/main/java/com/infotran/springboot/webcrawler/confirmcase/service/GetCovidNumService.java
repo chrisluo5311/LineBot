@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 @Service
@@ -56,24 +57,23 @@ public class GetCovidNumService implements ClientUtil {
 	 * @param body 疾管局新闻首页的连结
 	 *
 	 */
-	public String getURLOfNewsDetail(String body) throws LineBotException {
+	public String getURLOfNewsDetail(String body)  {
 		Document doc = Jsoup.parse(body);
 		Elements newslists = doc.select(".cbp-item");
 		Map<String, String> todayMap = TimeUtil.genTodayDate();
 		for (Element element : newslists) {
-			String month = element.select("p.icon-year").text().substring(7,8);
+			String month = element.select("p.icon-year").text().substring(7);
 			String date = element.select("p.icon-date").text();
 			String tname = element.select(".content-boxes-v3 > a").attr("title");
+			log.info("m:{}d:{}t:{}",month,date,tname);
 			if (todayMap.containsKey(month) && todayMap.containsValue(date) && tname.indexOf(TITLE_NAME) != -1) {
 				CDC_URL_PREFIX.append(element.select(".content-boxes-v3 > a").attr("href"));
 				log.info("{} 今日新聞全部url: {} ",LOG_PREFIX,CDC_URL_PREFIX.toString());
 				return CDC_URL_PREFIX.toString();
-			} else {
-				log.warn("{} 找不到新聞標題:{} 有無確定病例字樣:{}",LOG_PREFIX,tname,tname.indexOf("確定病例"));
-				throw new LineBotException(LineBotExceptionEnums.NEWS_TITLE_CHANGE);
 			}
 		}
-		throw new LineBotException(LineBotExceptionEnums.FAIL_ON_FIND_TODAY_COVIDNEWS);
+		log.warn("{} 找不到新聞標題",LOG_PREFIX);
+		return CDC_URL_PREFIX.toString();
 	}
 
 	/**
@@ -112,6 +112,9 @@ public class GetCovidNumService implements ClientUtil {
 			confirmCaseRedisTemplate.delete(CONFIRMCASE_REDIS_KEY);
 			confirmCaseRedisTemplate.opsForValue().set(CONFIRMCASE_REDIS_KEY,cfc);
 			confirmCase = confirmCaseService.save(cfc);
+			if(Objects.isNull(confirmCase)){
+				log.warn("confirmCase 新增至db失敗");
+			}
 		} catch (IOException e) {
 			throw new LineBotException(LineBotExceptionEnums.FAIL_ON_SSLHELPER_CONNECTION,e.getMessage());
 		} finally {
@@ -130,8 +133,6 @@ public class GetCovidNumService implements ClientUtil {
 		if (divchild.indexOf(keyword) != -1) {
 			numeric_Start = divchild.indexOf(keyword)+ keyword.length();// 數字起點
 			target = getNumberFromEachCategory(numeric_Start,divchild);
-		} else {
-			log.warn("新聞關鍵字可能有誤，請手動確認");
 		}
 		return target;
 	}
@@ -145,17 +146,15 @@ public class GetCovidNumService implements ClientUtil {
 		return sum;
 	}
 
-	private String getDomesticOrImportedCase(String comma,String semicolon) throws LineBotException {
+	private String getDomesticOrImportedCase(String comma,String semicolon){
 		Integer start = 0;//擷取起點
 		Integer end = 0;// 擷取終點
 		if(divchild.indexOf(comma)!=-1){
 			start = divchild.indexOf(comma)+ comma.length();
 			end = divchild.indexOf(semicolon);
 			return divchild.substring(start,end);
-		}else{
-			log.warn("新聞內容有改，請手動確認");
 		}
-		throw new LineBotException(LineBotExceptionEnums.NEWS_CONTENT_CHANGE);
+		return null;
 	}
 
 }
