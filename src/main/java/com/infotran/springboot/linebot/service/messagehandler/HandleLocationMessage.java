@@ -11,7 +11,6 @@ import com.infotran.springboot.webcrawler.medicinestore.model.MedicineStore;
 import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
-import com.linecorp.bot.model.message.ImagemapMessage;
 import com.linecorp.bot.model.message.LocationMessage;
 import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.TextMessage;
@@ -130,7 +129,7 @@ public class HandleLocationMessage extends BaseMessageHandler {
         List<MedicineStore> medStoreList = null;
         //從redis取出所有藥局
         medStoreList = medicineStoreRedisTemplate.opsForList().range("medicineStore",0,-1);
-        if(medStoreList==null){
+        if(Objects.isNull(medStoreList)){
             medStoreList = mService.findAll();
         }
         //两点公式算距离
@@ -144,7 +143,6 @@ public class HandleLocationMessage extends BaseMessageHandler {
 
         //按距離排序
         TreeMap<Double,MedicineStore> medStoreTreeMap = new TreeMap<>(medicineStoreMap);
-//        log.info("{} TreeMap medStoreTreeMap 排序後 : {}",LOG_PREFIX,medStoreTreeMap);
 
         //取出店家存進LocationMessage的LinkedList
         LinkedList<LocationMessage> locationlinkedList = new LinkedList<>();

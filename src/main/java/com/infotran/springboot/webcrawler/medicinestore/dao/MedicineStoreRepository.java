@@ -11,5 +11,7 @@ public interface MedicineStoreRepository extends JpaRepository<MedicineStore, St
 
     public Optional<MedicineStore> findById (String id);
 
-//    public List<MedicineStore> findAll();
+
+    
+
 }
