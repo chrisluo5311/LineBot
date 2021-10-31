@@ -43,6 +43,10 @@ public class GetVaccinedInfoService implements ClientUtil {
     @Value("${PDF.URL}")
     private String PDF_URL;
 
+    //疫苗統計資料PDF網址前綴
+    @Value("${CDC_URL_PREFIX}")
+    private String CDC_URL_PREFIX;
+
     //selenium使用的driver
     private static final String SYSTEM_DRIVER = "webdriver.chrome.driver";
 
@@ -54,10 +58,6 @@ public class GetVaccinedInfoService implements ClientUtil {
 
     //各梯次疫苗涵蓋率图FileName
     private static final String coverFileName = "eachBatchCoverage.jpg";
-
-    //疫苗統計資料PDF網址前綴
-    @Value("${CDC_URL_PREFIX}")
-    private String CDC_URL_PREFIX;
 
     @Resource
     CheckPDFRecordServiceImpl checkPDFRecordService;

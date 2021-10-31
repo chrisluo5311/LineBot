@@ -16,6 +16,7 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -56,6 +57,9 @@ public class WebCrawlerCreateJob implements ClientUtil {
 
     private static ExecutorService crawImgExecutor;
 
+    @Resource
+    RabbitTemplate rabbitTemplate;
+
     @PostConstruct
     public void init(){
         crawImgExecutor = new ThreadPoolExecutor(2,4,180,
@@ -85,8 +89,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
                 log.info("{} 執行 [當日新增確診數] 爬蟲",LOG_PREFIX);
                 String body = response.body().string();//整頁內容
                 if(!Objects.isNull(body)){
-                    String detailUrl = getCovidNumService.getURLOfNewsDetail(body);
-                    getCovidNumService.parseBody(detailUrl);
+                    rabbitTemplate.convertAndSend(body);
                 }else {
                     throw new LineBotException(LineBotExceptionEnums.FAIL_ON_BODY_RESPONSE);
                 }
