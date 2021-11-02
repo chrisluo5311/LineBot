@@ -35,9 +35,15 @@ import java.util.stream.Collectors;
 @Component
 public class HandleLocationMessage extends BaseMessageHandler {
 
-    private static final String LOG_PREFIX = "HandleLocationMessageReply";
+    private static final String LOG_PREFIX;
+    private static String REDIS_KEY_PREFIX;
+    private static Integer medicineStoreAmount;
 
-    private static String REDIS_KEY_PREFIX = "sortedLocationMessageList";//須加上使用者id
+    static {
+        LOG_PREFIX = "HandleLocationMessageReply";
+        REDIS_KEY_PREFIX = "sortedLocationMessageList";//須加上使用者id
+        medicineStoreAmount = 10;
+    }
 
     @Resource
     private RedisLock redisLock;
@@ -51,8 +57,6 @@ public class HandleLocationMessage extends BaseMessageHandler {
     @Resource
     RedisTemplate<Object, MedicineStore> medicineStoreRedisTemplate;
 
-    public StringBuilder keySB ;
-
     @Override
     public String getClassName() {
         return HandlerEnum.getHandlerName(2);
@@ -63,23 +67,20 @@ public class HandleLocationMessage extends BaseMessageHandler {
         //redis key 對應使用者
         StringBuilder keySB = new StringBuilder();
         keySB.append(REDIS_KEY_PREFIX).append(userId);
-        log.info("[{}] userid: {} 融合後redis key: {}",LOG_PREFIX,userId, keySB.toString());
         String receivedMessage = event.getText();
         switch (receivedMessage){
             case "下五間":
                 if(locationMessageRedisTemplate.hasKey(keySB)){
                     List<LocationMessage> locationList = locationMessageRedisTemplate.opsForList().range(keySB,0,-1);
-                    List<Message> messageList;
-                    if(locationList.size()==5){//確認是5家不然會抱錯 line不傳超過5家
-                        messageList = locationList.stream().map(Message.class::cast).collect(Collectors.toList());
-                    }else{
-                        messageList = locationList.subList(0, 5).stream().map(Message.class::cast).collect(Collectors.toList());
-                    }
+                    //確認是5家不然會抱錯 line不傳超過5家
+                    List<Message> messageList = (locationList.size()==5) ?
+                            locationList.stream().map(Message.class::cast).collect(Collectors.toList()) :
+                            locationList.subList(0, 5).stream().map(Message.class::cast).collect(Collectors.toList());
                     reply(replyToken, messageList);
                     //刪除redis key
                     redisLock.unlock(keySB.toString());
                 }else {
-                    //redis key 2分鐘Timeout才點會启动重新定位的方法
+                    //redis key 1分鐘Timeout才點會启动重新定位的方法
                     TextMessage textMessage = openMap();
                     reply(replyToken,textMessage);
                 }
@@ -117,59 +118,55 @@ public class HandleLocationMessage extends BaseMessageHandler {
     })
     @Override
     public List<LocationMessage> handleLocationMessageReply(LocationMessageContent event,String userId) {
-        //redis key 對應使用者
-        keySB = new StringBuilder();
-        keySB.append(REDIS_KEY_PREFIX).append(userId);
-        log.info("[{}] userid: {} 融合後redis key: {}",LOG_PREFIX,userId, keySB.toString());
-        Double lat1,long1,lat2,long2;
-        lat1 = event.getLatitude();
-        long1 = event.getLongitude();
-        //藥局map 儲存距離與店家
-        Map<Double,MedicineStore> medicineStoreMap = new HashMap<>();
-        List<MedicineStore> medStoreList = null;
         //從redis取出所有藥局
-        medStoreList = medicineStoreRedisTemplate.opsForList().range("medicineStore",0,-1);
+        List<MedicineStore> medStoreList = medicineStoreRedisTemplate.opsForList().range("medicineStore",0,-1);
         if(Objects.isNull(medStoreList)){
             medStoreList = mService.findAll();
         }
-        //两点公式算距离
-        for (int i = 0 ; i < medStoreList.size(); i ++) {
-            MedicineStore store = medStoreList.get(i);
-            lat2 = store.getLatitude();
-            long2 = store.getLongitude();
-            Double dist = distance(lat1,long1,lat2,long2);
-            medicineStoreMap.put(dist,store);
+        Double lat1 = event.getLatitude();
+        Double long1 = event.getLongitude();
+        //藥局map 儲存距離與店家
+        TreeMap<Double,MedicineStore> medicineStoreMap = new TreeMap<>();
+        if(medStoreList!=null) {
+            for(MedicineStore medicineStore : medStoreList){
+                //两点公式算距离
+                Double distance = getDistance(lat1, long1, medicineStore.getLatitude(), medicineStore.getLongitude());
+                medicineStoreMap.put(distance, medicineStore);
+            }
         }
-
-        //按距離排序
-        TreeMap<Double,MedicineStore> medStoreTreeMap = new TreeMap<>(medicineStoreMap);
 
         //取出店家存進LocationMessage的LinkedList
-        LinkedList<LocationMessage> locationlinkedList = new LinkedList<>();
+        LinkedList<LocationMessage> locationLinkedList = new LinkedList<>();
         LocationMessage locationMessage = null;
-        for (Map.Entry entry : medStoreTreeMap.entrySet()){
-            MedicineStore medicineStore = (MedicineStore) entry.getValue();
-            String name = medicineStore.getName();
-            String address = medicineStore.getAddress();
-            Double latitude = medicineStore.getLatitude();
-            Double longitude = medicineStore.getLongitude();
-            locationMessage = LocationMessage.builder()
-                                             .title(name)
-                                             .address(address)
-                                             .latitude(latitude)
-                                             .longitude(longitude)
-                                             .build();
-            locationlinkedList.add(locationMessage);
+        Integer i = 0;
+        for (Map.Entry entry : medicineStoreMap.entrySet()){
+            while (i < medicineStoreAmount){
+                MedicineStore medicineStore = (MedicineStore) entry.getValue();
+                String name = medicineStore.getName();
+                String address = medicineStore.getAddress();
+                Double latitude = medicineStore.getLatitude();
+                Double longitude = medicineStore.getLongitude();
+                locationMessage = LocationMessage.builder()
+                        .title(name)
+                        .address(address)
+                        .latitude(latitude)
+                        .longitude(longitude)
+                        .build();
+                locationLinkedList.add(locationMessage);
+                i++;
+            }
+            break;
         }
+        //redis key
+        String key = REDIS_KEY_PREFIX.concat(userId);
         //存後5家進redis
-        List<LocationMessage> listToRedis = locationlinkedList.stream().skip(5).limit(5).collect(Collectors.toList());
-        locationMessageRedisTemplate.opsForList().leftPushAll(keySB,listToRedis);
-        redisLock.lock(TIMEOUT,keySB.toString());
+        List<LocationMessage> listToRedis = locationLinkedList.stream().skip(5).limit(5).collect(Collectors.toList());
+        locationMessageRedisTemplate.opsForList().leftPushAll(key,listToRedis);
+        redisLock.lock(TIMEOUT,key);
         //設定Timeout:1分鐘
-        locationMessageRedisTemplate.expire(keySB,TIMEOUT, TimeUnit.MINUTES);
+        locationMessageRedisTemplate.expire(key,TIMEOUT, TimeUnit.MINUTES);
         //回覆前5家
-        List<LocationMessage> locationList = locationlinkedList.stream().limit(5).collect(Collectors.toList());
-        return locationList;
+        return locationLinkedList.stream().limit(5).collect(Collectors.toList());
     }
 
 
@@ -181,7 +178,7 @@ public class HandleLocationMessage extends BaseMessageHandler {
      * @param lon2 經度2
      * @return double 距離
      * */
-    private double distance (double lat1,double lon1,double lat2,double lon2){
+    private double getDistance(double lat1, double lon1, double lat2, double lon2){
         if ((lat1 == lat2) && (lon1 == lon2)){
             return 0;
         }else {

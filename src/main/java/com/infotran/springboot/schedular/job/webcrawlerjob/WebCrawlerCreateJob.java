@@ -71,7 +71,8 @@ public class WebCrawlerCreateJob implements ClientUtil {
             @Override
             public void onResponse(Call call, Response response) {
                 MDC.put("job","Confirm Case");
-                String body = response.body().string();//整頁內容
+                //整頁內容
+                String body = response.body().string();
                 if(Objects.nonNull(body)){
                     rabbitMqService.sendConfirmCase(body);
                 }else {

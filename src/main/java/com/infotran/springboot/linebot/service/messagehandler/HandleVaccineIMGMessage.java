@@ -53,26 +53,28 @@ public class HandleVaccineIMGMessage extends BaseMessageHandler {
 
     @Override
     protected List<TextMessage> textMessageReply(TextMessageContent event, String replyToken, String userId) {
-        QuickReply quickReply = createQuickReplyItemList();
         String receivedMessage = event.getText();
         switch (receivedMessage){
             case "查看疫苗施打人數累計統計圖":
+                QuickReply quickReply = createQuickReplyItemList();
                 //文字訊息
                 VaccineTypePeople vaccineTypePeople = vaccinedPeopleService.findAll();
                 StringBuilder content = new StringBuilder();
-                content.append("根據衛生福利部疾病管制署公佈: \n")
-                        .append("COVID-19疫苗接種人次，")
-                        .append(vaccineTypePeople.getBody())
-                        .append("\n\n資料來源: "+vaccineTypePeople.getResourceUrl()+"。");
+                if(vaccineTypePeople!=null){
+                    content.append("根據衛生福利部疾病管制署公佈: \n")
+                            .append("COVID-19疫苗接種人次，")
+                            .append(vaccineTypePeople.getBody())
+                            .append("\n\n資料來源: "+vaccineTypePeople.getResourceUrl()+"。");
+                }
                 TextMessage textMessage = TextMessage.builder().text(content.toString()).quickReply(quickReply).build();
                 //圖片訊息
                 URI vaccineImgURI1 = DownloadFileUtil.createUri("/static/cumulativeVaccined.jpg");
                 URI vaccineImgURI2 = DownloadFileUtil.createUri("/static/eachBatchCoverage.jpg");
-                ImageMessage imgMessage = ImageMessage.builder().previewImageUrl(vaccineImgURI1).originalContentUrl(vaccineImgURI1).build();
+                ImageMessage imgMessage1 = ImageMessage.builder().previewImageUrl(vaccineImgURI1).originalContentUrl(vaccineImgURI1).build();
                 ImageMessage imgMessage2 = ImageMessage.builder().previewImageUrl(vaccineImgURI2).originalContentUrl(vaccineImgURI2).build();
                 List<Message> replyList = new ArrayList<Message>();
                 replyList.add(textMessage);
-                replyList.add(imgMessage);
+                replyList.add(imgMessage1);
                 replyList.add(imgMessage2);
                 reply(replyToken,replyList);
                 break;

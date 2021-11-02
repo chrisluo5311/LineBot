@@ -1,5 +1,7 @@
 package com.infotran.springboot.linebot.controller;
 
+import com.infotran.springboot.exception.LineBotException;
+import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
 import com.infotran.springboot.linebot.service.BaseMessageInterface;
 import com.infotran.springboot.linebot.service.BaseMessagePool;
 import com.infotran.springboot.linebot.service.messagehandler.enums.HandlerEnum;
@@ -11,13 +13,11 @@ import com.linecorp.bot.model.response.BotApiResponse;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import javax.annotation.Resource;
 
-@LineMessageHandler
 @Slf4j
+@LineMessageHandler
 public class EchoApplication {
 
     private static final String LOG_PREFIX = "EchoApplication";
@@ -33,7 +33,6 @@ public class EchoApplication {
      * */
     @EventMapping
     public void handlePostBackEvent(PostbackEvent event) throws Exception {
-        log.info("======================回覆開始==========================");
         BotApiResponse botApiResponse = null;
         String data = event.getPostbackContent().getData();
         switch (data){
@@ -47,7 +46,10 @@ public class EchoApplication {
                 baseMessageInterface = baseMessagePool.getMethod(HandlerEnum.getHandlerName(6));
                 botApiResponse = baseMessageInterface.postBackReply(event);
         }
-        log.info("======================回覆結束==========================");
+        if(botApiResponse==null){
+            log.warn("接收處理PostbackEvent失敗");
+            throw new LineBotException(LineBotExceptionEnums.BOTAPI_RESPONSE_EMPTY,"PostbackEvent");
+        }
     }
 
 
@@ -57,7 +59,6 @@ public class EchoApplication {
      * */
     @EventMapping
     public void handleMessageEvent(MessageEvent event) throws Exception {
-        log.info("======================回覆開始==========================");
         if (event.getMessage() instanceof TextMessageContent) {
             String text =((TextMessageContent) event.getMessage()).getText();
             switch (text){
@@ -78,8 +79,12 @@ public class EchoApplication {
         } else if (event.getMessage() instanceof LocationMessageContent){
             baseMessageInterface = baseMessagePool.getMethod(HandlerEnum.getHandlerName(2));
         }
+        //接收處理 MessageEvent
         BotApiResponse botApiResponse = baseMessageInterface.handleMessageEvent(event);
-        log.info("======================回覆結束==========================");
+        if(botApiResponse==null){
+            log.warn("接收處理MessageEvent失敗");
+            throw new LineBotException(LineBotExceptionEnums.BOTAPI_RESPONSE_EMPTY,"MessageEvent");
+        }
     }
 
 

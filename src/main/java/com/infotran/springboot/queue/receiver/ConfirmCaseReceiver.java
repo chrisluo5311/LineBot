@@ -20,8 +20,7 @@ public class ConfirmCaseReceiver {
     public void receiveMessage(String json) throws LineBotException {
         MDC.put("consumer","Confirm Case Receiver");
         log.info("當日新增確診者接收處理-開始");
-        String detailedUrl = getCovidNumService.getURLOfNewsDetail(json);
-        getCovidNumService.parseBody(detailedUrl);
+        getCovidNumService.getURLOfNewsDetail(json);
         log.info("當日新增確診者接收處理-結束");
         MDC.remove("consumer");
     }

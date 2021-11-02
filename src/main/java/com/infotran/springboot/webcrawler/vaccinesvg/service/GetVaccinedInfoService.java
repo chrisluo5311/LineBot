@@ -146,8 +146,8 @@ public class GetVaccinedInfoService implements ClientUtil {
                 fullUrl.append(CDC_URL_PREFIX).append(ancherPdf.attr("href"));
                 //pdf轉換成文字
                 String content = PDFBoxUtil.readPDF(fullUrl.toString());
-                //解析內容
-                String result = parseContent(content,new StringBuilder());//結果(累計接踵疫苗人次字串)
+                //解析內容 :累計接踵疫苗人次字串
+                String result = parseContent(content,new StringBuilder());
                 //记录内容
                 VaccineTypePeople vPeople= VaccineTypePeople.builder()
                                                             .resourceUrl(fullUrl.toString())
@@ -156,7 +156,7 @@ public class GetVaccinedInfoService implements ClientUtil {
                                                             .build();
                 VaccineTypePeople vaccineTypePeople = vaccinedPeopleService.save(vPeople);
                 if(Objects.isNull(vaccineTypePeople)){
-                    log.warn("pdf解析成功 新增至db失败");
+                    log.warn("pdf解析成功 pdf内文新增至db失败");
                 }
                 //记录新的一筆
                 VaccinedPDFRecord vaccinedPDFRecord = VaccinedPDFRecord.builder()

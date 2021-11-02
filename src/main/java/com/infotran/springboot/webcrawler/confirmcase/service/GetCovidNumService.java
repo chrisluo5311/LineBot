@@ -57,7 +57,7 @@ public class GetCovidNumService implements ClientUtil {
 	 * @param body 疾管局新闻首页的连结
 	 *
 	 */
-	public String getURLOfNewsDetail(String body)  {
+	public ConfirmCase getURLOfNewsDetail(String body) throws LineBotException {
 		Document doc = Jsoup.parse(body);
 		Elements newslists = doc.select(".cbp-item");
 		Map<String, String> todayMap = TimeUtil.genTodayDate();
@@ -67,11 +67,11 @@ public class GetCovidNumService implements ClientUtil {
 			String tname = element.select(".content-boxes-v3 > a").attr("title");
 			if (todayMap.containsKey(month) && todayMap.containsValue(date) && tname.indexOf(TITLE_NAME) != -1) {
 				CDC_URL_PREFIX.append(element.select(".content-boxes-v3 > a").attr("href"));
-				return CDC_URL_PREFIX.toString();
+				return parseBody(CDC_URL_PREFIX.toString());
 			}
 		}
 		log.warn("{} 找不到新聞標題",LOG_PREFIX);
-		return CDC_URL_PREFIX.toString();
+		return null;
 	}
 
 	/**
@@ -105,14 +105,14 @@ public class GetCovidNumService implements ClientUtil {
 										 .deathAmount(deathNum)
 										 .newsUrl(detailedURL)
 										 .build();
-			if(Stream.of(newNum,reNum,totalNum,deathNum).allMatch(x->x==0)){
-				log.warn("當日指標皆為0，請手動確認");
+			if(Stream.of(newNum,reNum,deathNum).allMatch(x->x==0)){
+				log.warn("當日確診人數及死亡人數指標皆為0，請手動確認");
 			}
 			confirmCaseRedisTemplate.delete(CONFIRMCASE_REDIS_KEY);
 			confirmCaseRedisTemplate.opsForValue().set(CONFIRMCASE_REDIS_KEY,cfc);
 			confirmCase = confirmCaseService.save(cfc);
 			if(Objects.isNull(confirmCase)){
-				log.warn("confirmCase 新增至db失敗");
+				log.warn("confirmCase 爬蟲成功 存redis成功 但新增至db失敗");
 			}
 		} catch (IOException e) {
 			throw new LineBotException(LineBotExceptionEnums.FAIL_ON_SSLHELPER_CONNECTION,e.getMessage());
@@ -127,8 +127,10 @@ public class GetCovidNumService implements ClientUtil {
 	 * @return Integer 確診數目
 	 * */
 	private Integer getNumFromDivchild(String keyword) {
-		Integer numeric_Start = 0;//數字起點
-		Integer target = 0;//返回結果
+		//數字起點
+		Integer numeric_Start = 0;
+		//返回結果
+		Integer target = 0;
 		if (divchild.indexOf(keyword) != -1) {
 			numeric_Start = divchild.indexOf(keyword)+ keyword.length();// 數字起點
 			target = getNumberFromEachCategory(numeric_Start,divchild);
@@ -146,8 +148,10 @@ public class GetCovidNumService implements ClientUtil {
 	}
 
 	private String getDomesticOrImportedCase(String comma,String semicolon){
-		Integer start = 0;//擷取起點
-		Integer end = 0;// 擷取終點
+		//擷取起點
+		Integer start = 0;
+		// 擷取終點
+		Integer end = 0;
 		if(divchild.indexOf(comma)!=-1){
 			start = divchild.indexOf(comma)+ comma.length();
 			end = divchild.indexOf(semicolon);

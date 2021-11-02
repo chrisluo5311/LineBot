@@ -112,7 +112,6 @@ public abstract class BaseMessageHandler extends BaseMessageUtil implements Base
      * */
     @Override
     public final <T extends MessageContent> BotApiResponse handleMessageEvent(MessageEvent<T> event) throws Exception{
-        BotApiResponse botApiResponse = null;
         //replyToken
         String replyToken = event.getReplyToken();
         //source
@@ -126,20 +125,20 @@ public abstract class BaseMessageHandler extends BaseMessageUtil implements Base
             if (Objects.nonNull(textMessageList)){
                 Method textMethod = this.getClass().getDeclaredMethod("textMessageReply",TextMessageContent.class,String.class,String.class);
                 //使用@MultiQuickReply或@QuickReplyMode自動產生QuickReply，若為混和型回復需自行實作
-                botApiResponse = executeReply(textMethod,textMessageList,replyToken);
+                return executeReply(textMethod,textMessageList,replyToken);
             }
         } else if (event.getMessage() instanceof LocationMessageContent) {
             //2. 功能訊息-(處理使用者地址並回傳藥局資訊/可null)
             List<LocationMessage> locationMessageList = handleLocationMessageReply((LocationMessageContent) event.getMessage(),userId);
             if(Objects.nonNull(locationMessageList)){
                 Method locationMethod = this.getClass().getDeclaredMethod("handleLocationMessageReply",LocationMessageContent.class,String.class);
-                botApiResponse = executeReply(locationMethod,locationMessageList,replyToken);
+                return executeReply(locationMethod,locationMessageList,replyToken);
             }
         } else if (event.getMessage() instanceof  StickerMessageContent) {
             //處理貼圖(如果是官方貼圖，預設回覆一樣)
             handleSticker(replyToken, (StickerMessageContent) event.getMessage());
         }
-        return botApiResponse;
+        return null;
     }
 
     /**

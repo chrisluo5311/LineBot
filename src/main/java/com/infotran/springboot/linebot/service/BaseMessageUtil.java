@@ -129,7 +129,8 @@ public abstract class BaseMessageUtil implements LineClientInterface {
      * */
     protected QuickReply getQuickReply(Method method) {
         MultiQuickReply multiQuickReply = method.getAnnotation(MultiQuickReply.class);
-        if (Objects.isNull(multiQuickReply)){//單一
+        if (Objects.isNull(multiQuickReply)){
+            //單一
             QuickReplyMode quickReplyMode = method.getAnnotation(QuickReplyMode.class);
             if (Objects.isNull(quickReplyMode)) {
                 //不使用註解要自己寫QuickReply
@@ -138,7 +139,8 @@ public abstract class BaseMessageUtil implements LineClientInterface {
             QuickReplyItem quickReplyItem = getQuickReply(quickReplyMode);
             log.info("[{}] 回傳單一的QuickReplyItem物件: {}",LOG_PREFIX,quickReplyItem);
             return QuickReply.builder().item(quickReplyItem).build();
-        } else { //多個
+        } else {
+            //多個
             List<QuickReplyItem> quickReplyItemList = new ArrayList<>();
             for (QuickReplyMode quickReplyMode1 : multiQuickReply.value()){
                 QuickReplyItem item = getQuickReply(quickReplyMode1);
@@ -166,24 +168,21 @@ public abstract class BaseMessageUtil implements LineClientInterface {
         //回傳QuickReplyItem
         switch (mode){
             case POSTBACK:
-                QuickReplyItem item =QuickReplyItem.builder()
+                return QuickReplyItem.builder()
                         .action(PostbackAction.builder()
                                 .label(label)
                                 .data(data)
                                 .displayText(displayText)
                                 .build())
                         .build();
-                return item;
             case LOCATION:
-                QuickReplyItem item2 = QuickReplyItem.builder()
+                return QuickReplyItem.builder()
                         .action(LocationAction.withLabel(label))
                         .build();
-                return item2;
             case MESSAGE:
-                QuickReplyItem item3 = QuickReplyItem.builder()
+                return QuickReplyItem.builder()
                         .action(new MessageAction(label,text))
                         .build();
-                return item3;
         }
         return null;
     }

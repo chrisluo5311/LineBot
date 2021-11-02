@@ -2,13 +2,12 @@ package com.infotran.springboot.linebot.service.messagehandler;
 
 import com.infotran.springboot.annotation.QuickReplyMode;
 import com.infotran.springboot.annotation.quickreplyenum.ActionMode;
-import com.infotran.springboot.webcrawler.confirmcase.model.ConfirmCase;
 import com.infotran.springboot.linebot.service.BaseMessageHandler;
 import com.infotran.springboot.linebot.service.messagehandler.enums.HandlerEnum;
+import com.infotran.springboot.webcrawler.confirmcase.model.ConfirmCase;
 import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
-import com.linecorp.bot.model.message.ImagemapMessage;
 import com.linecorp.bot.model.message.LocationMessage;
 import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.TextMessage;
@@ -68,9 +67,9 @@ public class HandleTodayAmountMessage extends BaseMessageHandler {
                         message.append("本日確診數量尚未公布。");
                         log.info("{} 本日新增不存在", LOG_PREFIX);
                     }
-                    textMessage = new TextMessage(message.toString());
-                    return Collections.singletonList(textMessage);
+                    return Collections.singletonList(new TextMessage(message.toString()));
                 case "昨日確診數":
+                    //todo caseService可以設非叢集索引
                     confirmCase = caseService.findByConfirmTime(LocalDate.now().minusDays(1));
                     if (confirmCase != null) {
                         message.append("指揮中心快訊：昨日新增" + confirmCase.getTodayAmount() + "例COVID-19確定病例。\n");
@@ -80,8 +79,7 @@ public class HandleTodayAmountMessage extends BaseMessageHandler {
                         message.append("昨日資訊異常。");
                         log.warn("{} 昨日新增不存在", LOG_PREFIX);
                     }
-                    textMessage = new TextMessage(message.toString());
-                    return Collections.singletonList(textMessage);
+                    return Collections.singletonList(new TextMessage(message.toString()));
             }
         return null;
     }

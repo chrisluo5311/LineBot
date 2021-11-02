@@ -13,7 +13,7 @@ public enum LineBotExceptionEnums {
     FAIL_ON_SSLHELPER_CONNECTION("A03","SSL Connection 失敗"),
     FAIL_ON_FIND_TODAY_COVIDNEWS("A04","查找今日新聞失敗 或 尚未發佈 或 標題錯誤"),
 
-    RESPONSE_EMPTY("B01","響應物件為空"),
+    BOTAPI_RESPONSE_EMPTY("B01","MessageEvent響應物件為空"),
     RESPONSE_NOT_TARGET("B02","響應物件非目標"),
 
     NEWS_KEYWORD_CHANGE("C01","新聞關鍵字改變"),
@@ -24,7 +24,9 @@ public enum LineBotExceptionEnums {
 
     FAIL_ON_IMPLEMENT_GETCLASSNAME("E01","實現類未實作getClassName()方法"),
 
-    FAIL_ON_OUTPUT_FILE("F01","檔案輸出失敗")
+    FAIL_ON_OUTPUT_FILE("F01","檔案輸出失敗"),
+
+    FAIL_ON_CREATE_RICHMENU("G01","製作Line RichMenu失敗")
     ;
 
     private String code;

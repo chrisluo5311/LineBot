@@ -1,5 +1,7 @@
 package com.infotran.springboot.linebot.controller;
 
+import com.infotran.springboot.exception.LineBotException;
+import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
 import com.infotran.springboot.linebot.model.MenuID;
 import com.infotran.springboot.linebot.service.LineClientInterface;
 import com.infotran.springboot.linebot.service.MenuIdService;
@@ -36,8 +38,9 @@ public class CreateRichMenu implements LineClientInterface, CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		if (isRichMenuExists())return;
-		executeCreateRichMenu();
+		if (!isRichMenuExists()){
+			executeCreateRichMenu();
+		}
 	}
 
 	/**
@@ -63,12 +66,15 @@ public class CreateRichMenu implements LineClientInterface, CommandLineRunner {
 			client.linkRichMenuIdToUser("all", menuId).get();
 			client.setDefaultRichMenu(menuId).get();
 		} catch (InterruptedException | ExecutionException e) {
-			log.info("RichMenu 創建失敗");
-			e.printStackTrace();
+			throw new LineBotException(LineBotExceptionEnums.FAIL_ON_CREATE_RICHMENU,e.getMessage());
 		}
 	}
 
-
+	/**
+	 * 製做RichMenuArea
+	 * 例: 長、寬、功能名稱...等等
+	 *
+	 * */
 	private  List<RichMenuArea> createRichMenuArea(){
 		List<RichMenuArea> area = new ArrayList<>();
 		//查詢今日確診 action01
@@ -84,7 +90,6 @@ public class CreateRichMenu implements LineClientInterface, CommandLineRunner {
 		PostbackAction action04 = PostbackAction.builder().label("國內外疫情").data("國內外疫情").displayText("國內外疫情").build();
 		RichMenuArea globalStatus = new RichMenuArea(new RichMenuBounds(0, 846, 835, 840),action04);
 		//查看疫苗施打人數累計統計圖 action5
-//		PostbackAction action05 = PostbackAction.builder().label("施打疫苗統計").data("施打疫苗統計").displayText("施打疫苗統計").build();
 		MessageAction action05 = new MessageAction("查看疫苗施打人數累計統計圖","查看疫苗施打人數累計統計圖");
 		RichMenuArea vaccineReport = new RichMenuArea(new RichMenuBounds(833, 846, 833, 840),action05);
 		//其他 action6
@@ -109,13 +114,20 @@ public class CreateRichMenu implements LineClientInterface, CommandLineRunner {
 	 * @throws ExecutionException
 	 * @throws InterruptedException
 	 */
-	private static boolean isRichMenuExists() throws ExecutionException, InterruptedException {
-		List<RichMenuResponse> richmenuresponse = client.getRichMenuList().get().getRichMenus();
-		String ans = "";
-		for (RichMenuResponse res : richmenuresponse){
-			 ans = res.getRichMenuId();
+	private static boolean isRichMenuExists() {
+		List<RichMenuResponse> richmenuresponse = null;
+		try {
+			richmenuresponse = client.getRichMenuList().get().getRichMenus();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
 		}
-		return (ans.length()==0)?false:true;
+		for (RichMenuResponse res : richmenuresponse){
+			//只有一個才能這樣判定
+			return (res.getRichMenuId().length()==0)?false:true;
+		}
+		return false;
 	}
 
 
