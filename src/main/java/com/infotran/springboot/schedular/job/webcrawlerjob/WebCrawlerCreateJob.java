@@ -14,6 +14,7 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.internal.annotations.EverythingIsNonNull;
 import org.slf4j.MDC;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -21,11 +22,13 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 
+/**
+ * @author chris
+ */
 @Slf4j
 @Component
 public class WebCrawlerCreateJob implements ClientUtil {
@@ -44,6 +47,11 @@ public class WebCrawlerCreateJob implements ClientUtil {
 
     private static ExecutorService crawImgExecutor;
 
+    /**
+     * 目前截圖方法總數
+     */
+    private static final Integer PICTURE_METHOD_AMOUNT = 2;
+
     @PostConstruct
     public void init(){
         crawImgExecutor = new ThreadPoolExecutor(2,4,180,
@@ -55,13 +63,15 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * 每天14:00開始到14:55，每五分鐘執行一次
      *
      * */
-    @Scheduled(fixedRate = 1* TimeUnit.HOUR)
-    public void executeCrawlCovid() throws IOException {
-        Request request = new Request.Builder().url(getCovidNumService.CDC_URL).get().build(); // get post put 等
+    @Scheduled(fixedRate = TimeUnit.HOUR)
+    public void executeCrawlCovid() {
+        // get post put 等
+        Request request = new Request.Builder().url(getCovidNumService.CDC_URL).get().build();
         Call call = client.newCall(request);
         call.enqueue(new Callback() {
             @SneakyThrows
             @Override
+            @EverythingIsNonNull
             public void onFailure(Call call, IOException e) {
                 log.warn("執行 [當日新增確診數] 爬蟲 失敗");
                 throw new LineBotException(LineBotExceptionEnums.FAIL_ON_WEBCRAWLING,e.getMessage());
@@ -69,15 +79,13 @@ public class WebCrawlerCreateJob implements ClientUtil {
 
             @SneakyThrows
             @Override
+            @EverythingIsNonNull
             public void onResponse(Call call, Response response) {
                 MDC.put("job","Confirm Case");
                 //整頁內容
+                assert response.body() != null;
                 String body = response.body().string();
-                if(Objects.nonNull(body)){
-                    rabbitMqService.sendConfirmCase(body);
-                }else {
-                    throw new LineBotException(LineBotExceptionEnums.FAIL_ON_BODY_RESPONSE);
-                }
+                rabbitMqService.sendConfirmCase(body);
                 MDC.remove("job");
             }
         });
@@ -89,13 +97,15 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * (每小時執行一次)
      *
      * */
-    @Scheduled(fixedRate = 1* TimeUnit.HOUR)
-    public void executeMaskCrawl() throws IOException {
-        Request request = new Request.Builder().url(getMaskJsonService.MASK_URL).get().build(); // get
+    @Scheduled(fixedRate = TimeUnit.HOUR)
+    public void executeMaskCrawl() {
+        // get
+        Request request = new Request.Builder().url(getMaskJsonService.MASK_URL).get().build();
         Call call = client.newCall(request);
         call.enqueue(new Callback() {
             @SneakyThrows
             @Override
+            @EverythingIsNonNull
             public void onFailure(Call call, IOException e) {
                 log.warn("執行 [查詢剩餘口罩數] 爬蟲 失敗");
                 throw new LineBotException(LineBotExceptionEnums.FAIL_ON_WEBCRAWLING,e.getMessage());
@@ -103,14 +113,12 @@ public class WebCrawlerCreateJob implements ClientUtil {
 
             @SneakyThrows
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            @EverythingIsNonNull
+            public void onResponse( Call call, Response response) {
                 MDC.put("job","Mask Info");
+                assert response.body() != null;
                 String jsonBody = response.body().string();
-                if(Objects.nonNull(jsonBody)){
-                    rabbitMqService.sendMaskInfo(jsonBody);
-                }else {
-                    throw new LineBotException(LineBotExceptionEnums.FAIL_ON_BODY_RESPONSE);
-                }
+                rabbitMqService.sendMaskInfo(jsonBody);
                 MDC.remove("job");
             }
         });
@@ -123,12 +131,14 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * (每小時執行一次)
      * */
     @Scheduled(fixedRate = 12* TimeUnit.HOUR)
-    public void executeParsingPDF() throws InterruptedException {
-        Request request = new Request.Builder().url(getVaccinedInfoService.getPdfUrl()).get().build(); // get post put 等
+    public void executeParsingPDF() {
+        // get post put 等
+        Request request = new Request.Builder().url(getVaccinedInfoService.getPdfUrl()).get().build();
         Call call = client.newCall(request);
         call.enqueue(new Callback() {
             @SneakyThrows
             @Override
+            @EverythingIsNonNull
             public void onFailure(Call call, IOException e) {
                 log.warn("執行 [pdf 取得各疫苗接踵累计人次] 爬蟲 失敗");
                 throw new LineBotException(LineBotExceptionEnums.FAIL_ON_WEBCRAWLING,e.getMessage());
@@ -136,14 +146,12 @@ public class WebCrawlerCreateJob implements ClientUtil {
 
             @SneakyThrows
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            @EverythingIsNonNull
+            public void onResponse(Call call, Response response) {
                 MDC.put("job","Vaccined PDF");
+                assert response.body() != null;
                 String jsonBody = response.body().string();
-                if(Objects.nonNull(jsonBody)){
-                    rabbitMqService.sendPDFVaccinedAmount(jsonBody);
-                }else {
-                    throw new LineBotException(LineBotExceptionEnums.FAIL_ON_BODY_RESPONSE);
-                }
+                rabbitMqService.sendPDFVaccinedAmount(jsonBody);
                 MDC.remove("job");
             }
         });
@@ -154,10 +162,10 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * (每小時執行一次)
      * */
     @Scheduled(fixedRate = 12* TimeUnit.HOUR)
-    public void executeVaccineScreeShot() throws InterruptedException {
+    public void executeVaccineScreeShot() {
         MDC.put("job","Selenium Snapshot");
-        Integer i = 0;
-        while(i<2){
+        int i = 0;
+        while(i < PICTURE_METHOD_AMOUNT){
             if(i==0){
                 crawImgExecutor.execute(() -> {
                     try {
@@ -166,7 +174,6 @@ public class WebCrawlerCreateJob implements ClientUtil {
                         log.error("[累计接踵人次]截图輸出失敗 或 其他原因");
                     }
                 });
-                i++;
             }else {
                 crawImgExecutor.execute(() -> {
                     try {
@@ -175,8 +182,8 @@ public class WebCrawlerCreateJob implements ClientUtil {
                         log.error("[各梯次疫苗涵蓋率]截图輸出失敗 或 其他原因");
                     }
                 });
-                i++;
             }
+            i++;
         }
         MDC.remove("job");
     }

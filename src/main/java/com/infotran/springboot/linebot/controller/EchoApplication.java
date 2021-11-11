@@ -16,11 +16,12 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Resource;
 
+/**
+ * @author chris
+ */
 @Slf4j
 @LineMessageHandler
 public class EchoApplication {
-
-    private static final String LOG_PREFIX = "EchoApplication";
 
     @Resource
     BaseMessagePool baseMessagePool;
@@ -45,6 +46,8 @@ public class EchoApplication {
             case "其他":
                 baseMessageInterface = baseMessagePool.getMethod(HandlerEnum.getHandlerName(6));
                 botApiResponse = baseMessageInterface.postBackReply(event);
+                break;
+            default:
         }
         if(botApiResponse==null){
             log.warn("接收處理PostbackEvent失敗");

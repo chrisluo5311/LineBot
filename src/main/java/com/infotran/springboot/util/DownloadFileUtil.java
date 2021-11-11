@@ -40,7 +40,7 @@ public class DownloadFileUtil {
      * */
     public static String downloadByUrl(String govURL,String fileName) throws IOException {
         URL url = new URL(govURL);
-        String strFileContents = null;
+        StringBuilder strFileContents = null;
         try (
             InputStream inputStream = url.openStream();
             BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
@@ -50,10 +50,10 @@ public class DownloadFileUtil {
             int numBytesRead = 0;
             while ((numBytesRead = bufferedInputStream.read(bucket, 0, bucket.length)) != -1) {
                 fileOutputStream.write(bucket, 0, numBytesRead);
-                strFileContents += new String(bucket, 0, numBytesRead);
+                strFileContents.append(new String(bucket, 0, numBytesRead));
             }
         }
-        return strFileContents;
+        return strFileContents.toString();
     }
 
     /**

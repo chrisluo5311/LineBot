@@ -28,18 +28,17 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * @author chris
  * 測試及做筆記用
  * 編號: 0 <br>
- *
+ * @author chris
  * */
 @Slf4j
 @Component
 public class HandleTextMessage extends BaseMessageHandler {
 
-	private ReplyMessage replyMessage = null;
+	private final ReplyMessage replyMessage = null;
 
-	private static String LOG_PREFIX = "TestReplyMessageHandler";
+	private static final String LOG_PREFIX = "TestReplyMessageHandler";
 
 	@Override
 	public String getClassName() {

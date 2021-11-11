@@ -4,11 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
+/**
+ * @author chris
+ */
 @Slf4j
 @Controller
-public class MgrFindVeiwController {
-
-    private static final String LOG_PREFIX = "[MgrFindVeiwController]";
+public class MgrFindViewController {
 
     @GetMapping(value="/")
     public String home(){

@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 import javax.persistence.*;
 import java.time.LocalDate;
 
+/**
+ * @author chris
+ */
 @Entity
 @Table(name="ConfirmCase")
 @Data

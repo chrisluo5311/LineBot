@@ -5,23 +5,27 @@ import com.infotran.springboot.linebot.dao.MenuIdRepository;
 import com.infotran.springboot.linebot.model.MenuID;
 import com.infotran.springboot.linebot.service.MenuIdService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+
+/**
+ * @author chris
+ */
 @Service
 @Slf4j
-public class MenuIdSeriveImpl implements MenuIdService {
+public class MenuIdServiceImpl implements MenuIdService {
 
-	private static String LOG_PREFIX = "[MenuIdSeriveImpl]";
+	private static final String LOG_PREFIX = "[MenuIdServiceImpl]";
 
-	@Autowired
+	@Resource
 	MenuIdRepository menuRepo;
 	
 	@Override
 	public MenuID save(MenuID menuid) {
 		String id = menuid.getMenuId();
-		MenuID menuID =getMenuID(id);
-		if (id.length()!=0 && menuID!=null) {
+		MenuID menuId =getMenuId(id);
+		if (id.length()!=0 && menuId!=null) {
 			menuRepo.deleteAll();
 			log.info("{} LineBot 目錄id: {},",LOG_PREFIX,id);
 			menuRepo.save(menuid);
@@ -31,8 +35,8 @@ public class MenuIdSeriveImpl implements MenuIdService {
 	}
 
 	@Override
-	public MenuID getMenuID(String menuid){
-		return  menuRepo.findByMenuId(menuid);
+	public MenuID getMenuId(String menuId){
+		return  menuRepo.findByMenuId(menuId);
 	}
 
 	@Override

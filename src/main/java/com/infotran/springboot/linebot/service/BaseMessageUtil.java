@@ -24,10 +24,18 @@ import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
+/**
+ * @author chris
+ */
 @Slf4j
 public abstract class BaseMessageUtil implements LineClientInterface {
 
-    private static String LOG_PREFIX = "[BaseMessageUtil]";
+    private static final String LOG_PREFIX = "[BaseMessageUtil]";
+
+    /**
+     * 最大MESSAGE傳送數量
+     * */
+    private static final Integer MAX_MESSAGE_AMOUNT = 1000;
 
     /**
      * 回應訊息(replyToken,Message物件)<br>
@@ -50,16 +58,17 @@ public abstract class BaseMessageUtil implements LineClientInterface {
 
     /**
      * 回應訊息
-     * @param replyToken
-     * @param messages
-     * @param notificationDisabled
+     * @param replyToken  replyToken
+     * @param messages 回傳訊息 List
+     * @param notificationDisabled notificationDisabled
+     * @return BotApiResponse
      * */
     private BotApiResponse reply(@NonNull String replyToken,
                                    @NonNull List<Message> messages,
                                    boolean notificationDisabled) {
         try {
             log.info("======================發送post請求==========================");
-            BotApiResponse apiResponse = client
+            BotApiResponse apiResponse = CLIENT
                     .replyMessage(new ReplyMessage(replyToken, messages, notificationDisabled))
                     .get();
             log.info("========================請求結束============================");
@@ -74,12 +83,14 @@ public abstract class BaseMessageUtil implements LineClientInterface {
      * 回應文字訊息(小於1000字)
      * @param replyToken String
      * @param message String
+     * @return BotApiResponse
      * */
     protected BotApiResponse replyText(@NonNull String replyToken, @NonNull String message) {
         if (replyToken.isEmpty()) {
             throw new IllegalArgumentException("replyToken must not be empty");
         }
-        if (message.length() > 1000) {
+
+        if (message.length() > MAX_MESSAGE_AMOUNT) {
             message = message.substring(0, 1000 - 2) + "……";
         }
         return this.reply(replyToken, new TextMessage(message));
@@ -89,9 +100,9 @@ public abstract class BaseMessageUtil implements LineClientInterface {
 
     /**
      * 解析@QuickReply、合併Message集合並調用reply回覆<br>
-     * @param method
-     * @param messageList
-     * @param replyToken
+     * @param method 方法
+     * @param messageList messageList
+     * @param replyToken replyToken
      * @return BotApiResponse
      *
      * */

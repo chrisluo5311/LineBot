@@ -24,19 +24,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 
+/**
+ * @author chris
+ */
 @Slf4j
 @Component
 public abstract class BaseMessageHandler extends BaseMessageUtil implements BaseMessageInterface {
 
-    private static String LOG_PREFIX = "BaseMessageHandler";
+    private static final String LOG_PREFIX = "BaseMessageHandler";
 
     @Resource
     public ConfirmCaseService caseService;
@@ -56,8 +57,10 @@ public abstract class BaseMessageHandler extends BaseMessageUtil implements Base
      * 處理TextMessageContent文字訊息<br>
      * 可搭配使用的annotation : {@link QuickReplyMode}
      *
-     * @param event MessageEvent
-     * @return
+     * @param event TextMessageContent
+     * @param replyToken replyToken
+     * @param userId 使用者id
+     * @return List<TextMessage>
      *
      * */
     protected abstract List<TextMessage> textMessageReply(TextMessageContent event,String replyToken,String userId);
@@ -67,7 +70,7 @@ public abstract class BaseMessageHandler extends BaseMessageUtil implements Base
      * 可搭配使用的annotation : {@link QuickReplyMode}
      *
      * @param event PostbackEvent
-     * @return
+     * @return List<TextMessage>
      *
      * */
     protected abstract List<TextMessage> textMessageReply(PostbackEvent event);
@@ -75,7 +78,9 @@ public abstract class BaseMessageHandler extends BaseMessageUtil implements Base
     /**
      * 處理使用者回傳的現在位置
      *
-     * @param event  MessageEvent
+     * @param event  LocationMessageContent
+     * @param userId  使用者id
+     * @return  List<LocationMessage>
      */
     protected abstract <T extends MessageContent> List<LocationMessage> handleLocationMessageReply(LocationMessageContent event,String userId);
 
@@ -83,11 +88,12 @@ public abstract class BaseMessageHandler extends BaseMessageUtil implements Base
      * 處理Imagemap回复
      *
      * @param event  PostbackEvent
+     * @return  List<Message>
      */
     protected abstract List<Message> handleImagemapMessageReply(PostbackEvent event);
 
     @Override
-    public BotApiResponse postBackReply(PostbackEvent event) throws IOException, NoSuchMethodException {
+    public BotApiResponse postBackReply(PostbackEvent event) {
         BotApiResponse botApiResponse = null;
         String replyToken = event.getReplyToken();
         String data = event.getPostbackContent().getData();
@@ -96,18 +102,19 @@ public abstract class BaseMessageHandler extends BaseMessageUtil implements Base
             case "國內外疫情" :
                 break;
             case "其他" :
-                List<Message> textList = textMessageReply(event).stream().collect(Collectors.toList());
+                List<Message> textList = new ArrayList<>(textMessageReply(event));
                 botApiResponse = reply(replyToken,textList);
                 break;
             case "refreshfuntion2":
 
                 break;
+            default:
         }
         return botApiResponse;
     }
 
     /**
-     * 回覆順序: 處理文字訊息(可null) -> 功能訊息(確診數目、藥局地址、統計圖、貼圖...等等)
+     * 回覆順序: 處理文字訊息(可 null) -> 功能訊息(確診數目、藥局地址、統計圖、貼圖...等等)
      *
      * */
     @Override
@@ -153,7 +160,7 @@ public abstract class BaseMessageHandler extends BaseMessageUtil implements Base
         reply(replyToken, new StickerMessage(
                 content.getPackageId(), content.getStickerId())
         );
-    };
+    }
 
     /**
      * 打開地圖
@@ -161,7 +168,7 @@ public abstract class BaseMessageHandler extends BaseMessageUtil implements Base
      *
      * */
     public TextMessage openMap() {
-        final List<QuickReplyItem> items = Arrays.<QuickReplyItem>asList(
+        final List<QuickReplyItem> items = List.of(
                 QuickReplyItem.builder()
                         .action(LocationAction.withLabel("打開定位"))
                         .build()
@@ -169,8 +176,7 @@ public abstract class BaseMessageHandler extends BaseMessageUtil implements Base
 
         final QuickReply quickReply = QuickReply.items(items);
 
-        TextMessage textMessage = TextMessage.builder().text("點選下方打開地圖").quickReply(quickReply).build();
-        return textMessage;
+        return TextMessage.builder().text("點選下方打開地圖").quickReply(quickReply).build();
     }
 
 

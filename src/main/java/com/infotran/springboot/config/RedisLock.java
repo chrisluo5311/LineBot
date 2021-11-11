@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
  * 僅一主機運行
  * 不做看門狗監聽機制
  *
+ * @author chris
  */
 @Slf4j
 @Component

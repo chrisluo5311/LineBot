@@ -4,12 +4,32 @@ package com.infotran.springboot.linebot.service;
 import com.infotran.springboot.linebot.model.MenuID;
 import org.springframework.stereotype.Service;
 
+/**
+ * @author chris
+ */
 @Service
 public interface MenuIdService {
 
-	public MenuID save(MenuID menuid);
+	/**
+	 * 新增 MenuID
+	 * @param menuId RichMenu id
+	 * @return MenuID
+	 * */
+	MenuID save(MenuID menuId);
 
-	public MenuID getMenuID(String menuid);
+	/**
+	 * 依 MenuID 查找 MenuID
+	 * @param menuId RichMenu id
+	 * @return MenuID
+	 *
+	 * */
+	MenuID getMenuId(String menuId);
 
-	public MenuID getMenuByName(String menuName);
+	/**
+	 * 依 menuName 查找 MenuID
+	 * @param menuName RichMenu Name
+	 * @return MenuID
+	 *
+	 * */
+	MenuID getMenuByName(String menuName);
 }

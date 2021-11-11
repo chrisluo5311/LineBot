@@ -1,7 +1,6 @@
 package com.infotran.springboot.annotation;
 
 import com.infotran.springboot.annotation.quickreplyenum.ActionMode;
-import org.springframework.scheduling.annotation.Schedules;
 
 import java.lang.annotation.*;
 
@@ -9,6 +8,8 @@ import java.lang.annotation.*;
  *  QuickReply模式目前僅三種:
  *  POSTBACK,MESSAGE,LOCATION
  *  TODO URI,DATETIMEPICKER,CAMERA,CAMERA_ROLL
+ *
+ *  @author chris
  *
  * */
 @Target({ElementType.TYPE,ElementType.METHOD})

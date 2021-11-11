@@ -2,9 +2,12 @@ package com.infotran.springboot.exception;
 
 import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
 
+/**
+ * @author chris
+ */
 public class LineBotException extends Exception{
 
-    private LineBotExceptionEnums lineBotExceptionCodeCode;
+    private final LineBotExceptionEnums lineBotExceptionCodeCode;
 
     public LineBotException(LineBotExceptionEnums lineBotExceptionCodeCode, Object message, Throwable cause){
         super(lineBotExceptionCodeCode.getStatus() + "->" + message,cause);

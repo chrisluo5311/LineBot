@@ -5,7 +5,6 @@ import com.infotran.springboot.linebot.service.messagehandler.enums.HandlerEnum;
 import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
-import com.linecorp.bot.model.message.ImagemapMessage;
 import com.linecorp.bot.model.message.LocationMessage;
 import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.TextMessage;
@@ -16,11 +15,10 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * @author chris
  * 第六功能
  * 編號: 6 <br>
  * 處理其他功能
- *
+ * @author chris
  * */
 @Slf4j
 @Component
@@ -42,8 +40,7 @@ public class HandleOtherMessage extends BaseMessageHandler {
      * */
     @Override
     protected List<TextMessage> textMessageReply(PostbackEvent event) {
-        StringBuilder message = new StringBuilder();
-        message.append("⊂_ヽ\n" +
+        String message = "⊂_ヽ\n" +
                 "　 ＼＼ ＿\n" +
                 "　　 ＼(　•_•) F\n" +
                 "　　　 <　⌒ヽ A\n" +
@@ -57,8 +54,8 @@ public class HandleOtherMessage extends BaseMessageHandler {
                 "　| 丿 ＼ ⌒)\n" +
                 "　| |　　) /\n" +
                 "`ノ )　　Lﾉ\n" +
-                "(_／");
-        TextMessage text = TextMessage.builder().text(message.toString()).build();
+                "(_／";
+        TextMessage text = TextMessage.builder().text(message).build();
         return Collections.singletonList(text);
     }
 

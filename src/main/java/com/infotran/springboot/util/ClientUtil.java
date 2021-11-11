@@ -3,6 +3,9 @@ package com.infotran.springboot.util;
 import okhttp3.OkHttpClient;
 import javax.net.ssl.X509TrustManager;
 
+/**
+ * @author chris
+ */
 public interface ClientUtil {
 
 

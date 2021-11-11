@@ -7,6 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * 計算方法執行時間
+ * @author chris
  *
  * */
 @Target(ElementType.METHOD)

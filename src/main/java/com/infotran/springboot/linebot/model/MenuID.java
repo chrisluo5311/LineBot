@@ -6,6 +6,9 @@ import org.springframework.stereotype.Component;
 import javax.persistence.*;
 import java.io.Serializable;
 
+/**
+ * @author chris
+ */
 @Entity
 @Table(name = "MenuID")
 @Data
@@ -17,7 +20,7 @@ public class MenuID implements Serializable {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer Id;
+	private Integer id;
 	
 	private String menuId;
 	

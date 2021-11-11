@@ -7,6 +7,9 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author chris
+ */
 @Aspect
 @Slf4j
 @Component
@@ -21,7 +24,7 @@ public class LogAspect {
         long start = System.currentTimeMillis();
         log.info("======================方法開始==========================");
         Object object = joinPoint.proceed();
-        long executionTime = (System.currentTimeMillis()-start)/1000;//to s
+        long executionTime = (System.currentTimeMillis()-start)/1000;
         log.info("=================方法結束 方法耗時:{} ms==================",executionTime);
         return object;
     }

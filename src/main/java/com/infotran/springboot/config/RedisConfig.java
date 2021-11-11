@@ -26,6 +26,9 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
 
+/**
+ * @author chris
+ */
 @Configuration
 public class RedisConfig {
 
@@ -84,9 +87,11 @@ public class RedisConfig {
         // om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
         // 替换上方 过期的enableDefaultTyping
         om.activateDefaultTyping(LaissezFaireSubTypeValidator.instance ,ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.WRAPPER_ARRAY);
-        jackson2JsonRedisSerializer.setObjectMapper(om); // 解决jackson2无法反序列化LocalDateTime的问题
+        // 解决jackson2无法反序列化LocalDateTime的问题
+        jackson2JsonRedisSerializer.setObjectMapper(om);
         om.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        om.registerModule(new JavaTimeModule()); // 配置序列化（解决乱码的问题）
+        // 配置序列化（解决乱码的问题）
+        om.registerModule(new JavaTimeModule());
         RedisCacheConfiguration config = RedisCacheConfiguration
                                         .defaultCacheConfig()
                                         .entryTtl(Duration.ofDays(1))

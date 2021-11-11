@@ -24,11 +24,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- * @author chris
  * 第二功能
  * 編號: 2 <br>
  * 1.處理使用者回傳位置訊息
  * 2.搜尋最近的藥局並回傳: 第一次回傳五間，按快捷鍵再回傳五個
+ * @author chris
  *
  * */
 @Slf4j
@@ -36,20 +36,22 @@ import java.util.stream.Collectors;
 public class HandleLocationMessage extends BaseMessageHandler {
 
     private static final String LOG_PREFIX;
-    private static String REDIS_KEY_PREFIX;
-    private static Integer medicineStoreAmount;
+    private static final String REDIS_KEY_PREFIX;
+    private static final Integer MEDICINE_STORE_AMOUNT;
 
     static {
         LOG_PREFIX = "HandleLocationMessageReply";
-        REDIS_KEY_PREFIX = "sortedLocationMessageList";//須加上使用者id
-        medicineStoreAmount = 10;
+        REDIS_KEY_PREFIX = "sortedLocationMessageList";
+        MEDICINE_STORE_AMOUNT = 10;
     }
 
     @Resource
     private RedisLock redisLock;
 
-    //Reids Timeout 1分鐘
-    private static Integer TIMEOUT = 1;
+    /**
+     * Redis Timeout 1分鐘
+     * */
+    private static final Integer TIMEOUT = 1;
     
     @Resource
     RedisTemplate<Object, LocationMessage> locationMessageRedisTemplate;
@@ -65,20 +67,22 @@ public class HandleLocationMessage extends BaseMessageHandler {
     @Override
     protected  List<TextMessage> textMessageReply(TextMessageContent event,String replyToken,String userId) {
         //redis key 對應使用者
-        StringBuilder keySB = new StringBuilder();
-        keySB.append(REDIS_KEY_PREFIX).append(userId);
+        StringBuilder keyString = new StringBuilder();
+        keyString.append(REDIS_KEY_PREFIX).append(userId);
         String receivedMessage = event.getText();
         switch (receivedMessage){
             case "下五間":
-                if(locationMessageRedisTemplate.hasKey(keySB)){
-                    List<LocationMessage> locationList = locationMessageRedisTemplate.opsForList().range(keySB,0,-1);
+                if(Boolean.TRUE.equals(locationMessageRedisTemplate.hasKey(keyString))){
+                    List<LocationMessage> locationList = locationMessageRedisTemplate.opsForList().range(keyString,0,-1);
                     //確認是5家不然會抱錯 line不傳超過5家
-                    List<Message> messageList = (locationList.size()==5) ?
-                            locationList.stream().map(Message.class::cast).collect(Collectors.toList()) :
-                            locationList.subList(0, 5).stream().map(Message.class::cast).collect(Collectors.toList());
-                    reply(replyToken, messageList);
-                    //刪除redis key
-                    redisLock.unlock(keySB.toString());
+                    if(locationList!=null){
+                        List<Message> messageList = (5==locationList.size()) ?
+                                locationList.stream().map(Message.class::cast).collect(Collectors.toList()) :
+                                locationList.subList(0, 5).stream().map(Message.class::cast).collect(Collectors.toList());
+                        reply(replyToken, messageList);
+                        //刪除redis key
+                        redisLock.unlock(keyString.toString());
+                    }
                 }else {
                     //redis key 1分鐘Timeout才點會启动重新定位的方法
                     TextMessage textMessage = openMap();
@@ -90,6 +94,7 @@ public class HandleLocationMessage extends BaseMessageHandler {
                 TextMessage textMessage = openMap();
                 reply(replyToken,textMessage);
                 break;
+            default:
         }
         return null;
     }
@@ -137,10 +142,10 @@ public class HandleLocationMessage extends BaseMessageHandler {
 
         //取出店家存進LocationMessage的LinkedList
         LinkedList<LocationMessage> locationLinkedList = new LinkedList<>();
-        LocationMessage locationMessage = null;
+        LocationMessage locationMessage;
         Integer i = 0;
         for (Map.Entry entry : medicineStoreMap.entrySet()){
-            while (i < medicineStoreAmount){
+            while (i < MEDICINE_STORE_AMOUNT){
                 MedicineStore medicineStore = (MedicineStore) entry.getValue();
                 String name = medicineStore.getName();
                 String address = medicineStore.getAddress();
@@ -178,12 +183,12 @@ public class HandleLocationMessage extends BaseMessageHandler {
      * @param lon2 經度2
      * @return double 距離
      * */
-    private double getDistance(double lat1, double lon1, double lat2, double lon2){
-        if ((lat1 == lat2) && (lon1 == lon2)){
+    private double getDistance(Double lat1, Double lon1, Double lat2, Double lon2){
+        if ((lat1.equals(lat2)) && (lon1.equals(lon2))){
             return 0;
         }else {
-            double theta = lon1 - lon2;
-            double dist = Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.cos(Math.toRadians(theta));
+            Double theta = lon1 - lon2;
+            Double dist = Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.cos(Math.toRadians(theta));
             dist = Math.acos(dist);
             dist = Math.toDegrees(dist);
             dist = dist * 60 * 1.1515 * 1.609344;

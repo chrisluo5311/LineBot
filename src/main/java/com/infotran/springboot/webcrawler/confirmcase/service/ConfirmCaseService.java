@@ -4,6 +4,9 @@ import com.infotran.springboot.webcrawler.confirmcase.model.ConfirmCase;
 
 import java.time.LocalDate;
 
+/**
+ * @author chris
+ */
 public interface ConfirmCaseService {
 
 	ConfirmCase save(ConfirmCase fcase);

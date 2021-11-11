@@ -1,6 +1,9 @@
 package com.infotran.springboot.schedular;
 
 
+/**
+ * @author chris
+ */
 public final class TimeUnit {
 
     public static final int SECOND = 1000;

@@ -19,19 +19,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+/**
+ * @author chris
+ */
 @Component
 @Slf4j
 @Order(1)
 public class CreateRichMenu implements LineClientInterface, CommandLineRunner {
 
-	//menu名字
+	/**
+	 * menu名字
+	 * */
 	private static final String MENU_NAME = "CovidMenu";
 
-	//chatBarText功能選單
+	/**
+	 * chatBarText功能選單
+	 * */
 	private static final String CHAT_BAR_TEXT = "功能選單";
 
-	//richMenu的照片檔案路徑
-	private static final String richMenuFilePath = "/static/menufinal.jpg";
+	/**
+	 * richMenu的照片檔案路徑
+	 * */
+	private static final String RICH_MENU_FILE_PATH = "/static/menuFinal.jpg";
 
 	@Resource
 	MenuIdService menuService;
@@ -56,15 +65,15 @@ public class CreateRichMenu implements LineClientInterface, CommandLineRunner {
 									.chatBarText(CHAT_BAR_TEXT)
 									.areas(area)
 									.build();
-		byte[] buffer = DownloadFileUtil.file2Byte(richMenuFilePath);
+		byte[] buffer = DownloadFileUtil.file2Byte(RICH_MENU_FILE_PATH);
 		try {
-			RichMenuIdResponse menuResponse = client.createRichMenu(richmenu).get();
+			RichMenuIdResponse menuResponse = CLIENT.createRichMenu(richmenu).get();
 			String menuId = menuResponse.getRichMenuId();
 			MenuID menu = MenuID.builder().menuId(menuId).menuName(richmenu.getName()).build();
 			menuService.save(menu);
-			blobClient.setRichMenuImage(menuId, "image/jpeg", buffer).get();
-			client.linkRichMenuIdToUser("all", menuId).get();
-			client.setDefaultRichMenu(menuId).get();
+			BLOB_CLIENT.setRichMenuImage(menuId, "image/jpeg", buffer).get();
+			CLIENT.linkRichMenuIdToUser("all", menuId).get();
+			CLIENT.setDefaultRichMenu(menuId).get();
 		} catch (InterruptedException | ExecutionException e) {
 			throw new LineBotException(LineBotExceptionEnums.FAIL_ON_CREATE_RICHMENU,e.getMessage());
 		}
@@ -82,7 +91,7 @@ public class CreateRichMenu implements LineClientInterface, CommandLineRunner {
 		RichMenuArea todayNum = new RichMenuArea(new RichMenuBounds(0, 0, 836, 846),messageAction);
 		//查看所在位置口罩剩餘狀態 action2
 		MessageAction action02 = new MessageAction("查看所在位置口罩剩餘狀態","查看所在位置口罩剩餘狀態");
-		RichMenuArea BuyMask = new RichMenuArea(new RichMenuBounds(833, 2, 836, 844),action02);
+		RichMenuArea buyMask = new RichMenuArea(new RichMenuBounds(833, 2, 836, 844),action02);
 		//查看所在位置與確診足跡 action3
 		MessageAction action03 = new MessageAction("查看所在位置與確診足跡","查看所在位置與確診足跡");
 		RichMenuArea locationStatus = new RichMenuArea(new RichMenuBounds(1666, 3, 834, 843),action03);
@@ -97,7 +106,7 @@ public class CreateRichMenu implements LineClientInterface, CommandLineRunner {
 		RichMenuArea others = new RichMenuArea(new RichMenuBounds(1663, 843, 835, 843),action06);
 
 		area.add(todayNum);
-		area.add(BuyMask);
+		area.add(buyMask);
 		area.add(locationStatus);
 		area.add(globalStatus);
 		area.add(vaccineReport);
@@ -111,21 +120,17 @@ public class CreateRichMenu implements LineClientInterface, CommandLineRunner {
 	 * true:有目錄
 	 *
 	 * @return boolean
-	 * @throws ExecutionException
-	 * @throws InterruptedException
 	 */
 	private static boolean isRichMenuExists() {
-		List<RichMenuResponse> richmenuresponse = null;
+		List<RichMenuResponse> richMenuResponseList ;
 		try {
-			richmenuresponse = client.getRichMenuList().get().getRichMenus();
-		} catch (InterruptedException e) {
+			richMenuResponseList = CLIENT.getRichMenuList().get().getRichMenus();
+			for (RichMenuResponse res : richMenuResponseList){
+				//只有一個才能這樣判定
+				return res.getRichMenuId().length() != 0;
+			}
+		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		}
-		for (RichMenuResponse res : richmenuresponse){
-			//只有一個才能這樣判定
-			return (res.getRichMenuId().length()==0)?false:true;
 		}
 		return false;
 	}

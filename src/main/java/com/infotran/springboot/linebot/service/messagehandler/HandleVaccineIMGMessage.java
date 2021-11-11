@@ -33,9 +33,9 @@ import java.util.List;
  * */
 @Slf4j
 @Component
-public class HandleVaccineIMGMessage extends BaseMessageHandler {
+public class HandleVaccineImgMessage extends BaseMessageHandler {
 
-    private String LOG_PREFFIX = "[HandleVaccineIMGMessage]";
+    private final String LOG_PREFIX = "[HandleVaccineIMGMessage]";
 
     @Resource
     VaccinedPeopleService vaccinedPeopleService;
@@ -63,21 +63,22 @@ public class HandleVaccineIMGMessage extends BaseMessageHandler {
                 if(vaccineTypePeople!=null){
                     content.append("根據衛生福利部疾病管制署公佈: \n")
                             .append("COVID-19疫苗接種人次，")
-                            .append(vaccineTypePeople.getBody())
-                            .append("\n\n資料來源: "+vaccineTypePeople.getResourceUrl()+"。");
+                            .append(vaccineTypePeople.getBody()).append("\n\n資料來源: ")
+                            .append(vaccineTypePeople.getResourceUrl()).append("。");
                 }
                 TextMessage textMessage = TextMessage.builder().text(content.toString()).quickReply(quickReply).build();
                 //圖片訊息
-                URI vaccineImgURI1 = DownloadFileUtil.createUri("/static/cumulativeVaccined.jpg");
-                URI vaccineImgURI2 = DownloadFileUtil.createUri("/static/eachBatchCoverage.jpg");
-                ImageMessage imgMessage1 = ImageMessage.builder().previewImageUrl(vaccineImgURI1).originalContentUrl(vaccineImgURI1).build();
-                ImageMessage imgMessage2 = ImageMessage.builder().previewImageUrl(vaccineImgURI2).originalContentUrl(vaccineImgURI2).build();
+                URI vaccineImgUri1 = DownloadFileUtil.createUri("/static/cumulativeVaccined.jpg");
+                URI vaccineImgUri2 = DownloadFileUtil.createUri("/static/eachBatchCoverage.jpg");
+                ImageMessage imgMessage1 = ImageMessage.builder().previewImageUrl(vaccineImgUri1).originalContentUrl(vaccineImgUri1).build();
+                ImageMessage imgMessage2 = ImageMessage.builder().previewImageUrl(vaccineImgUri2).originalContentUrl(vaccineImgUri2).build();
                 List<Message> replyList = new ArrayList<Message>();
                 replyList.add(textMessage);
                 replyList.add(imgMessage1);
                 replyList.add(imgMessage2);
                 reply(replyToken,replyList);
                 break;
+            default:
         }
         return null;
     }

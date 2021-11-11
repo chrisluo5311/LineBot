@@ -21,6 +21,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+/**
+ * @author chris
+ */
 @Service
 @Slf4j
 public class GetCovidNumService implements ClientUtil {
@@ -48,7 +51,9 @@ public class GetCovidNumService implements ClientUtil {
 	@Autowired
 	RedisTemplate<Object, ConfirmCase> confirmCaseRedisTemplate;
 
-	//新聞body
+	/**
+	 * 新聞body
+	 */
 	String divchild;
 
 	/**

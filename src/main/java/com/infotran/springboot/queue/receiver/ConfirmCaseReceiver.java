@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
+/**
+ * @author chris
+ */
 @Slf4j
 @Component
 public class ConfirmCaseReceiver {

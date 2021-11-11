@@ -1,9 +1,10 @@
 package com.infotran.springboot.exception.exceptionenum;
 
-/*
-* 爬蟲狀態
-*
-* */
+/**
+ * 自訂義LineBot Exception 枚舉
+ *
+ * @author chris
+ */
 public enum LineBotExceptionEnums {
 
     SUCCESS("000","爬蟲成功"),

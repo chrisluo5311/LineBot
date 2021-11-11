@@ -6,7 +6,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-
+/**
+ * @author chris
+ */
 public class SSLSocketClientUtil {
 
     public static SSLSocketFactory getSocketFactory(TrustManager manager) {
@@ -15,9 +17,7 @@ public class SSLSocketClientUtil {
             SSLContext sslContext = SSLContext.getInstance("SSL");
             sslContext.init(null, new TrustManager[]{manager}, new SecureRandom());
             socketFactory = sslContext.getSocketFactory();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (KeyManagementException e) {
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
             e.printStackTrace();
         }
         return socketFactory;
@@ -43,13 +43,12 @@ public class SSLSocketClientUtil {
     }
 
     public static HostnameVerifier getHostnameVerifier() {
-        HostnameVerifier hostnameVerifier = new HostnameVerifier() {
+        return new HostnameVerifier() {
             @Override
             public boolean verify(String s, SSLSession sslSession) {
                 return true;
             }
         };
-        return hostnameVerifier;
     }
 
 
