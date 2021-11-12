@@ -21,7 +21,7 @@ public enum LineBotExceptionEnums {
     NEWS_TITLE_CHANGE("C02","新聞標題改變，請手動更新"),
     NEWS_CONTENT_CHANGE("C03","新聞内文[境外移入或本土]改變，請手動更新"),
 
-    FAIL_ON_SAVING_RESPONSE("D01","資料庫儲存失敗"),
+    DB_FAILED("D01","資料庫儲存失敗"),
 
     FAIL_ON_IMPLEMENT_GETCLASSNAME("E01","實現類未實作getClassName()方法"),
 

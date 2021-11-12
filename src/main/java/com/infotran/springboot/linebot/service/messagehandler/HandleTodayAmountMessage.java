@@ -60,7 +60,7 @@ public class HandleTodayAmountMessage extends BaseMessageHandler {
                         message.append("參考指揮中心新聞網址:").append(confirmCase.getNewsUrl());
                     } else {
                         message.append("本日確診數量尚未公布。");
-                        log.info("{} 本日新增不存在", LOG_PREFIX);
+                        log.warn("{} 本日新增不存在", LOG_PREFIX);
                     }
                     return Collections.singletonList(new TextMessage(message.toString()));
                 case "昨日確診數":

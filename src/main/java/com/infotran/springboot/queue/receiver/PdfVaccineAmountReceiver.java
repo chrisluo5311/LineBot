@@ -14,7 +14,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @Component
-public class PDFVaccinedAmountReceiver {
+public class PdfVaccineAmountReceiver {
 
     @Resource
     GetVaccinedInfoService getVaccinedInfoService;

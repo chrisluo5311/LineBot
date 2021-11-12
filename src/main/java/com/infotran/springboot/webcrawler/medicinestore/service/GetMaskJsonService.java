@@ -95,7 +95,7 @@ public class GetMaskJsonService implements ClientUtil {
         List<MedicineStore> response = medicineStoreService.saveAll(medList);
         if(Objects.isNull(response)){
             log.info("{} 口罩即時資訊json解析成功 新增至db失敗",LOG_PREFIX);
-            throw new LineBotException(LineBotExceptionEnums.FAIL_ON_SAVING_RESPONSE);
+            throw new LineBotException(LineBotExceptionEnums.DB_FAILED);
         }
         medicineStoreRedisTemplate.delete(REDIS_KEY);
         medicineStoreRedisTemplate.opsForList().leftPushAll(REDIS_KEY,medList);

@@ -76,11 +76,10 @@ public class HandleLocationMessage extends BaseMessageHandler {
                     List<LocationMessage> locationList = locationMessageRedisTemplate.opsForList().range(keyString,0,-1);
                     //確認是5家不然會抱錯 line不傳超過5家
                     if(locationList!=null){
-                        List<Message> messageList = (5==locationList.size()) ?
-                                locationList.stream().map(Message.class::cast).collect(Collectors.toList()) :
-                                locationList.subList(0, 5).stream().map(Message.class::cast).collect(Collectors.toList());
+                        List<Message> messageList = (5==locationList.size())
+                                ? locationList.stream().map(Message.class::cast).collect(Collectors.toList())
+                                : locationList.subList(0, 5).stream().map(Message.class::cast).collect(Collectors.toList());
                         reply(replyToken, messageList);
-                        //刪除redis key
                         redisLock.unlock(keyString.toString());
                     }
                 }else {
@@ -123,14 +122,12 @@ public class HandleLocationMessage extends BaseMessageHandler {
     })
     @Override
     public List<LocationMessage> handleLocationMessageReply(LocationMessageContent event,String userId) {
-        //從redis取出所有藥局
         List<MedicineStore> medStoreList = medicineStoreRedisTemplate.opsForList().range("medicineStore",0,-1);
         if(Objects.isNull(medStoreList)){
             medStoreList = mService.findAll();
         }
         Double lat1 = event.getLatitude();
         Double long1 = event.getLongitude();
-        //藥局map 儲存距離與店家
         TreeMap<Double,MedicineStore> medicineStoreMap = new TreeMap<>();
         if(medStoreList!=null) {
             for(MedicineStore medicineStore : medStoreList){
@@ -140,29 +137,17 @@ public class HandleLocationMessage extends BaseMessageHandler {
             }
         }
 
-        //取出店家存進LocationMessage的LinkedList
         LinkedList<LocationMessage> locationLinkedList = new LinkedList<>();
-        LocationMessage locationMessage;
-        Integer i = 0;
-        for (Map.Entry entry : medicineStoreMap.entrySet()){
-            while (i < MEDICINE_STORE_AMOUNT){
-                MedicineStore medicineStore = (MedicineStore) entry.getValue();
-                String name = medicineStore.getName();
-                String address = medicineStore.getAddress();
-                Double latitude = medicineStore.getLatitude();
-                Double longitude = medicineStore.getLongitude();
-                locationMessage = LocationMessage.builder()
-                        .title(name)
-                        .address(address)
-                        .latitude(latitude)
-                        .longitude(longitude)
-                        .build();
-                locationLinkedList.add(locationMessage);
-                i++;
-            }
-            break;
-        }
-        //redis key
+        medicineStoreMap.entrySet().stream().limit(MEDICINE_STORE_AMOUNT)
+                .map(Map.Entry::getValue)
+                .map(store -> LocationMessage.builder()
+                        .title(store.getName())
+                        .address(store.getAddress())
+                        .latitude(store.getLatitude())
+                        .longitude(store.getLongitude()).build())
+                .forEach(locationLinkedList::add);
+
+        //redis key + userid
         String key = REDIS_KEY_PREFIX.concat(userId);
         //存後5家進redis
         List<LocationMessage> listToRedis = locationLinkedList.stream().skip(5).limit(5).collect(Collectors.toList());
