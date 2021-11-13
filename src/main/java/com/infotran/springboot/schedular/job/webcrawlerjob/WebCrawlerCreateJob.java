@@ -190,15 +190,14 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * */
     @Scheduled(fixedRate = 6 * TimeUnit.HOUR)
     public void executeJHUCovidData(){
-        String JHU_URL = getDiffCountryStatus.JHU_URL_PREFIX
-        Request request = new Request.Builder().url().get().build();
+        Request request = new Request.Builder().url(getDiffCountryStatus.JHU_URL).get().build();
         Call call = CLIENT.newCall(request);
         call.enqueue(new Callback() {
             @SneakyThrows
             @Override
             @EverythingIsNonNull
             public void onFailure(Call call, IOException e) {
-                log.warn("執行 [pdf 取得各疫苗接踵累计人次] 爬蟲 失敗");
+                log.warn("執行 [JHU CSSE COVID-19 Data] 失敗");
                 throw new LineBotException(LineBotExceptionEnums.FAIL_ON_WEBCRAWLING,e.getMessage());
             }
 
@@ -209,7 +208,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
                 MDC.put("job","JHU_CovidData");
                 assert response.body() != null;
                 String jsonBody = response.body().string();
-                rabbitMqService.sendPDFVaccinedAmount(jsonBody);
+                rabbitMqService.sendJHUCovid19Data(jsonBody);
                 MDC.remove("job");
             }
         });

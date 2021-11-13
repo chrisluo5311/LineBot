@@ -48,10 +48,14 @@ public class TimeUtil {
         return now.toString();
     }
 
+    /**
+     * 今日日期(MM/DD/YYYY)
+     * @return String
+     * */
     public static String formForeignTodayDate(){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/DD/YYYY");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-DD-YYYY");
         LocalDate now = LocalDate.now();
-        return now.format(formatter).toString();
+        return now.format(formatter);
     }
 
 

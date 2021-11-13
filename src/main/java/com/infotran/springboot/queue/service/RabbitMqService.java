@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 
 /**
+ * RabbitMqService
  * @author chris
  */
 @Slf4j
@@ -27,21 +28,41 @@ public class RabbitMqService {
     @Value("${webcrawler.mq.routingkey.PDFVaccinedAmount}")
     String ROUTING_KEY_PDFVaccinedAmount;
 
+    @Value("${webcrawler.mq.routingkey.JHUCovidData}")
+    String ROUTING_KEY_JHUCovidData;
+
     @Resource
     private RabbitTemplate rabbitTemplate;
 
+    /**
+     * 推送[新增確診數]mq
+     * */
     public void sendConfirmCase(String body){
         rabbitTemplate.convertAndSend(TOPIC_WEBCRAWLER_EXCHANGE,ROUTING_KEY_CONFIRMCASE,body);
         log.info("推送[新增確診數]mq開始");
     }
 
+    /**
+     * 推送[查詢剩餘口罩數]mq
+     * */
     public void sendMaskInfo(String body){
         rabbitTemplate.convertAndSend(TOPIC_WEBCRAWLER_EXCHANGE,ROUTING_KEY_MASKINFO,body);
         log.info("推送[查詢剩餘口罩數]mq開始");
     }
 
+    /**
+     * pdf取得各疫苗接踵累计人次
+     * */
     public void sendPDFVaccinedAmount(String body){
         rabbitTemplate.convertAndSend(TOPIC_WEBCRAWLER_EXCHANGE,ROUTING_KEY_PDFVaccinedAmount,body);
         log.info("推送[pdf取得各疫苗接踵累计人次]mq開始");
+    }
+
+    /**
+     * 推送[JHU CSSE COVID-19 Data]mq
+     * */
+    public void sendJHUCovid19Data(String body){
+        rabbitTemplate.convertAndSend(TOPIC_WEBCRAWLER_EXCHANGE,ROUTING_KEY_JHUCovidData,body);
+        log.info("推送[JHU CSSE COVID-19 Data]mq開始");
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 
 /**
+ * RabbitMqConfig
  * @author chris
  */
 @Configuration
@@ -30,6 +31,9 @@ public class RabbitMqConfig {
     @Value("${webcrawler.mq.PDFVaccinedAmount}")
     String QUEUE_PDFVaccinedAmount;
 
+    @Value("${webcrawler.mq.JHUCovidData}")
+    String QUEUE_JHUCOVIDDATA;
+
     @Value("${webcrawler.mq.routingkey.confirmcase}")
     String ROUTING_KEY_CONFIRMCASE;
 
@@ -38,6 +42,9 @@ public class RabbitMqConfig {
 
     @Value("${webcrawler.mq.routingkey.PDFVaccinedAmount}")
     String ROUTING_KEY_PDFVaccinedAmount;
+
+    @Value("${webcrawler.mq.routingkey.JHUCovidData}")
+    String ROUTING_KEY_JHUCovidData;
 
     @Value("${spring.rabbitmq.host:127.0.0.1}")
     String address;
@@ -74,6 +81,11 @@ public class RabbitMqConfig {
     }
 
     @Bean
+    Queue queueJHUCovidData() {
+        return new Queue(QUEUE_JHUCOVIDDATA, false);
+    }
+
+    @Bean
     TopicExchange exchange() {
         return new TopicExchange(TOPIC_WEBCRAWLER_EXCHANGE);
     }
@@ -93,5 +105,11 @@ public class RabbitMqConfig {
     @DependsOn(value = {"queuePDFVaccinedAmount","exchange"})
     Binding bindingPDFVaccinedAmount(Queue queuePDFVaccinedAmount, TopicExchange exchange) {
         return BindingBuilder.bind(queuePDFVaccinedAmount).to(exchange).with(ROUTING_KEY_PDFVaccinedAmount);
+    }
+
+    @Bean
+    @DependsOn(value = {"queueJHUCovidData","exchange"})
+    Binding bindingJHUCovidData(Queue queueJHUCovidData, TopicExchange exchange) {
+        return BindingBuilder.bind(queueJHUCovidData).to(exchange).with(ROUTING_KEY_JHUCovidData);
     }
 }
