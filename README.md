@@ -53,7 +53,7 @@ server.port=9090
 1. [ngrok下載](https://ngrok.com/download "ngrok")
 2. ngrok http 9090  
 
-### 參考網站
+### Data source
 1. [衛福部疾管署](https://www.cdc.gov.tw/ "link") 
 2. [全球疫情地圖](https://covid-19.nchc.org.tw/ "全球疫情地圖")
 3. [疫苗接種統計圖](https://covid-19.nchc.org.tw/dt_002-csse_covid_19_daily_reports_vaccine_city2.php "疫苗接種統計圖")
@@ -63,4 +63,6 @@ server.port=9090
 7. [台灣電子地圖服務網](https://www.map.com.tw/ "台灣電子地圖服務網")
 8. [LINE Messaging API SDK for Java](https://github.com/line/line-bot-sdk-java "LineBot API SDK")
 9. [Messaging API reference](https://developers.line.biz/en/reference/messaging-api/ "LineBot API 文件")
-
+10. COVID-19 Data Repository by the Center for Systems Science and Engineering (CSSE) at Johns Hopkins University  
+[JHU CSSE COVID-19 Data](https://github.com/CSSEGISandData/COVID-19. "JHU CSSE COVID-19 Data")  
+"Dong E, Du H, Gardner L. An interactive web-based dashboard to track COVID-19 in real time. Lancet Inf Dis. 20(5):533-534. doi: 10.1016/S1473-3099(20)30120-1"
