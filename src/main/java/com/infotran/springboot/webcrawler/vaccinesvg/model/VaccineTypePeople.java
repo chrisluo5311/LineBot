@@ -9,6 +9,10 @@ import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 
+/**
+ * 各疫苗接踵累计人次
+ * @author chris
+ */
 @Entity
 @Table(name = "VaccineTypePeople")
 @Data
@@ -22,10 +26,13 @@ public class VaccineTypePeople {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer Id;
 
-    private String body;//內文
+    /** 內文 */
+    private String body;
 
-    private String resourceUrl;//資料來源
+    /** 資料來源 */
+    private String resourceUrl;
 
-    private String createTime;//新建時間
+    /** 新建時間 */
+    private String createTime;
 
 }

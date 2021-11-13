@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import javax.persistence.*;
 
 /**
+ * 藥局店家資訊
  * @author chris
  * 
  */

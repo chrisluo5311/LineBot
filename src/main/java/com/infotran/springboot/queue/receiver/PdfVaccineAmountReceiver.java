@@ -23,7 +23,7 @@ public class PdfVaccineAmountReceiver {
     public void receiveMessage(String json) {
         MDC.put("consumer","PDF Receiver");
         log.info("pdf取得各疫苗接踵累计人次接收處理-開始");
-        getVaccinedInfoService.crawlPDFVaccinedAmount(json);
+        getVaccinedInfoService.crawlPdfVaccinedAmount(json);
         log.info("pdf取得各疫苗接踵累计人次接收處理-結束");
         MDC.remove("consumer");
     }

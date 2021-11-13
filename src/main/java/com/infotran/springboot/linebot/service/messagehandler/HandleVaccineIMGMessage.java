@@ -58,7 +58,7 @@ public class HandleVaccineImgMessage extends BaseMessageHandler {
             case "查看疫苗施打人數累計統計圖":
                 QuickReply quickReply = createQuickReplyItemList();
                 //文字訊息
-                VaccineTypePeople vaccineTypePeople = vaccinedPeopleService.findAll();
+                VaccineTypePeople vaccineTypePeople = vaccinedPeopleService.findOne();
                 StringBuilder content = new StringBuilder();
                 if(vaccineTypePeople!=null){
                     content.append("根據衛生福利部疾病管制署公佈: \n")

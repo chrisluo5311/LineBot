@@ -1,6 +1,6 @@
 package com.infotran.springboot.webcrawler.vaccinesvg.service.Impl;
 
-import com.infotran.springboot.webcrawler.vaccinesvg.dao.VaccinedTypePelpleRepo;
+import com.infotran.springboot.webcrawler.vaccinesvg.dao.VaccinedTypePeopleRepo;
 import com.infotran.springboot.webcrawler.vaccinesvg.model.VaccineTypePeople;
 import com.infotran.springboot.webcrawler.vaccinesvg.service.VaccinedPeopleService;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +10,10 @@ import javax.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * VaccinedPeopleService 實作類
+ * @author chris
+ */
 @Service
 @Slf4j
 public class VaccinedPeopleServiceImpl implements VaccinedPeopleService {
@@ -17,7 +21,7 @@ public class VaccinedPeopleServiceImpl implements VaccinedPeopleService {
     private static final String LOG_PREFIX = "VaccinedPeopleServiceImpl";
 
     @Resource
-    VaccinedTypePelpleRepo vaccinedTypePelpleRepol;
+    VaccinedTypePeopleRepo vaccinedTypePeopleRepo;
 
     @Override
     public VaccineTypePeople save(VaccineTypePeople vaccineTypePeople) {
@@ -29,20 +33,20 @@ public class VaccinedPeopleServiceImpl implements VaccinedPeopleService {
             return vaccineTypePeople;
         }else {
             //不同筆
-            vaccinedTypePelpleRepol.deleteAll();
+            vaccinedTypePeopleRepo.deleteAll();
         }
-        return vaccinedTypePelpleRepol.save(vaccineTypePeople);
+        return vaccinedTypePeopleRepo.save(vaccineTypePeople);
     }
 
     @Override
     public VaccineTypePeople findByCreateTime(String createTime) {
-        VaccineTypePeople vaccineTypePeople = vaccinedTypePelpleRepol.findByCreateTime(createTime);
+        VaccineTypePeople vaccineTypePeople = vaccinedTypePeopleRepo.findByCreateTime(createTime);
         return vaccineTypePeople!=null?vaccineTypePeople:null;
     }
 
     @Override
-    public VaccineTypePeople findAll(){
-        List<VaccineTypePeople> vPeople = vaccinedTypePelpleRepol.findAll();
+    public VaccineTypePeople findOne(){
+        List<VaccineTypePeople> vPeople = vaccinedTypePeopleRepo.findAll();
         return vPeople.get(0);
     }
 }

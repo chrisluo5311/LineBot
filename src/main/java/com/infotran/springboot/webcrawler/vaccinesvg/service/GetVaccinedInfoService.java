@@ -23,34 +23,42 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * 取得
+ * 1. 累计接踵人次截圖
+ * 2. 各梯次疫苗涵蓋率圖
+ * 3. 解析pdf並取得各疫苗接踵累计人次
+ *
+ * @author chris
+ */
 @Slf4j
 @Service
 public class GetVaccinedInfoService implements ClientUtil {
 
-    //疫苗施打統計(infogram)標題:誰打了疫苗
+    /** 疫苗施打統計(infogram)標題:誰打了疫苗 */
     @Value("${VACCINE.IMG.URL}")
     private String VACCINE_IMG_URL;
 
-    //全球疫情地圖之疫苗接種統計圖
+    /** 全球疫情地圖之疫苗接種統計圖 */
     @Value("${VACCINE.URL}")
     private String VACCINE_URL;
 
-    //CDC疫苗統計資料pdf
+    /** CDC疫苗統計資料pdf */
     @Value("${PDF.URL}")
     private String PDF_URL;
 
-    //疫苗統計資料PDF網址前綴
+    /** 疫苗統計資料PDF網址前綴 */
     @Value("${CDC_URL_PREFIX}")
     private String CDC_URL_PREFIX;
 
     private static String LOG_PREFIX;
-    //selenium使用的driver
+    /** selenium使用的driver */
     private static String SYSTEM_DRIVER;
-    //chromedirver系统路径
+    /** chromedirver系统路径 */
     private static String SYSTEM_PATH ;
-    //累计接踵人次截圖FileName
+    /** 累计接踵人次截圖FileName */
     private static String cumuFileName;
-    //各梯次疫苗涵蓋率图FileName
+    /** 各梯次疫苗涵蓋率图FileName */
     private static String coverFileName;
 
     static {
@@ -76,7 +84,7 @@ public class GetVaccinedInfoService implements ClientUtil {
      * 取得累计接踵人次截圖
      *
      * */
-    public void crawlCumulativeVaccineImg() throws InterruptedException {
+    public void crawlCumulativeVaccineImg()  {
         System.setProperty(SYSTEM_DRIVER,SYSTEM_PATH);
         WebDriver driver = new ChromeDriver();
         try {
@@ -92,7 +100,7 @@ public class GetVaccinedInfoService implements ClientUtil {
             StringBuilder fullPath = new StringBuilder();
             fullPath.append(DownloadFileUtil.filePath).append(cumuFileName);
             FileUtils.copyFile(cumulativeVaccinedFile,new File(fullPath.toString()));
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             log.error("累计接踵人次截圖 圖片輸出失敗:{}",e.getMessage());
         } finally {
             driver.quit();
@@ -104,7 +112,7 @@ public class GetVaccinedInfoService implements ClientUtil {
      * 取得各梯次疫苗涵蓋率
      *
      * */
-    public void crawlEachBatchCoverage() throws InterruptedException {
+    public void crawlEachBatchCoverage() {
         System.setProperty(SYSTEM_DRIVER,SYSTEM_PATH);
         WebDriver driver = new ChromeDriver();
         try {
@@ -120,7 +128,7 @@ public class GetVaccinedInfoService implements ClientUtil {
             StringBuilder fullPath = new StringBuilder();
             fullPath.append(DownloadFileUtil.filePath).append(coverFileName);
             FileUtils.copyFile(cumulativeVaccinedFile,new File(fullPath.toString()));
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             log.error("取得各梯次疫苗涵蓋率 圖片輸出失敗:{}",e.getMessage());
         } finally {
             driver.quit();
@@ -131,7 +139,7 @@ public class GetVaccinedInfoService implements ClientUtil {
      * 解析pdf並取得各疫苗接踵累计人次
      * @param body
      */
-    public void crawlPDFVaccinedAmount(String body) {
+    public void crawlPdfVaccinedAmount(String body) {
         StringBuilder fullUrl = new StringBuilder();
         try {
             Document doc = Jsoup.parse(body);

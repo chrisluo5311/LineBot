@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 import java.util.Optional;
 
 /**
+ * MedicineStoreRepository
  * @author chris
  */
 public interface MedicineStoreRepository extends JpaRepository<MedicineStore, String> {

@@ -9,12 +9,15 @@ import javax.annotation.Resource;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * MedicineStoreService 實作類
+ * @author chris
+ */
 @Service
-public class MedicinetoreServiceImpl implements MedicineStoreService {
+public class MedicineStoreServiceImpl implements MedicineStoreService {
 
     @Resource
     MedicineStoreRepository medRepo;
-
 
     @Override
     public MedicineStore findByLatitudeAndLogitude(Double latitude, Double longitude) {

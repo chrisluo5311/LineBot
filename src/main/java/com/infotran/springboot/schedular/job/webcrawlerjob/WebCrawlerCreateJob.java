@@ -168,19 +168,11 @@ public class WebCrawlerCreateJob implements ClientUtil {
         while(i < PICTURE_METHOD_AMOUNT){
             if(i==0){
                 crawImgExecutor.execute(() -> {
-                    try {
-                        getVaccinedInfoService.crawlCumulativeVaccineImg();
-                    } catch (InterruptedException e) {
-                        log.error("[累计接踵人次]截图輸出失敗 或 其他原因");
-                    }
+                    getVaccinedInfoService.crawlCumulativeVaccineImg();
                 });
             }else {
                 crawImgExecutor.execute(() -> {
-                    try {
-                        getVaccinedInfoService.crawlEachBatchCoverage();
-                    } catch (InterruptedException e) {
-                        log.error("[各梯次疫苗涵蓋率]截图輸出失敗 或 其他原因");
-                    }
+                    getVaccinedInfoService.crawlEachBatchCoverage();
                 });
             }
             i++;

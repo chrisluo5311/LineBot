@@ -5,16 +5,45 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * 藥局店家service
+ * @author chris
+ */
 @Service
 public interface MedicineStoreService {
 
-    public MedicineStore findByLatitudeAndLogitude(Double latitude,Double longitude);
+    /**
+     * 依經緯度查詢店家
+     * @param latitude Double
+     * @param longitude Double
+     * @return MedicineStore MedicineStore
+     * */
+    MedicineStore findByLatitudeAndLogitude(Double latitude,Double longitude);
 
-    public MedicineStore save(MedicineStore medicineStore);
+    /**
+     * save MedicineStore
+     * @param medicineStore MedicineStore
+     * @return MedicineStore MedicineStore
+     * */
+    MedicineStore save(MedicineStore medicineStore);
 
-    public List<MedicineStore> findAll();
+    /**
+     * find all MedicineStore
+     * @return List<MedicineStore>
+     * */
+    List<MedicineStore> findAll();
 
-    public MedicineStore findById (String id);
+    /**
+     * 依 id 搜尋 MedicineStore
+     * @param id MedicineStore id
+     * @return  MedicineStore
+     * */
+    MedicineStore findById (String id);
 
-    public List<MedicineStore> saveAll(List<MedicineStore> storeList);
+    /**
+     * save all MedicineStore
+     * @param storeList List<MedicineStore>
+     * @return List<MedicineStore>
+     * */
+    List<MedicineStore> saveAll(List<MedicineStore> storeList);
 }
