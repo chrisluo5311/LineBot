@@ -99,7 +99,7 @@ public class GetMaskJsonService implements ClientUtil {
             }
             List<MedicineStore> response = medicineStoreService.saveAll(medList);
             if(Objects.isNull(response)){
-                log.info("{} 口罩即時資訊json解析成功 新增至db失敗",LOG_PREFIX);
+                log.warn("{} 口罩即時資訊json解析成功 新增至db失敗",LOG_PREFIX);
                 throw new LineBotException(LineBotExceptionEnums.DB_FAILED);
             }
         }catch (JSONException e ) {

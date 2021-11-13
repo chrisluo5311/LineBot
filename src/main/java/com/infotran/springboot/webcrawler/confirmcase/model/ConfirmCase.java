@@ -20,24 +20,32 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Component
 public class ConfirmCase {
-	
+
+	/** 確診表id */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer confirmId; //確診表id
+	private Integer confirmId;
 
-	private Integer totalAmount; //確診總數
-	
-	private Integer deathAmount; //死亡數目
-	
-	private Integer todayAmount; //今日確診數目
+	/** 確診總數 */
+	private Integer totalAmount;
 
-	private String domesticOrImportedCaseMemo;//確診案例中分佈(境外移入還是本土)
-	
-	private Integer returnAmount; //校正回歸數
+	/** 死亡數目 */
+	private Integer deathAmount;
 
-	private LocalDate confirmTime;//更新時間(now)
+	/** 今日確診數目 */
+	private Integer todayAmount;
 
-	private String newsUrl;//新聞網址
+	/** 確診案例中分佈(境外移入還是本土) */
+	private String domesticOrImportedCaseMemo;
+
+	/** 校正回歸數 */
+	private Integer returnAmount;
+
+	/** 更新時間(now) */
+	private LocalDate confirmTime;
+
+	/** 新聞網址 */
+	private String newsUrl;
 	
 	@PrePersist
 	protected void createConfirmTime() {

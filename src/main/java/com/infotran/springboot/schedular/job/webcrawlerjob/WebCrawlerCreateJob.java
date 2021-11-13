@@ -7,6 +7,7 @@ import com.infotran.springboot.schedular.TimeUnit;
 import com.infotran.springboot.util.ClientUtil;
 import com.infotran.springboot.webcrawler.confirmcase.service.GetCovidNumService;
 import com.infotran.springboot.webcrawler.medicinestore.service.GetMaskJsonService;
+import com.infotran.springboot.webcrawler.multicountry.service.GetDiffCountryStatus;
 import com.infotran.springboot.webcrawler.vaccinesvg.service.GetVaccinedInfoService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +44,9 @@ public class WebCrawlerCreateJob implements ClientUtil {
     GetVaccinedInfoService getVaccinedInfoService;
 
     @Resource
+    GetDiffCountryStatus getDiffCountryStatus;
+
+    @Resource
     RabbitMqService rabbitMqService;
 
     private static ExecutorService crawImgExecutor;
@@ -67,7 +71,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
     public void executeCrawlCovid() {
         // get post put 等
         Request request = new Request.Builder().url(getCovidNumService.CDC_URL).get().build();
-        Call call = client.newCall(request);
+        Call call = CLIENT.newCall(request);
         call.enqueue(new Callback() {
             @SneakyThrows
             @Override
@@ -101,7 +105,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
     public void executeMaskCrawl() {
         // get
         Request request = new Request.Builder().url(getMaskJsonService.MASK_URL).get().build();
-        Call call = client.newCall(request);
+        Call call = CLIENT.newCall(request);
         call.enqueue(new Callback() {
             @SneakyThrows
             @Override
@@ -134,7 +138,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
     public void executeParsingPDF() {
         // get post put 等
         Request request = new Request.Builder().url(getVaccinedInfoService.getPdfUrl()).get().build();
-        Call call = client.newCall(request);
+        Call call = CLIENT.newCall(request);
         call.enqueue(new Callback() {
             @SneakyThrows
             @Override
@@ -161,7 +165,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * 執行 [截图: 累计接踵人次 & 各梯次疫苗涵蓋率] 爬蟲<br>
      * (每小時執行一次)
      * */
-    @Scheduled(fixedRate = 12* TimeUnit.HOUR)
+    @Scheduled(fixedRate = TimeUnit.HOUR)
     public void executeVaccineScreeShot() {
         MDC.put("job","Selenium Snapshot");
         int i = 0;
@@ -180,5 +184,36 @@ public class WebCrawlerCreateJob implements ClientUtil {
         MDC.remove("job");
     }
 
+    /**
+     * 執行取得 [JHU CSSE COVID-19 Data] <br>
+     * (每 6 小時執行一次)
+     * */
+    @Scheduled(fixedRate = 6 * TimeUnit.HOUR)
+    public void executeJHUCovidData(){
+        String JHU_URL = getDiffCountryStatus.JHU_URL_PREFIX
+        Request request = new Request.Builder().url().get().build();
+        Call call = CLIENT.newCall(request);
+        call.enqueue(new Callback() {
+            @SneakyThrows
+            @Override
+            @EverythingIsNonNull
+            public void onFailure(Call call, IOException e) {
+                log.warn("執行 [pdf 取得各疫苗接踵累计人次] 爬蟲 失敗");
+                throw new LineBotException(LineBotExceptionEnums.FAIL_ON_WEBCRAWLING,e.getMessage());
+            }
 
+            @SneakyThrows
+            @Override
+            @EverythingIsNonNull
+            public void onResponse(Call call, Response response) {
+                MDC.put("job","JHU_CovidData");
+                assert response.body() != null;
+                String jsonBody = response.body().string();
+                rabbitMqService.sendPDFVaccinedAmount(jsonBody);
+                MDC.remove("job");
+            }
+        });
     }
+
+
+}

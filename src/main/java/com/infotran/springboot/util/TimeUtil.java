@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,5 +47,12 @@ public class TimeUtil {
         LocalDate now = LocalDate.now();
         return now.toString();
     }
+
+    public static String formForeignTodayDate(){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/DD/YYYY");
+        LocalDate now = LocalDate.now();
+        return now.format(formatter).toString();
+    }
+
 
 }
