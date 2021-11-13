@@ -14,7 +14,7 @@
 |:------:|:--------:|
 |  查詢今日確診數   | `cron`表示式: `0 0/5 14 * * ?`(每天14:00開始到14:55，每五分鐘執行一次)  |
 |  查詢藥局口罩剩餘數目   | `cron`表示式: `0 0 0/1 * * ?`(每小時執行一次)  |
-|  定時新增藥局資訊至資料庫   | @Scheduled(fixedRate = 1*TimeUnit.HOUR)(每小時執行一次)<br>使用自定義hibernate.jdbc.batch_size=1000。<br>Batch Size是設定對資料庫進行批量刪除，批量更新和批量插入的時候的批次大小 |
+|  定時新增藥局資訊至資料庫   | @Scheduled(fixedRate = 1*TimeUnit.HOUR)(每小時執行一次) |
 
 ### 目錄內容 
 1. 功能表、負責人、狀態、使用技術 
@@ -38,7 +38,6 @@ spring.datasource.password=P@ssw0rd
 server.port=9090
 ```
 
-
 3. 相關Maven依賴 
 
 |  套件  |  版本  |   备注   |
@@ -52,6 +51,15 @@ server.port=9090
 ### 測試須知
 1. [ngrok下載](https://ngrok.com/download "ngrok")
 2. ngrok http 9090  
+
+### docker image
+> rabbitmq
+```
+docker pull rabbitmq:management
+```
+|  套件  |  版本  |   备注   |
+|:------:|:--------:|:------------:|
+|  spring-boot-starter-amqp  | 2.4.5 |  |
 
 ### Data source
 1. [衛福部疾管署](https://www.cdc.gov.tw/ "link") 
