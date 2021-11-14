@@ -34,10 +34,16 @@ public class DiffCountry {
     /** 死亡數 */
     private String deaths;
 
-    /** 每十萬人確診數 */
+    /**
+     * 每十萬人確診數
+     * Incident_Rate: Incidence Rate = cases per 100,000 persons.
+     * */
     private String incidentRate;
 
-    /** 死亡比例: (登記死亡數/確診數) */
+    /**
+     *  死亡比例: (登記死亡數/確診數)
+     *  Case_Fatality_Ratio (%): Case-Fatality Ratio (%) = Number recorded deaths / Number cases.
+     *  */
     private String fatalityRatio;
 
     /** 最後更新時間 */

@@ -20,10 +20,10 @@ public class DiffCountryDataReceiver {
 
     @RabbitListener(queues = "${webcrawler.mq.JHUCovidData}")
     public void receiveMessage(String json) {
-        MDC.put("consumer","JHU_Covid_Data");
-        log.info("JHU各國疫情狀況接收處理-開始");
+        MDC.put("consumer","JHU_MQ_");
+        log.info("各國疫情狀況接收處理-開始");
         diffCountryStatus.parseCsvInfo(json);
-        log.info("JHU各國疫情狀況接收處理-結束");
+        log.info("各國疫情狀況接收處理-結束");
         MDC.remove("consumer");
     }
 }

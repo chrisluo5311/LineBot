@@ -1,5 +1,6 @@
 package com.infotran.springboot.webcrawler.multicountry.service;
 
+import com.infotran.springboot.webcrawler.multicountry.countryenum.CountryEnum;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +22,7 @@ public class GetDiffCountryStatus {
     public static final String US = "US";
 
     /** JHU Data URL 需補上每日日期 */
-    @Value("${JHU.URL.PREFIX}")
+    @Value("${CDC.WORLD.COVID}")
     public String JHU_URL;
 
     /**
@@ -29,16 +30,25 @@ public class GetDiffCountryStatus {
      * @param body JHU csv 檔
      * */
     public void parseCsvInfo(@NonNull String body){
-        String[] lines = body.split("/n");
-        for(int i = 1; i<lines.length;i++){
-            String[] eachCountry = lines[i].split(",");
-            for(int j = 0; j<eachCountry.length;j++){
-                // 3:Country_Region 4:Last_Update 7:Confirmed 8:Deaths 12:Incident_Rate 13:Case_Fatality_Ratio
-                if(US.equals(eachCountry[3])){
-                    Integer confirmedSum = Integer.parseInt(eachCountry[7]);
+        // 3:Country_Region 4:Last_Update 7:Confirmed 8:Deaths 12:Incident_Rate 13:Case_Fatality_Ratio
+        String[] countries = body.split("\n");
+        // other countries
+
+        // US 從674行開始
+        Integer sum = 0;
+        for(int i = 674 ; i < countries.length ; i++){
+            // us 各州
+            String[] eachState = countries[i].split(",");
+            for(int j = 0; j < eachState.length;j++){
+                //每一個state的狀況
+                if(CountryEnum.US.getCountryCode().equals(eachState[3])){
+                    log.info("");
+                    Integer confirmedNum = Integer.parseInt(eachState[7]);
+                    sum = sum + confirmedNum;
                 }
             }
         }
+        log.info("confirmed sum:{}",sum);
     }
 
 }
