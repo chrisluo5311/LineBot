@@ -3,10 +3,14 @@ package com.infotran.springboot.webcrawler.vaccinesvg.service;
 import com.infotran.springboot.webcrawler.vaccinesvg.model.VaccinedPDFRecord;
 import org.springframework.stereotype.Service;
 
+/**
+ * CheckPDFRecordSevice
+ * @author chris
+ */
 @Service
 public interface CheckPDFRecordSevice {
 
-    public String findByUploadTime(String uploadTime);
+    String findByUploadTime(String uploadTime);
 
-    public VaccinedPDFRecord save(VaccinedPDFRecord vaccinedPDFRecord);
+    VaccinedPDFRecord save(VaccinedPDFRecord vaccinedPDFRecord);
 }

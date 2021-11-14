@@ -33,7 +33,7 @@ import java.util.List;
  * */
 @Slf4j
 @Component
-public class HandleVaccineImgMessage extends BaseMessageHandler {
+public class HandleVaccineIMGMessage extends BaseMessageHandler {
 
     private final String LOG_PREFIX = "[HandleVaccineIMGMessage]";
 

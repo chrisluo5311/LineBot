@@ -5,6 +5,7 @@ import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
 import com.infotran.springboot.queue.service.RabbitMqService;
 import com.infotran.springboot.schedular.TimeUnit;
 import com.infotran.springboot.util.ClientUtil;
+import com.infotran.springboot.util.TimeUtil;
 import com.infotran.springboot.webcrawler.confirmcase.service.GetCovidNumService;
 import com.infotran.springboot.webcrawler.medicinestore.service.GetMaskJsonService;
 import com.infotran.springboot.webcrawler.multicountry.service.GetDiffCountryStatus;
@@ -28,6 +29,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
+ * 爬蟲類排程
  * @author chris
  */
 @Slf4j
@@ -44,22 +46,33 @@ public class WebCrawlerCreateJob implements ClientUtil {
     GetVaccinedInfoService getVaccinedInfoService;
 
     @Resource
-    GetDiffCountryStatus getDiffCountryStatus;
+    GetDiffCountryStatus countryStatus;
 
     @Resource
     RabbitMqService rabbitMqService;
 
     private static ExecutorService crawImgExecutor;
 
-    /**
-     * 目前截圖方法總數
-     */
+    /** 目前截圖方法總數 */
     private static final Integer PICTURE_METHOD_AMOUNT = 2;
+
+    /** 當日JHU URL */
+    private String JHU_TODAY_URL;
+    /** 昨日JHU URL */
+    private String JHU_YESTERDAY_URL;
+    /** 前天JHU URL */
+    private String JHU_MINUS2_URL;
 
     @PostConstruct
     public void init(){
         crawImgExecutor = new ThreadPoolExecutor(2,4,180,
                                                 java.util.concurrent.TimeUnit.SECONDS,new ArrayBlockingQueue<>(5),new ThreadPoolExecutor.AbortPolicy());
+        String JHU_URL = countryStatus.JHU_URL;
+        JHU_TODAY_URL = JHU_URL.concat(TimeUtil.formForeignTodayDate(null)).concat(".csv");
+        JHU_URL = JHU_URL.substring(0, JHU_URL.lastIndexOf("/")+1);
+        JHU_YESTERDAY_URL = JHU_URL.concat(TimeUtil.formForeignTodayDate(1L)).concat(".csv");
+        JHU_URL = JHU_URL.substring(0, JHU_URL.lastIndexOf("/")+1);
+        JHU_MINUS2_URL = JHU_URL.concat(TimeUtil.formForeignTodayDate(2L)).concat(".csv");
     }
 
     /**
@@ -67,7 +80,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * 每天14:00開始到14:55，每五分鐘執行一次
      *
      * */
-    @Scheduled(fixedRate = TimeUnit.HOUR)
+//    @Scheduled(fixedRate = TimeUnit.HOUR)
     public void executeCrawlCovid() {
         // get post put 等
         Request request = new Request.Builder().url(getCovidNumService.CDC_URL).get().build();
@@ -101,7 +114,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * (每小時執行一次)
      *
      * */
-    @Scheduled(fixedRate = TimeUnit.HOUR)
+//    @Scheduled(fixedRate = TimeUnit.HOUR)
     public void executeMaskCrawl() {
         // get
         Request request = new Request.Builder().url(getMaskJsonService.MASK_URL).get().build();
@@ -134,7 +147,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * 執行 [pdf 取得各疫苗接踵累计人次] 爬蟲<br>
      * (每小時執行一次)
      * */
-    @Scheduled(fixedRate = 12* TimeUnit.HOUR)
+//    @Scheduled(fixedRate = 12* TimeUnit.HOUR)
     public void executeParsingPDF() {
         // get post put 等
         Request request = new Request.Builder().url(getVaccinedInfoService.getPdfUrl()).get().build();
@@ -165,7 +178,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * 執行 [截图: 累计接踵人次 & 各梯次疫苗涵蓋率] 爬蟲<br>
      * (每小時執行一次)
      * */
-    @Scheduled(fixedRate = TimeUnit.HOUR)
+//    @Scheduled(fixedRate = TimeUnit.HOUR)
     public void executeVaccineScreeShot() {
         MDC.put("job","Selenium Snapshot");
         int i = 0;
@@ -185,19 +198,20 @@ public class WebCrawlerCreateJob implements ClientUtil {
     }
 
     /**
-     * 執行取得 [JHU CSSE COVID-19 Data] <br>
+     * 執行 每日 取得 [JHU CSSE COVID-19 Data] <br>
      * (每 6 小時執行一次)
      * */
-    @Scheduled(fixedRate = 6 * TimeUnit.HOUR)
-    public void executeJHUCovidData(){
-        Request request = new Request.Builder().url(getDiffCountryStatus.JHU_URL).get().build();
+//    @Scheduled(fixedRate = 6 * TimeUnit.HOUR)
+    public void executeTodayJHUCovidData(){
+        log.info("jhu url :{} ", JHU_TODAY_URL);
+        Request request = new Request.Builder().url(JHU_TODAY_URL).get().build();
         Call call = CLIENT.newCall(request);
         call.enqueue(new Callback() {
             @SneakyThrows
             @Override
             @EverythingIsNonNull
             public void onFailure(Call call, IOException e) {
-                log.warn("執行 [JHU CSSE COVID-19 Data] 失敗");
+                log.warn("執行 [TODAY JHU CSSE COVID-19 Data] 失敗");
                 throw new LineBotException(LineBotExceptionEnums.FAIL_ON_WEBCRAWLING,e.getMessage());
             }
 
@@ -205,8 +219,81 @@ public class WebCrawlerCreateJob implements ClientUtil {
             @Override
             @EverythingIsNonNull
             public void onResponse(Call call, Response response) {
-                MDC.put("job","JHU_CovidData");
-                assert response.body() != null;
+                MDC.put("job","JHU_Today_CovidData");
+                if(response.code()==404){
+                    log.warn("今日csv檔尚未發出");
+                    MDC.remove("job");
+                    return;
+                }
+                String jsonBody = response.body().string();
+                rabbitMqService.sendJHUCovid19Data(jsonBody);
+                MDC.remove("job");
+            }
+        });
+    }
+
+
+    /**
+     * 執行 YESTERDAY 取得 [YESTERDAY JHU CSSE COVID-19 Data] <br>
+     * (每 6 小時執行一次)
+     * */
+//    @Scheduled(fixedRate = 6 * TimeUnit.HOUR)
+    public void executeYesterdayJHUCovidData(){
+        Request request = new Request.Builder().url(JHU_YESTERDAY_URL).get().build();
+        Call call = CLIENT.newCall(request);
+        call.enqueue(new Callback() {
+            @SneakyThrows
+            @Override
+            @EverythingIsNonNull
+            public void onFailure(Call call, IOException e) {
+                log.warn("執行 [YESTERDAY JHU CSSE COVID-19 Data] 失敗");
+                throw new LineBotException(LineBotExceptionEnums.FAIL_ON_WEBCRAWLING,e.getMessage());
+            }
+
+            @SneakyThrows
+            @Override
+            @EverythingIsNonNull
+            public void onResponse(Call call, Response response) {
+                MDC.put("job","JHU_YESTERDAY_CovidData");
+                if(response.code()==404){
+                    log.warn("昨日csv檔尚未發出");
+                    MDC.remove("job");
+                    return;
+                }
+                String jsonBody = response.body().string();
+                rabbitMqService.sendJHUCovid19Data(jsonBody);
+                MDC.remove("job");
+            }
+        });
+    }
+
+    /**
+     * 執行 前天 取得 [前天 JHU CSSE COVID-19 Data] <br>
+     * (每 6 小時執行一次)
+     * */
+    @Scheduled(fixedRate = 6 * TimeUnit.HOUR)
+    public void executeMinus2DaysJHUCovidData(){
+        Request request = new Request.Builder().url(JHU_MINUS2_URL).get().build();
+        Call call = CLIENT.newCall(request);
+        call.enqueue(new Callback() {
+            @SneakyThrows
+            @Override
+            @EverythingIsNonNull
+            public void onFailure(Call call, IOException e) {
+                log.warn("執行 [前天 JHU CSSE COVID-19 Data] 失敗");
+                throw new LineBotException(LineBotExceptionEnums.FAIL_ON_WEBCRAWLING,e.getMessage());
+            }
+
+            @SneakyThrows
+            @Override
+            @EverythingIsNonNull
+            public void onResponse(Call call, Response response) {
+                MDC.put("job","JHU_前天_CovidData");
+                if(response.code()==404){
+                    log.warn("前天csv檔尚未發出");
+                    MDC.remove("job");
+                    return;
+                }
                 String jsonBody = response.body().string();
                 rabbitMqService.sendJHUCovid19Data(jsonBody);
                 MDC.remove("job");

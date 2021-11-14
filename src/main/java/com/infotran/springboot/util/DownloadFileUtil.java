@@ -134,9 +134,8 @@ public class DownloadFileUtil {
                 .GET()
                 .build();
         Future<String> futureString =
-                httpClient
-                        .sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString())
-                        .thenApply(HttpResponse::body);
+                httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString())
+                          .thenApply(HttpResponse::body);
         return futureString.get();
     }
 

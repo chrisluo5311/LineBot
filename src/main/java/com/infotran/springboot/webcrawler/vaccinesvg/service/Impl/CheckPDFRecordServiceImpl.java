@@ -9,6 +9,10 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.Objects;
 
+/**
+ * CheckPDFRecordSevice 實作類
+ * @author chris
+ */
 @Slf4j
 @Service
 public class CheckPDFRecordServiceImpl implements CheckPDFRecordSevice {

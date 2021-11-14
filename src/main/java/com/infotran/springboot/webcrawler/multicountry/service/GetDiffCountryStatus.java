@@ -1,11 +1,9 @@
 package com.infotran.springboot.webcrawler.multicountry.service;
 
-import com.infotran.springboot.util.TimeUtil;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
 
 /**
  * 取得不同國家的疫情狀態
@@ -20,22 +18,27 @@ public class GetDiffCountryStatus {
 
     public static final String REDIS_KEY = "global_covid_";
 
-    /**
-     * JHU CSSE COVID-19 Data
-     * 需補上每日日期
-     * */
+    public static final String US = "US";
+
+    /** JHU Data URL 需補上每日日期 */
     @Value("${JHU.URL.PREFIX}")
     public String JHU_URL;
 
-    @PostConstruct
-    public void init(){
-        String todayDate =TimeUtil.formForeignTodayDate();
-        JHU_URL.concat(todayDate).concat(".csv");
-        log.info("JHU URL: {}", JHU_URL);
-    }
-
-    public void parseJsonInfo(String body){
-
+    /**
+     * 解析各國疫情狀況
+     * @param body JHU csv 檔
+     * */
+    public void parseCsvInfo(@NonNull String body){
+        String[] lines = body.split("/n");
+        for(int i = 1; i<lines.length;i++){
+            String[] eachCountry = lines[i].split(",");
+            for(int j = 0; j<eachCountry.length;j++){
+                // 3:Country_Region 4:Last_Update 7:Confirmed 8:Deaths 12:Incident_Rate 13:Case_Fatality_Ratio
+                if(US.equals(eachCountry[3])){
+                    Integer confirmedSum = Integer.parseInt(eachCountry[7]);
+                }
+            }
+        }
     }
 
 }

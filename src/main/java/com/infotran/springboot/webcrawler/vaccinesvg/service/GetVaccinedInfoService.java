@@ -28,6 +28,7 @@ import java.util.Objects;
  * 1. 累计接踵人次截圖
  * 2. 各梯次疫苗涵蓋率圖
  * 3. 解析pdf並取得各疫苗接踵累计人次
+ * 若增加截圖方法也需同時新增 WebCrawlerCreateJob 的 PICTURE_METHOD_AMOUNT
  *
  * @author chris
  */
@@ -147,7 +148,7 @@ public class GetVaccinedInfoService implements ClientUtil {
             Element ancherPdf = doc.getElementsByClass("download").get(0).child(1).child(1);
             String title = ancherPdf.attr("title");
             //判別日期並回傳日期
-            String dateNum = verifyDate(title);
+            String dateNum = TimeUtil.verifyDate(title);
             String isNew = checkPDFRecordService.findByUploadTime(dateNum);
             if(Objects.nonNull(dateNum) && CheckPDFRecordServiceImpl.ISNEWPDF.equals(isNew)){
                 //提取url
@@ -184,20 +185,7 @@ public class GetVaccinedInfoService implements ClientUtil {
         }
     }
 
-    /**
-     * 提取數字並返回日期
-     * 若非日期返回null
-     * @param title 下載標題
-     * */
-    private String verifyDate(String title){
-        Integer index = 0;
-        Integer sum = 0;
-        while (Character.isDigit(title.charAt(index))) {
-            sum = sum*10 + Character.getNumericValue(title.charAt(index));
-            index++;
-        }
-        return sum==0?null:String.valueOf(sum);
-    }
+
 
     /**
      * 透過句號分割字串
