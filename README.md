@@ -28,17 +28,9 @@
 |  疫苗施打統計圖  |  chris  |  `尚未開始`  | okhttp、jsoup |            |
 |  其他統計表  |  chris  |  `尚未開始`  | okhttp、jsoup |             |
 
-2. 資料庫配置 
-> sqlserver
-```java
-spring.jpa.hibernate.ddl-auto=update
-spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=linebot
-spring.datasource.username=watcher
-spring.datasource.password=P@ssw0rd
-server.port=9090
-```
 
-3. 相關Maven依賴 
+
+2. 相關Maven依賴 
 
 |  套件  |  版本  |   备注   |
 |:------:|:--------:|:------------:|
