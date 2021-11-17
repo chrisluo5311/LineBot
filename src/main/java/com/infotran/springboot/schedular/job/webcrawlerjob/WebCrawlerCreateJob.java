@@ -84,10 +84,13 @@ public class WebCrawlerCreateJob implements ClientUtil {
             @EverythingIsNonNull
             public void onResponse(Call call, Response response) {
                 MDC.put("job","Confirm Case");
-                //整頁內容
-                assert response.body() != null;
-                String body = response.body().string();
-                rabbitMqService.sendConfirmCase(body);
+                String jsonBody = null;
+                if(response.body()!=null){
+                    jsonBody = response.body().string();
+                }else {
+                    throw new LineBotException(LineBotExceptionEnums.FAIL_ON_BODY_RESPONSE);
+                }
+                rabbitMqService.sendConfirmCase(jsonBody);
                 MDC.remove("job");
             }
         });
@@ -118,8 +121,12 @@ public class WebCrawlerCreateJob implements ClientUtil {
             @EverythingIsNonNull
             public void onResponse( Call call, Response response) {
                 MDC.put("job","Mask Info");
-                assert response.body() != null;
-                String jsonBody = response.body().string();
+                String jsonBody = null;
+                if(response.body()!=null){
+                    jsonBody = response.body().string();
+                }else {
+                    throw new LineBotException(LineBotExceptionEnums.FAIL_ON_BODY_RESPONSE);
+                }
                 rabbitMqService.sendMaskInfo(jsonBody);
                 MDC.remove("job");
             }
@@ -151,8 +158,12 @@ public class WebCrawlerCreateJob implements ClientUtil {
             @EverythingIsNonNull
             public void onResponse(Call call, Response response) {
                 MDC.put("job","Vaccined PDF");
-                assert response.body() != null;
-                String jsonBody = response.body().string();
+                String jsonBody = null;
+                if(response.body()!=null){
+                    jsonBody = response.body().string();
+                }else {
+                    throw new LineBotException(LineBotExceptionEnums.FAIL_ON_BODY_RESPONSE);
+                }
                 rabbitMqService.sendPDFVaccinedAmount(jsonBody);
                 MDC.remove("job");
             }
@@ -210,7 +221,12 @@ public class WebCrawlerCreateJob implements ClientUtil {
                     MDC.remove("job");
                     executeTodayWorldCovidData();
                 }
-                String jsonBody = response.body().string();
+                String jsonBody = null;
+                if(response.body()!=null){
+                    jsonBody = response.body().string();
+                }else {
+                    throw new LineBotException(LineBotExceptionEnums.FAIL_ON_BODY_RESPONSE);
+                }
                 rabbitMqService.sendWorldCovid19Data(jsonBody);
                 MDC.remove("job");
             }

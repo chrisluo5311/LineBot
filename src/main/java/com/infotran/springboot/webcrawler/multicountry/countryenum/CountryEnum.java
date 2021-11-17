@@ -31,7 +31,6 @@ public enum CountryEnum {
     CHINA(Code.CHINA,"中國大陸")
     ;
 
-
     /** 國家代號(對應CDC全球疫情CSV檔的iso_code) */
     private String countryCode;
     /** 國家名稱 */

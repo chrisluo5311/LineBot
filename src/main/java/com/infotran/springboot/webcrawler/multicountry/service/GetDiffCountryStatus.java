@@ -19,9 +19,7 @@ public class GetDiffCountryStatus {
 
     public static final String REDIS_KEY = "global_covid_";
 
-    public static final String US = "US";
-
-    /** JHU Data URL 需補上每日日期 */
+    /** CDC WORLD Data URL */
     @Value("${CDC.WORLD.COVID}")
     public String CDC_WORLD_URL;
 
