@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 
 /**
+ * CDC world status csv receiver
  * @author chris
  */
 @Slf4j

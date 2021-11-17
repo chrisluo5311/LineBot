@@ -28,8 +28,8 @@ public class RabbitMqService {
     @Value("${webcrawler.mq.routingkey.PDFVaccinedAmount}")
     String ROUTING_KEY_PDFVaccinedAmount;
 
-    @Value("${webcrawler.mq.routingkey.JHUCovidData}")
-    String ROUTING_KEY_JHUCovidData;
+    @Value("${webcrawler.mq.routingkey.WorldCovidData}")
+    String ROUTING_KEY_WorldCovidData;
 
     @Resource
     private RabbitTemplate rabbitTemplate;
@@ -59,10 +59,10 @@ public class RabbitMqService {
     }
 
     /**
-     * 推送[JHU CSSE COVID-19 Data]mq
+     * 推送[CDC CSV COVID-19 Data]mq
      * */
-    public void sendJHUCovid19Data(String body){
-        rabbitTemplate.convertAndSend(TOPIC_WEBCRAWLER_EXCHANGE,ROUTING_KEY_JHUCovidData,body);
-        log.info("推送[JHU CSSE COVID-19 Data]mq開始");
+    public void sendWorldCovid19Data(String body){
+        rabbitTemplate.convertAndSend(TOPIC_WEBCRAWLER_EXCHANGE, ROUTING_KEY_WorldCovidData,body);
+        log.info("推送[CDC WORLD COVID-19 Data]mq開始");
     }
 }

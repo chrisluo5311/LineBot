@@ -2,7 +2,6 @@ package com.infotran.springboot.linebot.service;
 
 import com.infotran.springboot.exception.LineBotException;
 import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
-import com.infotran.springboot.linebot.service.messagehandler.enums.HandlerEnum;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -23,8 +22,6 @@ public class BaseMessagePool implements InitializingBean, ApplicationContextAwar
 
     private ApplicationContext applicationContext;
 
-    private List<String> methodList = new ArrayList<>();
-
     private List<BaseMessageInterface> baseInterfaceList;
 
     @Override
@@ -34,7 +31,6 @@ public class BaseMessagePool implements InitializingBean, ApplicationContextAwar
 
     @Override
     public void afterPropertiesSet() {
-        methodList = HandlerEnum.getAllEnums();
         baseInterfaceList = new ArrayList<>(applicationContext.getBeansOfType(BaseMessageInterface.class).values());
         for(BaseMessageInterface base : baseInterfaceList){
             log.info("載入 Added BaseMessageInterface實現類: {}",base);

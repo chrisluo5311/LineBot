@@ -23,18 +23,16 @@ public class GetDiffCountryStatus {
 
     /** JHU Data URL 需補上每日日期 */
     @Value("${CDC.WORLD.COVID}")
-    public String JHU_URL;
+    public String CDC_WORLD_URL;
 
     /**
      * 解析各國疫情狀況
      * @param body JHU csv 檔
      * */
     public void parseCsvInfo(@NonNull String body){
-        // 3:Country_Region 4:Last_Update 7:Confirmed 8:Deaths 12:Incident_Rate 13:Case_Fatality_Ratio
         String[] countries = body.split("\n");
         // other countries
 
-        // US 從674行開始
         Integer sum = 0;
         for(int i = 674 ; i < countries.length ; i++){
             // us 各州
