@@ -1,14 +1,15 @@
 # LineBot (LINE Messaging API + Spring Boot+ Rabbitmq + Selenium)
+### 疫情小幫手(目錄-僅參考):
 ![目錄](https://github.com/chrisluo5311/LineBot/blob/master/src/main/resources/static/menufinal.jpg "line bot richmenu")
 
-### 安裝軟體對應版本(僅供参考):
+### 安裝軟體對應版本:
 |  軟體  |  版本  |   說明   |
 |:------:|:--------:|:------------:|
 |  JDK  | 11.0.10   | Spring boot對低版支持無測試過 |
 |  Redis  | 5.0.10   | 低版支持無測試過  |
 |  MS SQLServer  | MS SQLServer2019  | 低版支持無測試過 |
 
-### 定时任务说明
+### 定時任務說明
 
 |  功能  |  任務說明  |
 |:------:|:--------:|
@@ -25,8 +26,8 @@
 |  哪裡買口罩  |  chris  | `完成` | okhttp、jsoup | 發送請求至 [口罩即時查](https://wenyo.github.io/maskmap/ "口罩即時查") 後台的Request URL，返回含經緯度的藥局資訊，解析後發送LocationMessage給使用者   |
 |  所處位置疫情狀況  |  chris  |  `尚未開始` | leaflet |           |
 |  國內外疫情  |  chris  |  `尚未開始`  | okhttp、jsoup |           |
-|  疫苗施打統計圖  |  chris  |  `尚未開始`  | okhttp、jsoup |            |
-|  其他統計表  |  chris  |  `尚未開始`  | okhttp、jsoup |             |
+|  疫苗施打統計圖  |  chris  |  `完成`  | okhttp、jsoup |            |
+|  其他統計表  |  chris  |  `完成`  | okhttp、jsoup |             |
 
 
 
@@ -63,6 +64,6 @@ docker pull rabbitmq:management
 7. [台灣電子地圖服務網](https://www.map.com.tw/ "台灣電子地圖服務網")
 8. [LINE Messaging API SDK for Java](https://github.com/line/line-bot-sdk-java "LineBot API SDK")
 9. [Messaging API reference](https://developers.line.biz/en/reference/messaging-api/ "LineBot API 文件")
-10. COVID-19 Data Repository by the Center for Systems Science and Engineering (CSSE) at Johns Hopkins University  
+10. (未使用) COVID-19 Data Repository by the Center for Systems Science and Engineering (CSSE) at Johns Hopkins University  
 [JHU CSSE COVID-19 Data](https://github.com/CSSEGISandData/COVID-19 "JHU CSSE COVID-19 Data")  
 "Dong E, Du H, Gardner L. An interactive web-based dashboard to track COVID-19 in real time. Lancet Inf Dis. 20(5):533-534. doi: 10.1016/S1473-3099(20)30120-1"
