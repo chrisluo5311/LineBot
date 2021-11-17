@@ -1,4 +1,4 @@
-# LineBot (疫情小幫手)
+# LineBot (LINE Messaging API + Spring Boot+ Rabbitmq + Selenium)
 ![目錄](https://github.com/chrisluo5311/LineBot/blob/master/src/main/resources/static/menufinal.jpg "line bot richmenu")
 
 ### 安裝軟體對應版本(僅供参考):
