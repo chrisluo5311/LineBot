@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -159,7 +160,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
             public void onResponse(Call call, Response response) {
                 MDC.put("job","Vaccined PDF");
                 String jsonBody = null;
-                if(response.body()!=null){
+                if(Objects.nonNull(response.body())){
                     jsonBody = response.body().string();
                 }else {
                     throw new LineBotException(LineBotExceptionEnums.FAIL_ON_BODY_RESPONSE);
@@ -222,7 +223,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
                     executeTodayWorldCovidData();
                 }
                 String jsonBody = null;
-                if(response.body()!=null){
+                if(Objects.nonNull(response.body())){
                     jsonBody = response.body().string();
                 }else {
                     throw new LineBotException(LineBotExceptionEnums.FAIL_ON_BODY_RESPONSE);
