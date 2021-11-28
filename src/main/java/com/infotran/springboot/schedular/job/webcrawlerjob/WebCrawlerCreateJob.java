@@ -3,6 +3,7 @@ package com.infotran.springboot.schedular.job.webcrawlerjob;
 import com.infotran.springboot.exception.LineBotException;
 import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
 import com.infotran.springboot.queue.service.RabbitMqService;
+import com.infotran.springboot.schedular.TimeUnit;
 import com.infotran.springboot.util.ClientUtil;
 import com.infotran.springboot.webcrawler.confirmcase.service.GetCovidNumService;
 import com.infotran.springboot.webcrawler.medicinestore.service.GetMaskJsonService;
@@ -16,6 +17,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.internal.annotations.EverythingIsNonNull;
 import org.slf4j.MDC;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -66,9 +68,8 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * 每天14:00開始到14:55，每五分鐘執行一次
      *
      * */
-//    @Scheduled(fixedRate = TimeUnit.HOUR)
+//    @Scheduled(fixedRate = 30 * TimeUnit.MINUTE)
     public void executeCrawlCovid() {
-        // get post put 等
         Request request = new Request.Builder().url(getCovidNumService.CDC_URL).get().build();
         Call call = CLIENT.newCall(request);
         call.enqueue(new Callback() {
@@ -76,7 +77,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
             @Override
             @EverythingIsNonNull
             public void onFailure(Call call, IOException e) {
-                log.warn("執行 [當日新增確診數] 爬蟲 失敗");
+                log.error("執行 [當日新增確診數] 爬蟲 失敗");
                 throw new LineBotException(LineBotExceptionEnums.FAIL_ON_WEBCRAWLING,e.getMessage());
             }
 
@@ -105,7 +106,6 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * */
 //    @Scheduled(fixedRate = TimeUnit.HOUR)
     public void executeMaskCrawl() {
-        // get
         Request request = new Request.Builder().url(getMaskJsonService.MASK_URL).get().build();
         Call call = CLIENT.newCall(request);
         call.enqueue(new Callback() {
@@ -113,7 +113,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
             @Override
             @EverythingIsNonNull
             public void onFailure(Call call, IOException e) {
-                log.warn("執行 [查詢剩餘口罩數] 爬蟲 失敗");
+                log.error("執行 [查詢剩餘口罩數] 爬蟲 失敗");
                 throw new LineBotException(LineBotExceptionEnums.FAIL_ON_WEBCRAWLING,e.getMessage());
             }
 
@@ -150,7 +150,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
             @Override
             @EverythingIsNonNull
             public void onFailure(Call call, IOException e) {
-                log.warn("執行 [pdf 取得各疫苗接踵累计人次] 爬蟲 失敗");
+                log.error("執行 [pdf 取得各疫苗接踵累计人次] 爬蟲 失敗");
                 throw new LineBotException(LineBotExceptionEnums.FAIL_ON_WEBCRAWLING,e.getMessage());
             }
 
@@ -208,7 +208,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
             @Override
             @EverythingIsNonNull
             public void onFailure(Call call, IOException e) {
-                log.warn("執行 [TODAY CDC_World COVID-19 Data] 失敗");
+                log.error("執行 [TODAY CDC_World COVID-19 Data] 失敗");
                 throw new LineBotException(LineBotExceptionEnums.FAIL_ON_WEBCRAWLING,e.getMessage());
             }
 
@@ -221,12 +221,14 @@ public class WebCrawlerCreateJob implements ClientUtil {
                     log.error("CDC World url連線有問題");
                     MDC.remove("job");
                     executeTodayWorldCovidData();
+                    throw new LineBotException(LineBotExceptionEnums.RESPONSE_FAIL);
                 }
                 String jsonBody = null;
                 if(Objects.nonNull(response.body())){
-                    jsonBody = response.body().string();
+                    jsonBody = new String(response.body().string().getBytes(), "UNICODE");
+
                 }else {
-                    throw new LineBotException(LineBotExceptionEnums.FAIL_ON_BODY_RESPONSE);
+                    throw new LineBotException(LineBotExceptionEnums.FAIL_ON_GET_JSONOBJECT);
                 }
                 rabbitMqService.sendWorldCovid19Data(jsonBody);
                 MDC.remove("job");

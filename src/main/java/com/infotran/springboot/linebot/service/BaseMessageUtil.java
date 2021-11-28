@@ -4,9 +4,6 @@ import com.infotran.springboot.annotation.MultiQuickReply;
 import com.infotran.springboot.annotation.QuickReplyMode;
 import com.infotran.springboot.annotation.quickreplyenum.ActionMode;
 import com.linecorp.bot.model.ReplyMessage;
-import com.linecorp.bot.model.action.LocationAction;
-import com.linecorp.bot.model.action.MessageAction;
-import com.linecorp.bot.model.action.PostbackAction;
 import com.linecorp.bot.model.message.LocationMessage;
 import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.TextMessage;
@@ -17,10 +14,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
@@ -36,6 +30,17 @@ public abstract class BaseMessageUtil implements LineClientInterface {
      * 最大MESSAGE傳送數量
      * */
     private static final Integer MAX_MESSAGE_AMOUNT = 1000;
+
+    private static final ActionMode[] actions;
+
+    private static final Map<ActionMode,ActionMode> actionModeMap = new HashMap<>();;
+
+    static {
+        actions = ActionMode.values();
+        for(ActionMode mode : actions){
+            actionModeMap.put(mode,mode);
+        }
+    }
 
     /**
      * 回應訊息(replyToken,Message物件)<br>
@@ -176,24 +181,11 @@ public abstract class BaseMessageUtil implements LineClientInterface {
         String displayText = quickReplyMode.displayText();
         String text = quickReplyMode.text();
         log.info("[{}] @QuickReplyMode註解裡的參數 mode: {}, label: {}, data: {}, displayText: {},text: {}",LOG_PREFIX,mode,label,data,displayText,text);
+
         //回傳QuickReplyItem
-        switch (mode){
-            case POSTBACK:
-                return QuickReplyItem.builder()
-                        .action(PostbackAction.builder()
-                                .label(label)
-                                .data(data)
-                                .displayText(displayText)
-                                .build())
-                        .build();
-            case LOCATION:
-                return QuickReplyItem.builder()
-                        .action(LocationAction.withLabel(label))
-                        .build();
-            case MESSAGE:
-                return QuickReplyItem.builder()
-                        .action(new MessageAction(label,text))
-                        .build();
+        if(actionModeMap.containsKey(mode)){
+            ActionMode actionMode = actionModeMap.get(mode);
+            return actionMode.getQuickReplyItem(label,data,displayText,text);
         }
         return null;
     }

@@ -1,9 +1,14 @@
 package com.infotran.springboot.webcrawler.multicountry.service;
 
+import com.infotran.springboot.util.TimeUtil;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.IntStream;
 
 /**
  * 取得不同國家的疫情狀態
@@ -28,16 +33,19 @@ public class GetDiffCountryStatus {
      * 總死亡數: 8,新增死亡數: 9,每百萬人確診數: 11,每百萬人死亡數: 12
      * 疫苗總接種人數: 21,每百人接種疫苗人數: 25
      *
-     * @param body JHU csv 檔
+     * @param body CDC csv 檔
      * */
     public void parseCsvInfo(@NonNull String body){
         String[] countries = body.split("\n");
-        for (int i = 0; i<countries.length ;i++){
-            String[] column = countries[i].split(",");
-            for (int j = 0; j<column.length ; j++){
-                
+        CopyOnWriteArrayList<String> column = new CopyOnWriteArrayList<String>();
+        IntStream.range(0,countries.length).parallel().forEachOrdered(x -> {
+            Arrays.stream(countries[x].split(",")).filter(i -> i.equals(TimeUtil.formTodayDate())).map(column::add);
+            if(column.get(4).equals(TimeUtil.formTodayDate())){
+
             }
-        }
+            column.clear();
+        });
+
     }
 
 }

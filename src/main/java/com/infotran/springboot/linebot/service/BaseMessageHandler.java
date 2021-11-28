@@ -179,5 +179,6 @@ public abstract class BaseMessageHandler extends BaseMessageUtil implements Base
         return TextMessage.builder().text("點選下方打開地圖").quickReply(quickReply).build();
     }
 
+    
 
 }
