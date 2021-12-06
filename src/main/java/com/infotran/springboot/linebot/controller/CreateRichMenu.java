@@ -5,7 +5,7 @@ import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
 import com.infotran.springboot.linebot.model.MenuID;
 import com.infotran.springboot.linebot.service.LineClientInterface;
 import com.infotran.springboot.linebot.service.MenuIdService;
-import com.infotran.springboot.util.DownloadFileUtil;
+import com.infotran.springboot.util.HandleFileUtil;
 import com.linecorp.bot.model.action.MessageAction;
 import com.linecorp.bot.model.action.PostbackAction;
 import com.linecorp.bot.model.richmenu.*;
@@ -65,7 +65,7 @@ public class CreateRichMenu implements LineClientInterface, CommandLineRunner {
 									.chatBarText(CHAT_BAR_TEXT)
 									.areas(area)
 									.build();
-		byte[] buffer = DownloadFileUtil.file2Byte(RICH_MENU_FILE_PATH);
+		byte[] buffer = HandleFileUtil.file2Byte(RICH_MENU_FILE_PATH);
 		try {
 			RichMenuIdResponse menuResponse = CLIENT.createRichMenu(richmenu).get();
 			String menuId = menuResponse.getRichMenuId();

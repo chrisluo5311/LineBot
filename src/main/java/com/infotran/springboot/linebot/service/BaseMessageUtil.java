@@ -31,17 +31,6 @@ public abstract class BaseMessageUtil implements LineClientInterface {
      * */
     private static final Integer MAX_MESSAGE_AMOUNT = 1000;
 
-    private static final ActionMode[] actions;
-
-    private static final Map<ActionMode,ActionMode> actionModeMap = new HashMap<>();;
-
-    static {
-        actions = ActionMode.values();
-        for(ActionMode mode : actions){
-            actionModeMap.put(mode,mode);
-        }
-    }
-
     /**
      * 回應訊息(replyToken,Message物件)<br>
      * 將Message物件轉成List
@@ -181,12 +170,7 @@ public abstract class BaseMessageUtil implements LineClientInterface {
         String displayText = quickReplyMode.displayText();
         String text = quickReplyMode.text();
         log.info("[{}] @QuickReplyMode註解裡的參數 mode: {}, label: {}, data: {}, displayText: {},text: {}",LOG_PREFIX,mode,label,data,displayText,text);
-
         //回傳QuickReplyItem
-        if(actionModeMap.containsKey(mode)){
-            ActionMode actionMode = actionModeMap.get(mode);
-            return actionMode.getQuickReplyItem(label,data,displayText,text);
-        }
-        return null;
+        return mode.getQuickReplyItem(label,data,displayText,text);
     }
 }

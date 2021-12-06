@@ -2,7 +2,7 @@ package com.infotran.springboot.linebot.service.messagehandler;
 
 import com.infotran.springboot.linebot.service.BaseMessageHandler;
 import com.infotran.springboot.linebot.service.messagehandler.enums.HandlerEnum;
-import com.infotran.springboot.util.DownloadFileUtil;
+import com.infotran.springboot.util.HandleFileUtil;
 import com.infotran.springboot.webcrawler.vaccinesvg.model.VaccineTypePeople;
 import com.infotran.springboot.webcrawler.vaccinesvg.service.VaccinedPeopleService;
 import com.linecorp.bot.model.action.MessageAction;
@@ -68,8 +68,8 @@ public class HandleVaccineIMGMessage extends BaseMessageHandler {
                 }
                 TextMessage textMessage = TextMessage.builder().text(content.toString()).quickReply(quickReply).build();
                 //圖片訊息
-                URI vaccineImgUri1 = DownloadFileUtil.createUri("/static/cumulativeVaccined.jpg");
-                URI vaccineImgUri2 = DownloadFileUtil.createUri("/static/eachBatchCoverage.jpg");
+                URI vaccineImgUri1 = HandleFileUtil.createUri("/static/cumulativeVaccined.jpg");
+                URI vaccineImgUri2 = HandleFileUtil.createUri("/static/eachBatchCoverage.jpg");
                 ImageMessage imgMessage1 = ImageMessage.builder().previewImageUrl(vaccineImgUri1).originalContentUrl(vaccineImgUri1).build();
                 ImageMessage imgMessage2 = ImageMessage.builder().previewImageUrl(vaccineImgUri2).originalContentUrl(vaccineImgUri2).build();
                 List<Message> replyList = new ArrayList<Message>();

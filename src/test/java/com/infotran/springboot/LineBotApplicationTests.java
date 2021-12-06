@@ -1,6 +1,5 @@
 package com.infotran.springboot;
 
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -16,7 +15,7 @@ public class LineBotApplicationTests {
 //		System.out.println(param);
 //		return param;
 //	}
-	@Test
+//	@Test
 	public void demo() {
 		String a = "hello";
 		String b = "world";

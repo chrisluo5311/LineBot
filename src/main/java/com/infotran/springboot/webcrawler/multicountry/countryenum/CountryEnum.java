@@ -36,6 +36,9 @@ public enum CountryEnum {
     /** 國家名稱 */
     private String name;
 
+    /**
+     * 對應isocode
+     * */
     public class Code{
         public static final String GLOBAL = "OWID_WRL";
         public static final String US = "USA";

@@ -5,6 +5,7 @@ import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
 import com.infotran.springboot.queue.service.RabbitMqService;
 import com.infotran.springboot.schedular.TimeUnit;
 import com.infotran.springboot.util.ClientUtil;
+import com.infotran.springboot.util.HandleFileUtil;
 import com.infotran.springboot.webcrawler.confirmcase.service.GetCovidNumService;
 import com.infotran.springboot.webcrawler.medicinestore.service.GetMaskJsonService;
 import com.infotran.springboot.webcrawler.multicountry.service.GetDiffCountryStatus;
@@ -23,6 +24,11 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -198,42 +204,25 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * 執行 每日 取得 [CDC_World COVID-19 Data] <br>
      * (每 6 小時執行一次)
      * */
-//    @Scheduled(fixedRate = 6 * TimeUnit.HOUR)
-    public void executeTodayWorldCovidData(){
-        log.info("CDC World url :{} ", countryStatus.CDC_WORLD_URL);
-        Request request = new Request.Builder().url(countryStatus.CDC_WORLD_URL).get().build();
-        Call call = CLIENT.newCall(request);
-        call.enqueue(new Callback() {
-            @SneakyThrows
-            @Override
-            @EverythingIsNonNull
-            public void onFailure(Call call, IOException e) {
-                log.error("執行 [TODAY CDC_World COVID-19 Data] 失敗");
-                throw new LineBotException(LineBotExceptionEnums.FAIL_ON_WEBCRAWLING,e.getMessage());
-            }
-
-            @SneakyThrows
-            @Override
-            @EverythingIsNonNull
-            public void onResponse(Call call, Response response) {
-                MDC.put("job","CDC_World_Today_CovidData");
-                if(response.code()==404){
-                    log.error("CDC World url連線有問題");
-                    MDC.remove("job");
-                    executeTodayWorldCovidData();
-                    throw new LineBotException(LineBotExceptionEnums.RESPONSE_FAIL);
-                }
-                String jsonBody = null;
-                if(Objects.nonNull(response.body())){
-                    jsonBody = new String(response.body().string().getBytes(), "UNICODE");
-
-                }else {
-                    throw new LineBotException(LineBotExceptionEnums.FAIL_ON_GET_JSONOBJECT);
-                }
-                rabbitMqService.sendWorldCovid19Data(jsonBody);
-                MDC.remove("job");
-            }
-        });
+    @Scheduled(fixedRate = 6 * TimeUnit.HOUR)
+    public void executeTodayWorldCovidData()  {
+        MDC.put("job","CDC_World_Today_CovidData");
+        log.info("url :{} ", countryStatus.CDC_WORLD_URL);
+        try {
+            HandleFileUtil.downloadWithFilesCopy(countryStatus.CDC_WORLD_URL,GetDiffCountryStatus.FILENAME);
+            URI uri = new URI(HandleFileUtil.filePath.concat(GetDiffCountryStatus.FILENAME));
+            System.out.println(uri);
+            Path path = Paths.get("src/main/resources/static/world.csv");
+            byte[] bytes = HandleFileUtil.decomposeGzipToBytes(path);
+            String body = new String(bytes, StandardCharsets.UTF_8);
+            rabbitMqService.sendWorldCovid19Data(body);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        } finally {
+            MDC.remove("job");
+        }
     }
 
 

@@ -13,18 +13,20 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
+import java.util.zip.GZIPInputStream;
 
 /**
  * @author chris
  * */
 @Component
 @Slf4j
-public class DownloadFileUtil {
+public class HandleFileUtil {
 
     //檔案路徑
     public static final String filePath = "D:/IdeaProject/LineBot/src/main/resources/static/";
@@ -88,14 +90,13 @@ public class DownloadFileUtil {
      * @param govURL 政府公開csv檔URL
      * @return List
      * */
-    public static List<String> downloadWithFilesCopy(String govURL,String fileName) throws IOException {
+    public static void downloadWithFilesCopy(String govURL,String fileName) throws IOException {
         URL url = new URL(govURL);
         List<String> strFileContents = new ArrayList<>();
         try(InputStream inputStream = url.openStream()){
-            Files.copy(inputStream, Paths.get(filePath+fileName), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(inputStream, Paths.get(filePath.concat(fileName)), StandardCopyOption.REPLACE_EXISTING);
 //                Files.readAllLines(Paths.get(url.toURI())).stream().map(String::trim).forEach(strFileContents::add);
         }
-        return null;
     }
 
     /**
@@ -207,11 +208,33 @@ public class DownloadFileUtil {
         return buffer;
     }
 
+    /**
+     * create Uri from path
+     * to https
+     * @param path 路徑
+     * */
     public static URI createUri(String path) {
         return ServletUriComponentsBuilder.fromCurrentContextPath()
                 .scheme("https")
                 .path(path).build()
                 .toUri();
+    }
+
+    /**
+     * unzip Gzip to byte[]
+     * @param source Path
+     * */
+    public static byte[] decomposeGzipToBytes(Path source) throws IOException  {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        try (GZIPInputStream gis = new GZIPInputStream(new FileInputStream(source.toFile()))) {
+            // copy GZIPInputStream to ByteArrayOutputStream
+            byte[] buffer = new byte[2048];
+            int len;
+            while ((len = gis.read(buffer)) > 0) {
+                output.write(buffer, 0, len);
+            }
+        }
+        return output.toByteArray();
     }
 
 

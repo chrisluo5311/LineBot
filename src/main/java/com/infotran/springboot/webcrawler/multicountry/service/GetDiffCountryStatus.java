@@ -23,24 +23,37 @@ public class GetDiffCountryStatus {
 
     public static final String REDIS_KEY = "global_covid_";
 
+    public static final String FILENAME = "world";
+
+    private static String TODAY_DATE = TimeUtil.formTodayDate();
+
     /** CDC WORLD Data URL */
     @Value("${CDC.WORLD.COVID}")
     public String CDC_WORLD_URL;
 
+
     /**
-     * 解析各國疫情狀況
-     * iso_code: 1, 國家: 3, 日期: 4,總確診數 5,新增確診數 6
-     * 總死亡數: 8,新增死亡數: 9,每百萬人確診數: 11,每百萬人死亡數: 12
-     * 疫苗總接種人數: 21,每百人接種疫苗人數: 25
+     * 解析各國疫情狀況<br>
+     * iso_code: 1,<br>
+     * 國家: 3,<br>
+     * 日期: 4,<br>
+     * 總確診數 5,<br>
+     * 新增確診數: 6,<br>
+     * 總死亡數: 8,<br>
+     * 新增死亡數: 9,<br>
+     * 每百萬人確診數: 11,<br>
+     * 每百萬人死亡數: 12,<br>
+     * 疫苗總接種人數: 21,<br>
+     * 每百人接種疫苗人數: 25<br>
      *
-     * @param body CDC csv 檔
+     * @param body CDC的csv檔
      * */
     public void parseCsvInfo(@NonNull String body){
         String[] countries = body.split("\n");
         CopyOnWriteArrayList<String> column = new CopyOnWriteArrayList<String>();
         IntStream.range(0,countries.length).parallel().forEachOrdered(x -> {
             Arrays.stream(countries[x].split(",")).filter(i -> i.equals(TimeUtil.formTodayDate())).map(column::add);
-            if(column.get(4).equals(TimeUtil.formTodayDate())){
+            if(checkTime(column.get(4))){
 
             }
             column.clear();
@@ -48,4 +61,10 @@ public class GetDiffCountryStatus {
 
     }
 
+    /**
+     * 檢查是否為今日日期
+     * */
+    private Boolean checkTime(@NonNull String time){
+        return (time.equals(TODAY_DATE))?true:false;
+    }
 }

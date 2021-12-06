@@ -5,7 +5,7 @@ import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
 /**
  * @author chris
  */
-public class LineBotException extends Exception{
+public class LineBotException extends Exception {
 
     private final LineBotExceptionEnums lineBotExceptionCodeCode;
 
@@ -24,6 +24,7 @@ public class LineBotException extends Exception{
         super(lineBotExceptionCodeCode.getStatus());
         this.lineBotExceptionCodeCode = lineBotExceptionCodeCode;
     }
+
 
     public LineBotExceptionEnums getWebCrawlerCode(){
         return this.lineBotExceptionCodeCode;

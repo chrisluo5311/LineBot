@@ -27,7 +27,9 @@ public enum LineBotExceptionEnums {
 
     FAIL_ON_OUTPUT_FILE("F01","檔案輸出失敗"),
 
-    FAIL_ON_CREATE_RICHMENU("G01","製作Line RichMenu失敗")
+    FAIL_ON_CREATE_RICHMENU("G01","製作Line RichMenu失敗"),
+
+    MISSING_COUNTRY_RESPONSECODE("H01","各國CSV檔不支援此對應欄位")
     ;
 
     private String code;
