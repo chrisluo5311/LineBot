@@ -6,4 +6,9 @@ public interface DiffCountryService {
 
     DiffCountry save(DiffCountry diffCountry);
 
+    DiffCountry findByIsoCode(String isoCode);
+
+    DiffCountry findByLastUpdate(String lastUpdate);
+
+
 }

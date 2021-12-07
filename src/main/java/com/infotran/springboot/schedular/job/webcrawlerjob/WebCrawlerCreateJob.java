@@ -212,7 +212,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
             HandleFileUtil.downloadWithFilesCopy(countryStatus.CDC_WORLD_URL,GetDiffCountryStatus.FILENAME);
             URI uri = new URI(HandleFileUtil.filePath.concat(GetDiffCountryStatus.FILENAME));
             log.info("完整CSV檔存儲路徑:{}",uri);
-            Path path = Paths.get("src/main/resources/static/world.csv");
+            Path path = Paths.get("src/main/resources/static/world");
             //取出並解壓縮成Bytes
             byte[] bytes = HandleFileUtil.decomposeGzipToBytes(path);
             //轉utf-8

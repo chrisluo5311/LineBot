@@ -7,6 +7,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * DiffCountryRepository
  * @author chris
  */
-public interface DiffCountryRepository extends JpaRepository<DiffCountry, String> {
+public interface DiffCountryRepository extends JpaRepository<DiffCountry, Integer> {
+
+    DiffCountry findByIsoCode(String isoCode);
+
+    DiffCountry findByLastUpdate(String lastUpdate);
 
 }

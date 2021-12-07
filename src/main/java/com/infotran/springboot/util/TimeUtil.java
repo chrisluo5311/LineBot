@@ -54,17 +54,18 @@ public class TimeUtil {
     }
 
     /**
-     * 今日日期(MM/DD/YYYY)
+     * 今日日期
      * @return String
      * */
-    public static String formForeignTodayDate(Long minusDays){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-YYYY");
+    public static String formForeignTodayDate(String format,Long minusDays){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
         if(Objects.nonNull(minusDays)){
             log.info("minusDays:{}",formatter.format(LocalDateTime.now().minusDays(minusDays)));
             return formatter.format(LocalDateTime.now().minusDays(minusDays));
         }
         return formatter.format(LocalDateTime.now());
     }
+
 
     /**
      * 提取數字並返回日期
