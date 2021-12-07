@@ -4,6 +4,8 @@ package com.infotran.springboot.webcrawler.multicountry.countryenum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Arrays;
+
 /**
  * 國家enum
  * @author chris
@@ -37,7 +39,7 @@ public enum CountryEnum {
     private String name;
 
     /**
-     * 對應isocode
+     * 對應的isocode
      * */
     public class Code{
         public static final String GLOBAL = "OWID_WRL";
@@ -57,5 +59,23 @@ public enum CountryEnum {
         public static final String KOREAN = "KOR";
         public static final String HONGKONG = "HKG";
         public static final String CHINA = "CHN";
+    }
+
+    /**
+     * 匹配 IsoCode
+     * @param code IsoCode
+     * @return Boolean
+     * */
+    public static Boolean matchCountryIsoCode(String code){
+        return Arrays.stream(CountryEnum.values()).anyMatch(x->x.getCountryCode().equals(code));
+    }
+
+    /**
+     * Get CountryEnum By Code
+     * @param isoCode
+     * @return CountryEnum
+     * */
+    public static CountryEnum getCountryEnumByCode(String isoCode){
+        return Arrays.stream(CountryEnum.values()).filter(x->x.getCountryCode().equals(isoCode)).findFirst().get();
     }
 }

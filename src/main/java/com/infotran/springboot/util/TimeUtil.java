@@ -54,10 +54,14 @@ public class TimeUtil {
     }
 
     /**
-     * 今日日期
+     * 客製化日期格式
+     * 並可設定往前幾天
+     * 不設定可放null值
+     * @param format 日期格式 ex. YYYY-MM-dd
+     * @param minusDays 減去幾天 long型別
      * @return String
      * */
-    public static String formForeignTodayDate(String format,Long minusDays){
+    public static String formCustomDate(String format, Long minusDays){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
         if(Objects.nonNull(minusDays)){
             log.info("minusDays:{}",formatter.format(LocalDateTime.now().minusDays(minusDays)));

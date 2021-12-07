@@ -1,6 +1,7 @@
 package com.infotran.springboot.webcrawler.multicountry.service;
 
 import com.infotran.springboot.util.TimeUtil;
+import com.infotran.springboot.webcrawler.multicountry.countryenum.CountryEnum;
 import com.infotran.springboot.webcrawler.multicountry.model.DiffCountry;
 import com.infotran.springboot.webcrawler.multicountry.service.Impl.DiffCountryServiceImpl;
 import lombok.NonNull;
@@ -29,9 +30,9 @@ public class GetDiffCountryStatus {
 
     public static final String FILENAME = "world";
 
-    private static String TODAY_DATE = TimeUtil.formForeignTodayDate("YYYY-MM-DD",null);
+    private static String TODAY_DATE = TimeUtil.formCustomDate("YYYY-MM-dd",null);
 
-    private static String YESTERDAY_DATE = TimeUtil.formForeignTodayDate("YYYY-MM-DD",1l);
+    private static String YESTERDAY_DATE = TimeUtil.formCustomDate("YYYY-MM-dd",1l);
 
     /** CDC WORLD Data URL */
     @Value("${CDC.WORLD.COVID}")
@@ -60,15 +61,14 @@ public class GetDiffCountryStatus {
         //每一行 以換行\n區分
         String[] countries = body.split("\n");
         CopyOnWriteArrayList<String> column = new CopyOnWriteArrayList<>();
-        IntStream.range(0,countries.length).parallel().forEach(x -> {
+        IntStream.range(0,countries.length).parallel().forEachOrdered(x -> {
             //每一個 以逗號區分
             Arrays.stream(countries[x].split(",")).forEach(column::add);
-            System.out.println(column);
-            if(column.size()>=4){
-                if(checkTodayTime(column.get(4))){
+            if(column.size()>=25){
+                if(checkTodayTime(column.get(4)) && verifyIsoCode(column.get(1))){
                     //儲存今日資料
                     saveToDb(column,TODAY_DATE);
-                } else if(checkYesterdayTime(column.get(4))){
+                } else if(checkYesterdayTime(column.get(4)) && verifyIsoCode(column.get(1))){
                     //更新昨日資料
                     updateDb(column,YESTERDAY_DATE);
                 }
@@ -92,6 +92,14 @@ public class GetDiffCountryStatus {
      * */
     private Boolean checkYesterdayTime(@NonNull String time){
         return (time.equals(YESTERDAY_DATE))?true:false;
+    }
+
+    /**
+     * 驗證isocode是否為需求
+     * @param code
+     * */
+    private Boolean verifyIsoCode(String code){
+        return CountryEnum.matchCountryIsoCode(code);
     }
 
     /**
