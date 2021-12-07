@@ -26,8 +26,6 @@ public class GetDiffCountryStatus {
 
     private static final String LOG_PREFIX = "GetDiffCountryStatus";
 
-    public static final String REDIS_KEY = "global_covid_";
-
     public static final String FILENAME = "world";
 
     private static String TODAY_DATE = TimeUtil.formCustomDate("YYYY-MM-dd",null);
@@ -75,7 +73,6 @@ public class GetDiffCountryStatus {
             }
             column.clear();
         });
-
     }
 
     /**
@@ -98,7 +95,7 @@ public class GetDiffCountryStatus {
      * 驗證isocode是否為需求
      * @param code
      * */
-    private Boolean verifyIsoCode(String code){
+    private Boolean verifyIsoCode(@NonNull String code){
         return CountryEnum.matchCountryIsoCode(code);
     }
 
