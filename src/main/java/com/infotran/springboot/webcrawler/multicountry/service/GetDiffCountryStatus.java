@@ -63,7 +63,8 @@ public class GetDiffCountryStatus {
         IntStream.range(0,countries.length).parallel().forEach(x -> {
             //每一個 以逗號區分
             Arrays.stream(countries[x].split(",")).forEach(column::add);
-            if(column.size()>=25){
+            System.out.println(column);
+            if(column.size()>=4){
                 if(checkTodayTime(column.get(4))){
                     //儲存今日資料
                     saveToDb(column,TODAY_DATE);
