@@ -95,7 +95,7 @@ public class HandleVaccineIMGMessage extends BaseMessageHandler {
     }
 
     /**
-     * 混和行回復需自行生成QuickReply物件
+     * 混合型回復自行生成QuickReply物件
      *
      * @return QuickReply
      * */

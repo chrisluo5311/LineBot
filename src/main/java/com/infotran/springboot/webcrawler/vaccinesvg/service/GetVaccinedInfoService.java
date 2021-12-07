@@ -181,7 +181,7 @@ public class GetVaccinedInfoService implements ClientUtil {
                 log.warn("{} pdf檔尚未更新 或 pdf檔非統計資料表 或 pdf檔已新增過",LOG_PREFIX);
             }
         } catch (IOException e) {
-            log.error("pdf輸出失敗:{}", e.getMessage());
+            log.error("pdf輸出失敗或解析失敗:{}", e.getMessage());
         }
     }
 

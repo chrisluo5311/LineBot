@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import javax.persistence.*;
 
 /**
+ * CDC各國疫情狀態的csv檔對應欄位的model
  * @author chris
  */
 @Entity
@@ -25,26 +26,35 @@ public class DiffCountry {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    /** iso code */
+    private String isoCode;
+
     /** 國家 */
     private String country;
 
     /** 確診數 */
-    private String confirmed;
+    private String totalAmount;
+
+    /** 新增確診數 */
+    private String newAmount;
 
     /** 死亡數 */
-    private String deaths;
+    private String totalDeath;
 
-    /**
-     * 每十萬人確診數
-     * Incident_Rate: Incidence Rate = cases per 100,000 persons.
-     * */
-    private String incidentRate;
+    /** 新增確診數 */
+    private String newDeath;
 
-    /**
-     *  死亡比例: (登記死亡數/確診數)
-     *  Case_Fatality_Ratio (%): Case-Fatality Ratio (%) = Number recorded deaths / Number cases.
-     *  */
-    private String fatalityRatio;
+    /** 每百萬人確診數 */
+    private String confirmedInMillions;
+
+    /** 每百萬人死亡數 */
+    private String deathInMillions;
+
+    /** 疫苗總接種人數 */
+    private String vaccinatedInMillions;
+
+    /** 每百人接種疫苗人數 */
+    private String vaccinatedInHundreds;
 
     /** 最後更新時間 */
     private String lastUpdate;

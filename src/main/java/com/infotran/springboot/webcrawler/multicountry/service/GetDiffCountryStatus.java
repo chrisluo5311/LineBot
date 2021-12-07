@@ -1,12 +1,16 @@
 package com.infotran.springboot.webcrawler.multicountry.service;
 
 import com.infotran.springboot.util.TimeUtil;
+import com.infotran.springboot.webcrawler.multicountry.model.DiffCountry;
+import com.infotran.springboot.webcrawler.multicountry.service.Impl.DiffCountryServiceImpl;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.IntStream;
 
@@ -31,9 +35,11 @@ public class GetDiffCountryStatus {
     @Value("${CDC.WORLD.COVID}")
     public String CDC_WORLD_URL;
 
+    @Resource
+    DiffCountryServiceImpl diffCountryService;
 
     /**
-     * 解析各國疫情狀況<br>
+     * 解析各國疫情狀況：<br>
      * iso_code: 1,<br>
      * 國家: 3,<br>
      * 日期: 4,<br>
@@ -49,12 +55,40 @@ public class GetDiffCountryStatus {
      * @param body CDC的csv檔
      * */
     public void parseCsvInfo(@NonNull String body){
+        //每一行 以換行\n區分
         String[] countries = body.split("\n");
         CopyOnWriteArrayList<String> column = new CopyOnWriteArrayList<String>();
         IntStream.range(0,countries.length).parallel().forEachOrdered(x -> {
-            Arrays.stream(countries[x].split(",")).filter(i -> i.equals(TimeUtil.formTodayDate())).map(column::add);
+            //每一個 以逗號區分
+            Arrays.stream(countries[x].split(",")).map(column::add);
             if(checkTime(column.get(4))){
-
+                String isoCode = column.get(1);
+                String countryName = column.get(3);
+                String totalAmount = column.get(5);
+                String newAmount = column.get(6);
+                String totalDeath = column.get(8);
+                String newDeath = column.get(9);
+                String confirmedInMillions = column.get(11);
+                String deathInMillions = column.get(12);
+                String vaccinatedInMillions = column.get(21);
+                String vaccinatedInHundreds = column.get(25);
+                DiffCountry diffCountry = DiffCountry.builder()
+                                                     .isoCode(isoCode)
+                                                     .country(countryName)
+                                                     .totalAmount(totalAmount)
+                                                     .newAmount(newAmount)
+                                                     .totalDeath(totalDeath)
+                                                     .newDeath(newDeath)
+                                                     .confirmedInMillions(confirmedInMillions)
+                                                     .deathInMillions(deathInMillions)
+                                                     .vaccinatedInMillions(vaccinatedInMillions)
+                                                     .vaccinatedInHundreds(vaccinatedInHundreds)
+                                                     .lastUpdate(TODAY_DATE)
+                                                     .build();
+                DiffCountry result = diffCountryService.save(diffCountry);
+                if(Objects.isNull(result)){
+                    log.warn("{} 成功解析各國疫情狀況，但新增db失敗",LOG_PREFIX);
+                }
             }
             column.clear();
         });

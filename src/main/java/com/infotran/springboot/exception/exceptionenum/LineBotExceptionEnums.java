@@ -16,6 +16,7 @@ public enum LineBotExceptionEnums {
 
     BOTAPI_RESPONSE_EMPTY("B01","MessageEvent響應物件為空"),
     RESPONSE_NOT_TARGET("B02","響應物件非目標"),
+    NO_SUCH_MESSAGE_EVENT("B03","不支援此MessageEvent"),
 
     NEWS_KEYWORD_CHANGE("C01","新聞關鍵字改變"),
     NEWS_TITLE_CHANGE("C02","新聞標題改變，請手動更新"),

@@ -56,7 +56,6 @@ public class HandleTextMessage extends BaseMessageHandler {
 					emojis.add(emoji);
 					TextMessage textMessage = TextMessage.builder().text("測試成功$").emojis(emojis).build();
 					return Collections.singletonList(textMessage);
-	//				botApiResponse = reply(replyToken,textMessage);
 				case "測試carousel":
 					URI imageuri = URI.create("https://www.ballarataquaticcentre.com/wp-content/uploads/2020/07/mask-icon.jpg");
 					CarouselTemplate carouselTemplate = new CarouselTemplate(

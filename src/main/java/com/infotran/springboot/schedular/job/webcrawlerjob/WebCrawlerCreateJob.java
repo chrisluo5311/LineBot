@@ -31,6 +31,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -59,10 +60,6 @@ public class WebCrawlerCreateJob implements ClientUtil {
 
     private static ExecutorService crawImgExecutor;
 
-    /** 目前截圖方法總數 */
-    private static final Integer PICTURE_METHOD_AMOUNT = 2;
-
-
     @PostConstruct
     public void init(){
         crawImgExecutor = new ThreadPoolExecutor(2,4,180,
@@ -71,7 +68,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
 
     /**
      * 執行 [當日新增確診數] 爬蟲
-     * 每天14:00開始到14:55，每五分鐘執行一次
+     * 每三十分鐘執行一次
      *
      * */
 //    @Scheduled(fixedRate = 30 * TimeUnit.MINUTE)
@@ -93,13 +90,16 @@ public class WebCrawlerCreateJob implements ClientUtil {
             public void onResponse(Call call, Response response) {
                 MDC.put("job","Confirm Case");
                 String jsonBody = null;
-                if(response.body()!=null){
-                    jsonBody = response.body().string();
-                }else {
-                    throw new LineBotException(LineBotExceptionEnums.FAIL_ON_BODY_RESPONSE);
+                try{
+                    if(response.body()!=null){
+                        jsonBody = response.body().string();
+                        rabbitMqService.sendConfirmCase(jsonBody);
+                    }else {
+                        throw new LineBotException(LineBotExceptionEnums.FAIL_ON_BODY_RESPONSE);
+                    }
+                } finally {
+                    MDC.remove("job");
                 }
-                rabbitMqService.sendConfirmCase(jsonBody);
-                MDC.remove("job");
             }
         });
     }
@@ -148,7 +148,6 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * */
 //    @Scheduled(fixedRate = 12* TimeUnit.HOUR)
     public void executeParsingPDF() {
-        // get post put 等
         Request request = new Request.Builder().url(getVaccinedInfoService.getPdfUrl()).get().build();
         Call call = CLIENT.newCall(request);
         call.enqueue(new Callback() {
@@ -164,15 +163,18 @@ public class WebCrawlerCreateJob implements ClientUtil {
             @Override
             @EverythingIsNonNull
             public void onResponse(Call call, Response response) {
-                MDC.put("job","Vaccined PDF");
+                MDC.put("job","Vaccine PDF");
                 String jsonBody = null;
-                if(Objects.nonNull(response.body())){
-                    jsonBody = response.body().string();
-                }else {
-                    throw new LineBotException(LineBotExceptionEnums.FAIL_ON_BODY_RESPONSE);
+                try{
+                    if(Objects.nonNull(response.body())){
+                        jsonBody = response.body().string();
+                        rabbitMqService.sendPDFVaccinedAmount(jsonBody);
+                    }else {
+                        throw new LineBotException(LineBotExceptionEnums.FAIL_ON_BODY_RESPONSE);
+                    }
+                }finally {
+                    MDC.remove("job");
                 }
-                rabbitMqService.sendPDFVaccinedAmount(jsonBody);
-                MDC.remove("job");
             }
         });
     }
@@ -184,20 +186,18 @@ public class WebCrawlerCreateJob implements ClientUtil {
 //    @Scheduled(fixedRate = TimeUnit.HOUR)
     public void executeVaccineScreeShot() {
         MDC.put("job","Selenium Snapshot");
-        int i = 0;
-        while(i < PICTURE_METHOD_AMOUNT){
-            if(i==0){
-                crawImgExecutor.execute(() -> {
-                    getVaccinedInfoService.crawlCumulativeVaccineImg();
-                });
-            }else {
-                crawImgExecutor.execute(() -> {
-                    getVaccinedInfoService.crawlEachBatchCoverage();
-                });
-            }
-            i++;
+        try {
+            crawImgExecutor.submit(()->{
+                getVaccinedInfoService.crawlCumulativeVaccineImg();
+                getVaccinedInfoService.crawlEachBatchCoverage();
+            }).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } finally {
+            MDC.remove("job");
         }
-        MDC.remove("job");
     }
 
     /**
@@ -211,9 +211,11 @@ public class WebCrawlerCreateJob implements ClientUtil {
         try {
             HandleFileUtil.downloadWithFilesCopy(countryStatus.CDC_WORLD_URL,GetDiffCountryStatus.FILENAME);
             URI uri = new URI(HandleFileUtil.filePath.concat(GetDiffCountryStatus.FILENAME));
-            System.out.println(uri);
+            log.info("完整CSV檔存儲路徑:{}",uri);
             Path path = Paths.get("src/main/resources/static/world.csv");
+            //取出並解壓縮成Bytes
             byte[] bytes = HandleFileUtil.decomposeGzipToBytes(path);
+            //轉utf-8
             String body = new String(bytes, StandardCharsets.UTF_8);
             rabbitMqService.sendWorldCovid19Data(body);
         } catch (IOException e) {

@@ -3,6 +3,8 @@ package com.infotran.springboot.linebot.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.infotran.springboot.annotation.QuickReplyMode;
+import com.infotran.springboot.exception.LineBotException;
+import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
 import com.infotran.springboot.webcrawler.confirmcase.service.ConfirmCaseService;
 import com.infotran.springboot.webcrawler.medicinestore.service.MedicineStoreService;
 import com.linecorp.bot.model.action.LocationAction;
@@ -145,7 +147,7 @@ public abstract class BaseMessageHandler extends BaseMessageUtil implements Base
             //處理貼圖(如果是官方貼圖，預設回覆一樣)
             handleSticker(replyToken, (StickerMessageContent) event.getMessage());
         }
-        return null;
+        throw new LineBotException(LineBotExceptionEnums.NO_SUCH_MESSAGE_EVENT);
     }
 
     /**

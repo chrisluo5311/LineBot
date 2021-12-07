@@ -44,39 +44,39 @@ public class HandleTodayAmountMessage extends BaseMessageHandler {
     @Override
     @QuickReplyMode(mode = ActionMode.MESSAGE,label="昨日確診數",text="昨日確診數")
     protected List<TextMessage> textMessageReply(TextMessageContent event,String replyToken,String userId) {
-            String receivedMessage = event.getText();
-            StringBuilder message = new StringBuilder();
-            ConfirmCase confirmCase;
-            switch (receivedMessage) {
-                case "查詢今日確診":
-                    confirmCase = confirmCaseRedisTemplate.opsForValue().get("今日確診");
-                    if(confirmCase==null){
-                        confirmCase = caseService.findByConfirmTime(LocalDate.now());
-                    }
-                    if (confirmCase != null) {
-                        message.append("指揮中心快訊：今日新增").append(confirmCase.getTodayAmount()).append("例COVID-19確定病例。\n");
-                        message.append("校正回歸數").append(confirmCase.getReturnAmount()).append("例。\n");
-                        message.append("死亡人數").append(confirmCase.getDeathAmount()).append("例。\n\n");
-                        message.append("參考指揮中心新聞網址:").append(confirmCase.getNewsUrl());
-                    } else {
-                        message.append("本日確診數量尚未公布。");
-                        log.warn("{} 本日新增不存在", LOG_PREFIX);
-                    }
-                    return Collections.singletonList(new TextMessage(message.toString()));
-                case "昨日確診數":
-                    //todo caseService可以設非叢集索引
-                    confirmCase = caseService.findByConfirmTime(LocalDate.now().minusDays(1));
-                    if (confirmCase != null) {
-                        message.append("指揮中心快訊：昨日新增").append(confirmCase.getTodayAmount()).append("例COVID-19確定病例。\n");
-                        message.append("校正回歸數").append(confirmCase.getReturnAmount()).append("例。\n");
-                        message.append("死亡人數").append(confirmCase.getDeathAmount()).append("例。");
-                    } else {
-                        message.append("昨日資訊異常。");
-                        log.warn("{} 昨日新增不存在", LOG_PREFIX);
-                    }
-                    return Collections.singletonList(new TextMessage(message.toString()));
-                default:
-            }
+        String receivedMessage = event.getText();
+        StringBuilder message = new StringBuilder();
+        ConfirmCase confirmCase;
+        switch (receivedMessage) {
+            case "查詢今日確診":
+                confirmCase = confirmCaseRedisTemplate.opsForValue().get("今日確診");
+                if(confirmCase==null){
+                    confirmCase = caseService.findByConfirmTime(LocalDate.now());
+                }
+                if (confirmCase != null) {
+                    message.append("指揮中心快訊：今日新增").append(confirmCase.getTodayAmount()).append("例COVID-19確定病例。\n");
+                    message.append("校正回歸數").append(confirmCase.getReturnAmount()).append("例。\n");
+                    message.append("死亡人數").append(confirmCase.getDeathAmount()).append("例。\n\n");
+                    message.append("參考指揮中心新聞網址:").append(confirmCase.getNewsUrl());
+                } else {
+                    message.append("本日確診數量尚未公布。");
+                    log.warn("{} 本日新增不存在", LOG_PREFIX);
+                }
+                return Collections.singletonList(new TextMessage(message.toString()));
+            case "昨日確診數":
+                //todo caseService可以設非叢集索引
+                confirmCase = caseService.findByConfirmTime(LocalDate.now().minusDays(1));
+                if (confirmCase != null) {
+                    message.append("指揮中心快訊：昨日新增").append(confirmCase.getTodayAmount()).append("例COVID-19確定病例。\n");
+                    message.append("校正回歸數").append(confirmCase.getReturnAmount()).append("例。\n");
+                    message.append("死亡人數").append(confirmCase.getDeathAmount()).append("例。");
+                } else {
+                    message.append("昨日資訊異常。");
+                    log.warn("{} 昨日新增不存在", LOG_PREFIX);
+                }
+                return Collections.singletonList(new TextMessage(message.toString()));
+            default:
+        }
         return null;
     }
 

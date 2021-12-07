@@ -135,6 +135,8 @@ public class HandleLocationMessage extends BaseMessageHandler {
                 Double distance = getDistance(lat1, long1, medicineStore.getLatitude(), medicineStore.getLongitude());
                 medicineStoreMap.put(distance, medicineStore);
             }
+        } else {
+            log.error("{} redis 或 資料庫無藥局資料 請手動確認",LOG_PREFIX);
         }
 
         LinkedList<LocationMessage> locationLinkedList = new LinkedList<>();
