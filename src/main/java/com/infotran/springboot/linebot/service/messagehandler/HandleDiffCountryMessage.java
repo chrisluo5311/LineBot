@@ -96,7 +96,6 @@ public class HandleDiffCountryMessage extends BaseMessageHandler {
                 TemplateMessage templateMessage = new TemplateMessage("請使用手機觀看", carouselTemplate);
                 reply(replyToken,templateMessage);
                 break;
-
             default:
         }
         return null;

@@ -1,11 +1,9 @@
 package com.infotran.springboot.webcrawler.multicountry.countryenum;
 
-
 import com.infotran.springboot.util.HandleFileUtil;
 import com.infotran.springboot.webcrawler.multicountry.model.DiffCountry;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
