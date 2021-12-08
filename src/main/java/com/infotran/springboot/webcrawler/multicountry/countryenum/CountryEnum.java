@@ -2,11 +2,14 @@ package com.infotran.springboot.webcrawler.multicountry.countryenum;
 
 
 import com.infotran.springboot.util.HandleFileUtil;
+import com.infotran.springboot.webcrawler.multicountry.model.DiffCountry;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * 國家enum
@@ -30,7 +33,7 @@ public enum CountryEnum implements CountryEnumInterface{
     NORTH_AMERICA(Code.NORTH_AMERICA,"北美洲"){
         @Override
         public URI getUri() {
-            return null;
+            return  HandleFileUtil.createUri("/static/NorthAmerica.png");
         }
 
         @Override
@@ -53,7 +56,7 @@ public enum CountryEnum implements CountryEnumInterface{
     EU(Code.EU,"歐洲聯盟"){
         @Override
         public URI getUri() {
-            return null;
+            return HandleFileUtil.createUri("/static/EU.jpg");
         }
 
         @Override
@@ -64,7 +67,7 @@ public enum CountryEnum implements CountryEnumInterface{
     SOUTH_AMERICA(Code.SOUTH_AMERICA,"南美洲"){
         @Override
         public URI getUri() {
-            return null;
+            return HandleFileUtil.createUri("/static/SouthAmerica.png");
         }
 
         @Override
@@ -75,7 +78,7 @@ public enum CountryEnum implements CountryEnumInterface{
     INDIA(Code.INDIA,"印度"){
         @Override
         public URI getUri() {
-            return null;
+            return HandleFileUtil.createUri("/static/India.jpg");
         }
 
         @Override
@@ -86,7 +89,7 @@ public enum CountryEnum implements CountryEnumInterface{
     BRAZIL(Code.BRAZIL,"巴西"){
         @Override
         public URI getUri() {
-            return null;
+            return HandleFileUtil.createUri("/static/Brazil.jpg");
         }
 
         @Override
@@ -97,7 +100,7 @@ public enum CountryEnum implements CountryEnumInterface{
     ENGLAND(Code.ENGLAND,"英國"){
         @Override
         public URI getUri() {
-            return null;
+            return HandleFileUtil.createUri("/static/UK.png");
         }
 
         @Override
@@ -108,7 +111,7 @@ public enum CountryEnum implements CountryEnumInterface{
     RUSSIA(Code.RUSSIA,"俄羅斯"){
         @Override
         public URI getUri() {
-            return null;
+            return HandleFileUtil.createUri("/static/Russia.jpg");
         }
 
         @Override
@@ -119,7 +122,7 @@ public enum CountryEnum implements CountryEnumInterface{
     FRANCE(Code.FRANCE,"法國"){
         @Override
         public URI getUri() {
-            return null;
+            return HandleFileUtil.createUri("/static/France.jpg");
         }
 
         @Override
@@ -130,7 +133,7 @@ public enum CountryEnum implements CountryEnumInterface{
     GERMAN(Code.GERMAN,"德國"){
         @Override
         public URI getUri() {
-            return null;
+            return HandleFileUtil.createUri("/static/German.png");
         }
 
         @Override
@@ -141,7 +144,7 @@ public enum CountryEnum implements CountryEnumInterface{
     THAILAND(Code.THAILAND,"泰國"){
         @Override
         public URI getUri() {
-            return null;
+            return HandleFileUtil.createUri("/static/Thailand.png");
         }
 
         @Override
@@ -163,7 +166,7 @@ public enum CountryEnum implements CountryEnumInterface{
     ISRAEL(Code.ISRAEL,"以色列"){
         @Override
         public URI getUri() {
-            return null;
+            return HandleFileUtil.createUri("/static/Israel.png");
         }
 
         @Override
@@ -174,7 +177,7 @@ public enum CountryEnum implements CountryEnumInterface{
     KOREAN(Code.KOREAN,"韓國"){
         @Override
         public URI getUri() {
-            return null;
+            return HandleFileUtil.createUri("/static/Korea.png");
         }
 
         @Override
@@ -185,7 +188,7 @@ public enum CountryEnum implements CountryEnumInterface{
     HONGKONG(Code.HONGKONG,"香港"){
         @Override
         public URI getUri() {
-            return null;
+            return HandleFileUtil.createUri("/static/HK.png");
         }
 
         @Override
@@ -207,7 +210,7 @@ public enum CountryEnum implements CountryEnumInterface{
     SINGAPORE(Code.SINGAPORE,"新加坡"){
         @Override
         public URI getUri() {
-            return null;
+            return HandleFileUtil.createUri("/static/Singapore.png");
         }
 
         @Override
@@ -262,5 +265,58 @@ public enum CountryEnum implements CountryEnumInterface{
      * */
     public static CountryEnum getCountryEnumByCode(String isoCode){
         return Arrays.stream(CountryEnum.values()).filter(x->x.getCountryCode().equals(isoCode)).findFirst().get();
+    }
+
+    /**
+     * Get CountryEnum By countryName
+     * @param countryName
+     * @return CountryEnum
+     * */
+    public static CountryEnum getCountryEnumByName(String countryName){
+        return Arrays.stream(CountryEnum.values()).filter(x->x.getCountryCode().equals(countryName)).findFirst().get();
+    }
+
+    /**
+     * 取得前四個優先回覆的地區
+     * @return List CountryEnum
+     * */
+    public static List<CountryEnum> getPriorityCountryEnum(){
+        List<CountryEnum> countryEnumList = new ArrayList<>();
+        countryEnumList.add(CountryEnum.GLOBAL);
+        countryEnumList.add(CountryEnum.US);
+        countryEnumList.add(CountryEnum.CHINA);
+        countryEnumList.add(CountryEnum.JAPAN);
+        return countryEnumList;
+    }
+
+    /**
+     * 製作回覆模板
+     * @param diffCountry
+     * @return String
+     * */
+    public static String createReplyTemplate(DiffCountry diffCountry){
+        StringBuffer text = new StringBuffer();
+        String country              = diffCountry.getCountry();
+        String totalAmount          = diffCountry.getTotalAmount();
+        String newAmount            = diffCountry.getNewAmount();
+        String totalDeath           = diffCountry.getTotalDeath();
+        String newDeath             = diffCountry.getNewDeath();
+        String confirmedInMillions  = diffCountry.getConfirmedInMillions();//每百萬確診數
+        String deathInMillions      = diffCountry.getDeathInMillions();//每百萬死亡數
+        String totalVaccinated      = diffCountry.getTotalVaccinated();//疫苗總接種人數
+        String vaccinatedInHundreds = diffCountry.getVaccinatedInHundreds();//每百人接種疫苗人數
+        String lastUpdate           = diffCountry.getLastUpdate();
+        text.append(country).append("疫情狀況:\n");
+        text.append("總確診數: ").append(totalAmount+"人\n");
+        text.append("新增確診數: ").append(newAmount+"人\n");
+        text.append("總死亡數: ").append(totalDeath+"人\n");
+        text.append("新增死亡數: ").append(newDeath+"人\n");
+        text.append("每百萬確診數: ").append(confirmedInMillions+"\n");
+        text.append("每百萬死亡數: ").append(deathInMillions+"\n");
+        text.append("疫苗總接種人數: ").append(totalVaccinated+"人\n");
+        text.append("每百人接種疫苗人數: ").append(vaccinatedInHundreds+"\n\n");
+        text.append("最後更新時間: ").append(lastUpdate+"\n");
+        text.append("備:若欄位應不為0而為0者，可能為該國未提供，一切資料僅供參考，造成不便，敬請見諒");
+        return text.toString();
     }
 }

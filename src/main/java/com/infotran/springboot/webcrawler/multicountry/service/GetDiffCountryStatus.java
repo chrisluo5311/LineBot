@@ -63,10 +63,12 @@ public class GetDiffCountryStatus {
             //每一個 以逗號區分
             Arrays.stream(countries[x].split(",")).forEach(column::add);
             if(column.size()>=25){
-                if(checkTodayTime(column.get(4)) && verifyIsoCode(column.get(1))){
+                String date = column.get(4);
+                String isoCode = column.get(1);
+                if(checkTodayTime(date) && verifyIsoCode(isoCode)){
                     //儲存今日資料
                     saveToDb(column,TODAY_DATE);
-                } else if(checkYesterdayTime(column.get(4)) && verifyIsoCode(column.get(1))){
+                } else if(checkYesterdayTime(date) && verifyIsoCode(isoCode)){
                     //更新昨日資料
                     updateDb(column,YESTERDAY_DATE);
                 }
@@ -118,7 +120,7 @@ public class GetDiffCountryStatus {
      * @param time 日期(昨日)
      * */
     private void updateDb(CopyOnWriteArrayList<String> column,String time){
-        DiffCountry oldCountry = diffCountryService.findByIsoCode(column.get(1));
+        DiffCountry oldCountry = diffCountryService.findByIsoCodeAndLastUpdate(column.get(1),time);
         if(Objects.isNull(oldCountry)){
             //新增
             saveToDb(column,time);
@@ -148,20 +150,19 @@ public class GetDiffCountryStatus {
         String deathInMillions = column.get(12);
         String vaccinatedInMillions = column.get(21);
         String vaccinatedInHundreds = column.get(25);
-        DiffCountry diffCountry = DiffCountry.builder()
-                .isoCode(isoCode)
-                .country(countryName)
-                .totalAmount(totalAmount)
-                .newAmount(newAmount)
-                .totalDeath(totalDeath)
-                .newDeath(newDeath)
-                .confirmedInMillions(confirmedInMillions)
-                .deathInMillions(deathInMillions)
-                .vaccinatedInMillions(vaccinatedInMillions)
-                .vaccinatedInHundreds(vaccinatedInHundreds)
-                .lastUpdate(date)
-                .build();
-        return diffCountry;
+        return DiffCountry.builder()
+                          .isoCode(isoCode)
+                          .country(countryName)
+                          .totalAmount(totalAmount)
+                          .newAmount(newAmount)
+                          .totalDeath(totalDeath)
+                          .newDeath(newDeath)
+                          .confirmedInMillions(confirmedInMillions)
+                          .deathInMillions(deathInMillions)
+                          .totalVaccinated(vaccinatedInMillions)
+                          .vaccinatedInHundreds(vaccinatedInHundreds)
+                          .lastUpdate(date)
+                          .build();
     }
 
 }

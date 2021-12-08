@@ -2,6 +2,7 @@ package com.infotran.springboot.linebot.service.messagehandler;
 
 import com.infotran.springboot.linebot.service.BaseMessageHandler;
 import com.infotran.springboot.linebot.service.messagehandler.enums.HandlerEnum;
+import com.infotran.springboot.util.TimeUtil;
 import com.infotran.springboot.webcrawler.multicountry.countryenum.CountryEnum;
 import com.infotran.springboot.webcrawler.multicountry.model.DiffCountry;
 import com.infotran.springboot.webcrawler.multicountry.service.Impl.DiffCountryServiceImpl;
@@ -17,9 +18,10 @@ import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.message.template.CarouselColumn;
 import com.linecorp.bot.model.message.template.CarouselTemplate;
 
+import javax.annotation.Resource;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 第四功能
@@ -33,6 +35,7 @@ public class HandleDiffCountryMessage extends BaseMessageHandler {
 
     private static final String LOG_PREFIX = "HandleDiffCountryMessage";
 
+    @Resource
     DiffCountryServiceImpl diffCountryService;
 
     @Override
@@ -55,8 +58,10 @@ public class HandleDiffCountryMessage extends BaseMessageHandler {
         return null;
     }
 
+
     @Override
     protected List<Message> handleImagemapMessageReply(PostbackEvent event) {
+        String replyToken = event.getReplyToken();
         String data = event.getPostbackContent().getData();
         switch (data){
             case "國外疫情":
@@ -66,37 +71,55 @@ public class HandleDiffCountryMessage extends BaseMessageHandler {
                 URI chinaUri  = CountryEnum.CHINA.getUri();
                 URI japanUri  = CountryEnum.JAPAN.getUri();
                 //建構內容text
-
+                List<CountryEnum> countryEnums = CountryEnum.getPriorityCountryEnum();
+                Map<CountryEnum, String> replyTestMap = getReplyText(countryEnums);
                 //建構CarouselTemplate
                 CarouselTemplate carouselTemplate = new CarouselTemplate(
                         Arrays.asList(
-                                new CarouselColumn(globalUri, "全球疫情統計", "fuga", Arrays.asList(
+                                new CarouselColumn(globalUri, "全球疫情統計", replyTestMap.get(CountryEnum.GLOBAL), Arrays.asList(
                                         new URIAction("查看全球疫情數據",
                                                 URI.create(CountryEnum.GLOBAL.getActionUri()), null)
                                 )),
-                                new CarouselColumn(usUri, "美國疫情統計", "fuga", Arrays.asList(
+                                new CarouselColumn(usUri, "美國疫情統計", replyTestMap.get(CountryEnum.US), Arrays.asList(
                                         new URIAction("查看美國疫情數據",
                                                 URI.create(CountryEnum.US.getActionUri()), null)
                                 )),
-                                new CarouselColumn(chinaUri, "中國疫情統計", "fuga", Arrays.asList(
+                                new CarouselColumn(chinaUri, "中國疫情統計", replyTestMap.get(CountryEnum.CHINA), Arrays.asList(
                                         new URIAction("查看中國疫情數據",
                                                 URI.create(CountryEnum.CHINA.getActionUri()), null)
                                 )),
-                                new CarouselColumn(japanUri, "日本疫情統計", "fuga", Arrays.asList(
+                                new CarouselColumn(japanUri, "日本疫情統計", replyTestMap.get(CountryEnum.JAPAN), Arrays.asList(
                                         new URIAction("查看日本疫情數據",
                                                 URI.create(CountryEnum.JAPAN.getActionUri()), null)
                                 ))
                         ));
                 TemplateMessage templateMessage = new TemplateMessage("請使用手機觀看", carouselTemplate);
+                reply(replyToken,templateMessage);
                 break;
+
             default:
         }
         return null;
     }
 
-    private String getReplyText(DiffCountry diffCountry){
-
-        return null;
+    /**
+     * 取得每個國家相對應的回覆內容
+     * @param countryEnumList
+     * @return Map
+     * */
+    private Map<CountryEnum,String> getReplyText(List<CountryEnum> countryEnumList){
+        Map<CountryEnum,String> replyMap = new HashMap<>();
+        AtomicReference<DiffCountry> diffCountry = null;
+        //找當天資料
+        countryEnumList.stream().forEach(x->{
+            diffCountry.set(diffCountryService.findByIsoCodeAndLastUpdate(x.getCountryCode(), TimeUtil.formCustomDate("YYYY-MM-dd", null)));
+            if(Objects.isNull(diffCountry.get())){
+                //前天資料
+                diffCountry.set(diffCountryService.findByIsoCodeAndLastUpdate(x.getCountryCode(), TimeUtil.formCustomDate("YYYY-MM-dd", 1l)));
+            }
+            replyMap.put(x,CountryEnum.createReplyTemplate(diffCountry.get()));
+        });
+        return replyMap;
     }
 
 }

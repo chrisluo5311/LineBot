@@ -51,7 +51,7 @@ public class DiffCountry {
     private String deathInMillions;
 
     /** 疫苗總接種人數 */
-    private String vaccinatedInMillions;
+    private String totalVaccinated;
 
     /** 每百人接種疫苗人數 */
     private String vaccinatedInHundreds;

@@ -26,8 +26,12 @@ public class DiffCountryServiceImpl implements DiffCountryService {
     }
 
     @Override
-    public DiffCountry findByIsoCode(@NonNull String isoCode) {
-        return diffCountryRepository.findByIsoCode(isoCode);
+    public DiffCountry findByIsoCodeAndLastUpdate(@NonNull String isoCode,@NonNull String time) {
+        DiffCountry diffCountry = diffCountryRepository.findByIsoCodeAndLastUpdate(isoCode,time);
+        if(diffCountry!=null){
+            return diffCountry;
+        }
+        return null;
     }
 
     @Override

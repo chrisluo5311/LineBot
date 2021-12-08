@@ -120,7 +120,7 @@ public class HandleLocationMessage extends BaseMessageHandler {
     @LogExecutionTime
     @MultiQuickReply(value = {
             @QuickReplyMode(mode=ActionMode.MESSAGE,label = "下五間",text = "下五間"),
-            @QuickReplyMode(mode=ActionMode.MESSAGE,label="重新定位",text = "重新定位")
+            @QuickReplyMode(mode=ActionMode.MESSAGE,label = "重新定位",text = "重新定位")
     })
     @Override
     public List<LocationMessage> handleLocationMessageReply(LocationMessageContent event,String userId) {

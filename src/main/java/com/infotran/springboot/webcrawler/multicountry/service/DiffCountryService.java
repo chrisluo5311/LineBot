@@ -8,7 +8,7 @@ public interface DiffCountryService {
 
     DiffCountry save(DiffCountry diffCountry);
 
-    DiffCountry findByIsoCode(String isoCode);
+    DiffCountry findByIsoCodeAndLastUpdate(String isoCode,String time) ;
 
     DiffCountry findByLastUpdate(String lastUpdate);
 
