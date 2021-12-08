@@ -209,9 +209,9 @@ public class HandleFileUtil {
     }
 
     /**
-     * create Uri from path
-     * to https
+     * create Uri from path to https
      * @param path 路徑
+     * @return URI
      * */
     public static URI createUri(String path) {
         return ServletUriComponentsBuilder.fromCurrentContextPath()
@@ -221,8 +221,9 @@ public class HandleFileUtil {
     }
 
     /**
-     * unzip Gzip to byte[]
+     * Unzip Gzip to byte[]
      * @param source Path
+     * @return byte[]
      * */
     public static byte[] decomposeGzipToBytes(Path source) throws IOException  {
         ByteArrayOutputStream output = new ByteArrayOutputStream();

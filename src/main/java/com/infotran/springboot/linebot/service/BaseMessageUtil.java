@@ -4,8 +4,11 @@ import com.infotran.springboot.annotation.MultiQuickReply;
 import com.infotran.springboot.annotation.QuickReplyMode;
 import com.infotran.springboot.annotation.quickreplyenum.ActionMode;
 import com.linecorp.bot.model.ReplyMessage;
+import com.linecorp.bot.model.action.LocationAction;
+import com.linecorp.bot.model.event.message.StickerMessageContent;
 import com.linecorp.bot.model.message.LocationMessage;
 import com.linecorp.bot.model.message.Message;
+import com.linecorp.bot.model.message.StickerMessage;
 import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.message.quickreply.QuickReply;
 import com.linecorp.bot.model.message.quickreply.QuickReplyItem;
@@ -26,9 +29,7 @@ public abstract class BaseMessageUtil implements LineClientInterface {
 
     private static final String LOG_PREFIX = "[BaseMessageUtil]";
 
-    /**
-     * 最大MESSAGE傳送數量
-     * */
+    /** 最大MESSAGE傳送數量 */
     private static final Integer MAX_MESSAGE_AMOUNT = 1000;
 
     /**
@@ -69,6 +70,7 @@ public abstract class BaseMessageUtil implements LineClientInterface {
             log.info("[{}] 送出給使用者的訊息: {}",LOG_PREFIX,messages);
             return apiResponse;
         } catch (InterruptedException | ExecutionException e) {
+            log.error("發送post請求 失敗:{}",e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -90,7 +92,36 @@ public abstract class BaseMessageUtil implements LineClientInterface {
         return this.reply(replyToken, new TextMessage(message));
     }
 
+    /**
+     * 測試用<br>
+     * 處理使用者回傳的貼圖<br>
+     * (預設回復一模一樣的貼圖)
+     * @param replyToken replyToken
+     * @param content StickerMessageContent
+     * */
+    public void handleSticker(String replyToken, StickerMessageContent content) {
+        //回傳一模一樣的給用戶
+        reply(replyToken, new StickerMessage(
+                content.getPackageId(), content.getStickerId())
+        );
+    }
 
+    /**
+     * 打開地圖
+     * @return TestMessage 訊息帶打開地圖動作的QuickReply
+     *
+     * */
+    public TextMessage openMap() {
+        final List<QuickReplyItem> items = List.of(
+                QuickReplyItem.builder()
+                        .action(LocationAction.withLabel("打開定位"))
+                        .build()
+        );
+
+        final QuickReply quickReply = QuickReply.items(items);
+
+        return TextMessage.builder().text("點選下方打開地圖").quickReply(quickReply).build();
+    }
 
     /**
      * 解析@QuickReply、合併Message集合並調用reply回覆<br>

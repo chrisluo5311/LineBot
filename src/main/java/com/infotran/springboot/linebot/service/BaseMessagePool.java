@@ -34,15 +34,15 @@ public class BaseMessagePool implements InitializingBean, ApplicationContextAwar
     public void afterPropertiesSet() {
         baseInterfaceList = new ArrayList<>(applicationContext.getBeansOfType(BaseMessageInterface.class).values());
         for(BaseMessageInterface base : baseInterfaceList){
-            log.info("載入 Added BaseMessageInterface實現類: {}",base);
+            log.info("載入 BaseMessageInterface 實現類: {}",base);
         }
     }
 
     /**
      * 透過enums的名字查詢實現類
-     * @param enums HandlerEnum的handlerName
+     * @param enums HandlerEnum
      * @return BaseMessageInterface
-     * @throws LineBotException 實現類未實作getClassName()方法
+     * @throws LineBotException 實現類未實作getHandler()方法
      * */
     public BaseMessageInterface getMethod(HandlerEnum enums) throws Exception{
         for (BaseMessageInterface base : baseInterfaceList){

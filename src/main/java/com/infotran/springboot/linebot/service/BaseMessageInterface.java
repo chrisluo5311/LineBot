@@ -21,7 +21,7 @@ public interface BaseMessageInterface {
 
 	/**
 	 *  實作才有值
-	 *  @return String
+	 *  @return HandlerEnum
 	 *
 	 * */
 	default HandlerEnum getHandler(){
@@ -30,12 +30,13 @@ public interface BaseMessageInterface {
 
 	/**
 	 *  PostbackEvent分配器<br>
-	 *  根據PostbackEvent的data參數不同執行相對應的方法
+	 *  根據PostbackEvent的data參數不同而執行相對應的方法
 	 *  @param event PostbackEvent
-	 *  @return Map
+	 *  @param data  Menu回傳字段
+	 *  @return BotApiResponse 響應物件
 	 *  @throws  Exception LineBotException
 	 * */
-	BotApiResponse postBackReply(PostbackEvent event) throws Exception;
+	BotApiResponse postBackReply(PostbackEvent event,String data) throws Exception;
 
 	/**
 	 *  MessageEvent分配器<br>

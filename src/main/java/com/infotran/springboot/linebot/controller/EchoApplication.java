@@ -52,12 +52,12 @@ public class EchoApplication {
                 throw new LineBotException(LineBotExceptionEnums.BOTAPI_RESPONSE_EMPTY,"PostbackEvent");
             }
             baseMessageInterface = baseMessagePool.getMethod(handlerEnum);
-            BotApiResponse botApiResponse = baseMessageInterface.postBackReply(event);
+            BotApiResponse botApiResponse = baseMessageInterface.postBackReply(event,data);
             if(Objects.isNull(botApiResponse)){
                 throw new LineBotException(LineBotExceptionEnums.BOTAPI_RESPONSE_EMPTY,"PostbackEvent");
             }
         } catch (LineBotException e) {
-            log.error("{} 接收處理PostbackEvent失敗或無對應PostbackEvent Data:{}",LOG_PREFIX,e.getMessage());
+            log.error("{} 接收處理PostbackEvent失敗 或 無對應PostbackEvent Data 或 實作類未對應enum:{}",LOG_PREFIX,e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -74,13 +74,14 @@ public class EchoApplication {
             if (event.getMessage() instanceof TextMessageContent) {
                 String text =((TextMessageContent) event.getMessage()).getText();
                 Map<String,HandlerEnum> requestMapping = new HashMap<>();
-                requestMapping.put("查詢今日確診",HandlerEnum.HANDLE_DEFAULT_MESSAGE);
-                requestMapping.put("昨日確診數",HandlerEnum.HANDLE_DEFAULT_MESSAGE);
+                requestMapping.put("查詢今日確診",HandlerEnum.HANDLE_TODAY_AMOUNT_MESSAGE);
+                requestMapping.put("昨日確診數",HandlerEnum.HANDLE_TODAY_AMOUNT_MESSAGE);
                 requestMapping.put("查看所在位置口罩剩餘狀態",HandlerEnum.HANDLE_LOCATION_MESSAGE);
                 requestMapping.put("下五間",HandlerEnum.HANDLE_LOCATION_MESSAGE);
                 requestMapping.put("重新定位",HandlerEnum.HANDLE_LOCATION_MESSAGE);
                 requestMapping.put("掃描QRCode",HandlerEnum.HANDLE_QRCODE);
                 requestMapping.put("查看統計圖",HandlerEnum.HANDLE_STATISTIC_DIAGRAM);
+                requestMapping.put("查看各縣市COVID-19疫苗涵蓋率",HandlerEnum.HANDLE_STATISTIC_DIAGRAM);
                 //若無則default
                 HandlerEnum handlerEnum = (requestMapping.containsKey(text))
                                             ? requestMapping.get(text)

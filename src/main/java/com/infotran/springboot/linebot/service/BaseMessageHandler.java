@@ -8,7 +8,6 @@ import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
 import com.infotran.springboot.linebot.service.messagehandler.enums.HandlerEnum;
 import com.infotran.springboot.webcrawler.confirmcase.service.ConfirmCaseService;
 import com.infotran.springboot.webcrawler.medicinestore.service.MedicineStoreService;
-import com.linecorp.bot.model.action.LocationAction;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
@@ -18,10 +17,7 @@ import com.linecorp.bot.model.event.message.TextMessageContent;
 import com.linecorp.bot.model.event.source.Source;
 import com.linecorp.bot.model.message.LocationMessage;
 import com.linecorp.bot.model.message.Message;
-import com.linecorp.bot.model.message.StickerMessage;
 import com.linecorp.bot.model.message.TextMessage;
-import com.linecorp.bot.model.message.quickreply.QuickReply;
-import com.linecorp.bot.model.message.quickreply.QuickReplyItem;
 import com.linecorp.bot.model.response.BotApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -34,6 +30,7 @@ import java.util.Objects;
 
 
 /**
+ * BaseMessageHandler
  * @author chris
  */
 @Slf4j
@@ -89,17 +86,15 @@ public abstract class BaseMessageHandler extends BaseMessageUtil implements Base
 
     /**
      * 處理Imagemap回复
-     *
      * @param event  PostbackEvent
      * @return  List<Message>
      */
     protected abstract List<Message> handleImagemapMessageReply(PostbackEvent event);
 
     @Override
-    public BotApiResponse postBackReply(PostbackEvent event) {
+    public BotApiResponse postBackReply(PostbackEvent event,String data) {
         BotApiResponse botApiResponse = null;
         String replyToken = event.getReplyToken();
-        String data = event.getPostbackContent().getData();
         log.info("[{}] postBackReply方法的event data: {}",LOG_PREFIX,data);
         switch (data){
             case "國內外疫情" :
@@ -109,14 +104,14 @@ public abstract class BaseMessageHandler extends BaseMessageUtil implements Base
                 botApiResponse = reply(replyToken,textList);
                 break;
             default:
-
         }
         return botApiResponse;
     }
 
     /**
-     * 回覆順序: 處理文字訊息(可 null) -> 功能訊息(確診數目、藥局地址、統計圖、貼圖...等等)
-     *
+     * 回覆順序 : <br>
+     * 1. 處理文字訊息(可 null) <br>
+     * 2. 功能訊息(確診數目、藥局地址、統計圖、貼圖...等等)
      * */
     @Override
     public final <T extends MessageContent> BotApiResponse handleMessageEvent(MessageEvent<T> event) throws Exception{
@@ -132,7 +127,7 @@ public abstract class BaseMessageHandler extends BaseMessageUtil implements Base
             List<TextMessage> textMessageList = textMessageReply((TextMessageContent)event.getMessage(),replyToken,userId);
             if (Objects.nonNull(textMessageList)){
                 Method textMethod = this.getClass().getDeclaredMethod("textMessageReply",TextMessageContent.class,String.class,String.class);
-                //使用@MultiQuickReply或@QuickReplyMode自動產生QuickReply，若為混和型回復需自行實作
+                //使用@MultiQuickReply或@QuickReplyMode自動產生QuickReply，若為混合型回復需自行實作
                 return executeReply(textMethod,textMessageList,replyToken);
             }
         } else if (event.getMessage() instanceof LocationMessageContent) {
@@ -148,38 +143,5 @@ public abstract class BaseMessageHandler extends BaseMessageUtil implements Base
         }
         throw new LineBotException(LineBotExceptionEnums.NO_SUCH_MESSAGE_EVENT);
     }
-
-    /**
-     * 測試用<br>
-     * 處理使用者回傳的貼圖
-     * (預設回復一模一樣的貼圖)
-     * @param replyToken String
-     * @param content StickerMessageContent
-     * */
-    public void handleSticker(String replyToken, StickerMessageContent content) {
-        //回傳一模一樣的給用戶
-        reply(replyToken, new StickerMessage(
-                content.getPackageId(), content.getStickerId())
-        );
-    }
-
-    /**
-     * 打開地圖
-     * @return TestMessage 訊息帶打開地圖動作的QuickReply
-     *
-     * */
-    public TextMessage openMap() {
-        final List<QuickReplyItem> items = List.of(
-                QuickReplyItem.builder()
-                        .action(LocationAction.withLabel("打開定位"))
-                        .build()
-        );
-
-        final QuickReply quickReply = QuickReply.items(items);
-
-        return TextMessage.builder().text("點選下方打開地圖").quickReply(quickReply).build();
-    }
-
-    
 
 }

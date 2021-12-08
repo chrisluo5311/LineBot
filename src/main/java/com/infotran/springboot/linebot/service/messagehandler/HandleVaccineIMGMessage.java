@@ -54,9 +54,10 @@ public class HandleVaccineIMGMessage extends BaseMessageHandler {
     protected List<TextMessage> textMessageReply(TextMessageContent event, String replyToken, String userId) {
         String receivedMessage = event.getText();
         switch (receivedMessage){
-            case "查看疫苗施打人數累計統計圖":
+            case "查看統計圖":
+                //混合型回覆 自行生成QuickReply物件
                 QuickReply quickReply = createQuickReplyItemList();
-                //文字訊息
+                //select出文字訊息pdf
                 VaccineTypePeople vaccineTypePeople = vaccinedPeopleService.findOne();
                 StringBuilder content = new StringBuilder();
                 if(vaccineTypePeople!=null){
@@ -65,18 +66,23 @@ public class HandleVaccineIMGMessage extends BaseMessageHandler {
                             .append(vaccineTypePeople.getBody()).append("\n\n資料來源: ")
                             .append(vaccineTypePeople.getResourceUrl()).append("。");
                 }
-                TextMessage textMessage = TextMessage.builder().text(content.toString()).quickReply(quickReply).build();
+                TextMessage pdfTextMessage = TextMessage.builder().text(content.toString()).quickReply(quickReply).build();
                 //圖片訊息
                 URI vaccineImgUri1 = HandleFileUtil.createUri("/static/cumulativeVaccined.jpg");
                 URI vaccineImgUri2 = HandleFileUtil.createUri("/static/eachBatchCoverage.jpg");
-                ImageMessage imgMessage1 = ImageMessage.builder().previewImageUrl(vaccineImgUri1).originalContentUrl(vaccineImgUri1).build();
-                ImageMessage imgMessage2 = ImageMessage.builder().previewImageUrl(vaccineImgUri2).originalContentUrl(vaccineImgUri2).build();
+                ImageMessage cumulativeVaccined = ImageMessage.builder().previewImageUrl(vaccineImgUri1).originalContentUrl(vaccineImgUri1).build();
+                ImageMessage eachBatchCoverage = ImageMessage.builder().previewImageUrl(vaccineImgUri2).originalContentUrl(vaccineImgUri2).build();
+                //組成List
                 List<Message> replyList = new ArrayList<Message>();
-                replyList.add(textMessage);
-                replyList.add(imgMessage1);
-                replyList.add(imgMessage2);
+                replyList.add(pdfTextMessage);
+                replyList.add(cumulativeVaccined);
+                replyList.add(eachBatchCoverage);
+                //回覆
                 reply(replyToken,replyList);
                 break;
+            case "查看各縣市COVID-19疫苗涵蓋率":
+                //todo 查看各縣市COVID-19疫苗涵蓋率
+                log.warn("尚未製作 查看各縣市COVID-19疫苗涵蓋率");
             default:
         }
         return null;

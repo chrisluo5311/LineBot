@@ -11,7 +11,8 @@ import org.springframework.stereotype.Service;
 public interface VaccinedPeopleService {
 
     /**
-     * save VaccineTypePeople
+     * Save VaccineTypePeople<br>
+     * 若有則刪除，僅留一筆
      * @param vaccineTypePeople vaccineTypePeople
      * @return VaccineTypePeople
      * */
@@ -25,7 +26,8 @@ public interface VaccinedPeopleService {
     VaccineTypePeople findByCreateTime(String createTime);
 
     /**
-     * find One VaccineTypePeople
+     * find One VaccineTypePeople<br>
+     * 只會有一筆，使用findAll
      * @return VaccineTypePeople
      * */
     VaccineTypePeople findOne();

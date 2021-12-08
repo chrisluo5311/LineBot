@@ -32,7 +32,7 @@ public class VaccinedPeopleServiceImpl implements VaccinedPeopleService {
             //同筆資料
             return vaccineTypePeople;
         }else {
-            //不同筆
+            //不同筆 刪除舊的
             vaccinedTypePeopleRepo.deleteAll();
         }
         return vaccinedTypePeopleRepo.save(vaccineTypePeople);

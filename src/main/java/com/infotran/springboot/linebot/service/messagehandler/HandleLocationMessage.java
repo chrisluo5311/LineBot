@@ -38,11 +38,13 @@ public class HandleLocationMessage extends BaseMessageHandler {
     private static final String LOG_PREFIX;
     private static final String REDIS_KEY_PREFIX;
     private static final Integer MEDICINE_STORE_AMOUNT;
+    private static final Integer REPLY_STORE_LIMIT;
 
     static {
         LOG_PREFIX = "HandleLocationMessageReply";
         REDIS_KEY_PREFIX = "sortedLocationMessageList";
         MEDICINE_STORE_AMOUNT = 10;
+        REPLY_STORE_LIMIT = 5;
     }
 
     @Resource
@@ -74,9 +76,9 @@ public class HandleLocationMessage extends BaseMessageHandler {
             case "下五間":
                 if(Boolean.TRUE.equals(locationMessageRedisTemplate.hasKey(keyString))){
                     List<LocationMessage> locationList = locationMessageRedisTemplate.opsForList().range(keyString,0,-1);
-                    //確認是5家不然會抱錯 line不傳超過5家
+                    //確認是5家 line不傳超過5家會抱錯
                     if(locationList!=null){
-                        List<Message> messageList = (5==locationList.size())
+                        List<Message> messageList = (REPLY_STORE_LIMIT ==locationList.size())
                                 ? locationList.stream().map(Message.class::cast).collect(Collectors.toList())
                                 : locationList.subList(0, 5).stream().map(Message.class::cast).collect(Collectors.toList());
                         reply(replyToken, messageList);
@@ -136,6 +138,7 @@ public class HandleLocationMessage extends BaseMessageHandler {
                 medicineStoreMap.put(distance, medicineStore);
             }
         } else {
+            //TODO throw exception
             log.error("{} redis 或 資料庫無藥局資料 請手動確認",LOG_PREFIX);
         }
 
