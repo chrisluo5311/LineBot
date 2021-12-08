@@ -2,7 +2,6 @@ package com.infotran.springboot.linebot.service;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.infotran.springboot.annotation.QuickReplyMode;
 import com.infotran.springboot.exception.LineBotException;
 import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
 import com.infotran.springboot.linebot.service.messagehandler.enums.HandlerEnum;
@@ -35,7 +34,7 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
-public abstract class BaseMessageHandler extends BaseMessageUtil implements BaseMessageInterface {
+public abstract class BaseMessageHandler extends BaseMessageTemplate implements BaseMessageInterface {
 
     private static final String LOG_PREFIX = "BaseMessageHandler";
 
@@ -52,44 +51,6 @@ public abstract class BaseMessageHandler extends BaseMessageUtil implements Base
     public boolean canSupport(HandlerEnum handlerEnum) {
         return getHandler().equals(handlerEnum);
     }
-
-    /**
-     * 處理TextMessageContent文字訊息<br>
-     * 可搭配使用的annotation : {@link QuickReplyMode}
-     *
-     * @param event TextMessageContent
-     * @param replyToken replyToken
-     * @param userId 使用者id
-     * @return List<TextMessage>
-     *
-     * */
-    protected abstract List<TextMessage> textMessageReply(TextMessageContent event,String replyToken,String userId);
-
-    /**
-     * 處理PostbackEvent文字訊息<br>
-     * 可搭配使用的annotation : {@link QuickReplyMode}
-     *
-     * @param event PostbackEvent
-     * @return List<TextMessage>
-     *
-     * */
-    protected abstract List<TextMessage> textMessageReply(PostbackEvent event);
-
-    /**
-     * 處理使用者回傳的現在位置
-     *
-     * @param event  LocationMessageContent
-     * @param userId  使用者id
-     * @return  List<LocationMessage>
-     */
-    protected abstract <T extends MessageContent> List<LocationMessage> handleLocationMessageReply(LocationMessageContent event,String userId);
-
-    /**
-     * 處理Imagemap回复
-     * @param event  PostbackEvent
-     * @return  List<Message>
-     */
-    protected abstract List<Message> handleImagemapMessageReply(PostbackEvent event);
 
     @Override
     public BotApiResponse postBackReply(PostbackEvent event,String data) {

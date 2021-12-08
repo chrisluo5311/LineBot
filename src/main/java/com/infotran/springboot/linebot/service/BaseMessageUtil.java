@@ -22,6 +22,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 /**
+ * 回覆訊息所需的方法<br>
+ * ex.回覆文字訊息、貼圖、打開地圖、快捷鍵...等等
  * @author chris
  */
 @Slf4j

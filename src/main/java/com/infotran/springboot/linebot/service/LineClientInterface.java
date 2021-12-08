@@ -5,6 +5,7 @@ import com.linecorp.bot.client.LineBlobClient;
 import com.linecorp.bot.client.LineMessagingClient;
 
 /**
+ * LineMessagingClient 回覆訊息所需token
  * @author chris
  */
 public interface LineClientInterface {
