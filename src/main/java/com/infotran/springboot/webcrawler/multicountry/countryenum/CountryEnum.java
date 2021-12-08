@@ -1,9 +1,11 @@
 package com.infotran.springboot.webcrawler.multicountry.countryenum;
 
 
+import com.infotran.springboot.util.HandleFileUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.net.URI;
 import java.util.Arrays;
 
 /**
@@ -12,25 +14,207 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum CountryEnum {
+public enum CountryEnum implements CountryEnumInterface{
 
-    GLOBAL(Code.GLOBAL,"全球"),
-    NORTH_AMERICA(Code.NORTH_AMERICA,"北美洲"),
-    US(Code.US,"美國"),
-    EU(Code.EU,"歐洲聯盟"),
-    SOUTH_AMERICA(Code.SOUTH_AMERICA,"南美洲"),
-    INDIA(Code.INDIA,"印度"),
-    BRAZIL(Code.BRAZIL,"巴西"),
-    ENGLAND(Code.ENGLAND,"英國"),
-    RUSSIA(Code.RUSSIA,"俄羅斯"),
-    FRANCE(Code.FRANCE,"法國"),
-    GERMAN(Code.GERMAN,"德國"),
-    THAILAND(Code.THAILAND,"泰國"),
-    JAPAN(Code.JAPAN,"日本"),
-    ISRAEL(Code.ISRAEL,"以色列"),
-    KOREAN(Code.KOREAN,"韓國"),
-    HONGKONG(Code.HONGKONG,"香港"),
-    CHINA(Code.CHINA,"中國大陸")
+    GLOBAL(Code.GLOBAL,"全球"){
+        @Override
+        public URI getUri() {
+            return HandleFileUtil.createUri("/static/worldCovid19.png");
+        }
+
+        @Override
+        public String getActionUri() {
+            return worldCovidUrl.concat(this.getCountryCode());
+        }
+    },
+    NORTH_AMERICA(Code.NORTH_AMERICA,"北美洲"){
+        @Override
+        public URI getUri() {
+            return null;
+        }
+
+        @Override
+        public String getActionUri() {
+            return worldCovidUrl.concat(this.getCountryCode());
+        }
+    },
+    US(Code.US,"美國"){
+
+        @Override
+        public URI getUri() {
+            return HandleFileUtil.createUri("/static/AmericaFlag.png");
+        }
+
+        @Override
+        public String getActionUri() {
+            return worldCovidUrl.concat(this.getCountryCode());
+        }
+    },
+    EU(Code.EU,"歐洲聯盟"){
+        @Override
+        public URI getUri() {
+            return null;
+        }
+
+        @Override
+        public String getActionUri() {
+            return worldCovidUrl.concat(this.getCountryCode());
+        }
+    },
+    SOUTH_AMERICA(Code.SOUTH_AMERICA,"南美洲"){
+        @Override
+        public URI getUri() {
+            return null;
+        }
+
+        @Override
+        public String getActionUri() {
+            return worldCovidUrl.concat(this.getCountryCode());
+        }
+    },
+    INDIA(Code.INDIA,"印度"){
+        @Override
+        public URI getUri() {
+            return null;
+        }
+
+        @Override
+        public String getActionUri() {
+            return worldCovidUrl.concat(this.getCountryCode());
+        }
+    },
+    BRAZIL(Code.BRAZIL,"巴西"){
+        @Override
+        public URI getUri() {
+            return null;
+        }
+
+        @Override
+        public String getActionUri() {
+            return worldCovidUrl.concat(this.getCountryCode());
+        }
+    },
+    ENGLAND(Code.ENGLAND,"英國"){
+        @Override
+        public URI getUri() {
+            return null;
+        }
+
+        @Override
+        public String getActionUri() {
+            return worldCovidUrl.concat(this.getCountryCode());
+        }
+    },
+    RUSSIA(Code.RUSSIA,"俄羅斯"){
+        @Override
+        public URI getUri() {
+            return null;
+        }
+
+        @Override
+        public String getActionUri() {
+            return worldCovidUrl.concat(this.getCountryCode());
+        }
+    },
+    FRANCE(Code.FRANCE,"法國"){
+        @Override
+        public URI getUri() {
+            return null;
+        }
+
+        @Override
+        public String getActionUri() {
+            return worldCovidUrl.concat(this.getCountryCode());
+        }
+    },
+    GERMAN(Code.GERMAN,"德國"){
+        @Override
+        public URI getUri() {
+            return null;
+        }
+
+        @Override
+        public String getActionUri() {
+            return worldCovidUrl.concat(this.getCountryCode());
+        }
+    },
+    THAILAND(Code.THAILAND,"泰國"){
+        @Override
+        public URI getUri() {
+            return null;
+        }
+
+        @Override
+        public String getActionUri() {
+            return worldCovidUrl.concat(this.getCountryCode());
+        }
+    },
+    JAPAN(Code.JAPAN,"日本"){
+        @Override
+        public URI getUri() {
+            return HandleFileUtil.createUri("/static/JapanFlag.png");
+        }
+
+        @Override
+        public String getActionUri() {
+            return worldCovidUrl.concat(this.getCountryCode());
+        }
+    },
+    ISRAEL(Code.ISRAEL,"以色列"){
+        @Override
+        public URI getUri() {
+            return null;
+        }
+
+        @Override
+        public String getActionUri() {
+            return worldCovidUrl.concat(this.getCountryCode());
+        }
+    },
+    KOREAN(Code.KOREAN,"韓國"){
+        @Override
+        public URI getUri() {
+            return null;
+        }
+
+        @Override
+        public String getActionUri() {
+            return worldCovidUrl.concat(this.getCountryCode());
+        }
+    },
+    HONGKONG(Code.HONGKONG,"香港"){
+        @Override
+        public URI getUri() {
+            return null;
+        }
+
+        @Override
+        public String getActionUri() {
+            return worldCovidUrl.concat(this.getCountryCode());
+        }
+    },
+    CHINA(Code.CHINA,"中國大陸"){
+        @Override
+        public URI getUri() {
+            return HandleFileUtil.createUri("/static/ChinaFlag.png");
+        }
+
+        @Override
+        public String getActionUri() {
+            return worldCovidUrl.concat(this.getCountryCode());
+        }
+    },
+    SINGAPORE(Code.SINGAPORE,"新加坡"){
+        @Override
+        public URI getUri() {
+            return null;
+        }
+
+        @Override
+        public String getActionUri() {
+            return worldCovidUrl.concat(this.getCountryCode());
+        }
+    }
     ;
 
     /** 國家代號(對應CDC全球疫情CSV檔的iso_code) */
@@ -55,10 +239,11 @@ public enum CountryEnum {
         public static final String GERMAN = "DEU";
         public static final String THAILAND = "THA";
         public static final String JAPAN = "JPN";
-        public static final String ISRAEL = "JPN";
+        public static final String ISRAEL = "ISR";
         public static final String KOREAN = "KOR";
         public static final String HONGKONG = "HKG";
         public static final String CHINA = "CHN";
+        public static final String SINGAPORE = "SGP";
     }
 
     /**

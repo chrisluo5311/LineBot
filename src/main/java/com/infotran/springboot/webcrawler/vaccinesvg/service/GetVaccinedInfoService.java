@@ -24,11 +24,10 @@ import java.io.IOException;
 import java.util.Objects;
 
 /**
- * 取得
- * 1. 累计接踵人次截圖
- * 2. 各梯次疫苗涵蓋率圖
- * 3. 解析pdf並取得各疫苗接踵累计人次
- * 若增加截圖方法也需同時新增 WebCrawlerCreateJob 的 PICTURE_METHOD_AMOUNT
+ * 取得 <br>
+ * 1. 累计接踵人次截圖 <br>
+ * 2. 各梯次疫苗涵蓋率圖 <br>
+ * 3. 解析pdf並取得各疫苗接踵累计人次 <br>
  *
  * @author chris
  */
@@ -185,8 +184,6 @@ public class GetVaccinedInfoService implements ClientUtil {
         }
     }
 
-
-
     /**
      * 透過句號分割字串
      * 只取第2個和第3個字串
@@ -197,7 +194,5 @@ public class GetVaccinedInfoService implements ClientUtil {
         String[] strings = content.split("。");
         return result.append(strings[1]).append(strings[2]).toString();
     }
-
-
 
 }

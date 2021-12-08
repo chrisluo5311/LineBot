@@ -2,26 +2,38 @@ package com.infotran.springboot.linebot.service.messagehandler;
 
 import com.infotran.springboot.linebot.service.BaseMessageHandler;
 import com.infotran.springboot.linebot.service.messagehandler.enums.HandlerEnum;
+import com.infotran.springboot.webcrawler.multicountry.countryenum.CountryEnum;
+import com.infotran.springboot.webcrawler.multicountry.model.DiffCountry;
+import com.infotran.springboot.webcrawler.multicountry.service.Impl.DiffCountryServiceImpl;
+import com.linecorp.bot.model.action.URIAction;
 import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
 import com.linecorp.bot.model.event.message.MessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
 import com.linecorp.bot.model.message.LocationMessage;
 import com.linecorp.bot.model.message.Message;
+import com.linecorp.bot.model.message.TemplateMessage;
 import com.linecorp.bot.model.message.TextMessage;
+import com.linecorp.bot.model.message.template.CarouselColumn;
+import com.linecorp.bot.model.message.template.CarouselTemplate;
 
+import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * 第四功能
  * 國內外疫情
  * 編號: 4 <br>
- * 1.處理國內外疫情状况
+ * 1.處理國外疫情状况
  *
  * @author chris
  */
 public class HandleDiffCountryMessage extends BaseMessageHandler {
 
+    private static final String LOG_PREFIX = "HandleDiffCountryMessage";
+
+    DiffCountryServiceImpl diffCountryService;
 
     @Override
     public HandlerEnum getHandler() {
@@ -45,6 +57,46 @@ public class HandleDiffCountryMessage extends BaseMessageHandler {
 
     @Override
     protected List<Message> handleImagemapMessageReply(PostbackEvent event) {
+        String data = event.getPostbackContent().getData();
+        switch (data){
+            case "國外疫情":
+                //先4個 : 全球、美國、中國、日本
+                URI globalUri = CountryEnum.GLOBAL.getUri();
+                URI usUri     = CountryEnum.US.getUri();
+                URI chinaUri  = CountryEnum.CHINA.getUri();
+                URI japanUri  = CountryEnum.JAPAN.getUri();
+                //建構內容text
+
+                //建構CarouselTemplate
+                CarouselTemplate carouselTemplate = new CarouselTemplate(
+                        Arrays.asList(
+                                new CarouselColumn(globalUri, "全球疫情統計", "fuga", Arrays.asList(
+                                        new URIAction("查看全球疫情數據",
+                                                URI.create(CountryEnum.GLOBAL.getActionUri()), null)
+                                )),
+                                new CarouselColumn(usUri, "美國疫情統計", "fuga", Arrays.asList(
+                                        new URIAction("查看美國疫情數據",
+                                                URI.create(CountryEnum.US.getActionUri()), null)
+                                )),
+                                new CarouselColumn(chinaUri, "中國疫情統計", "fuga", Arrays.asList(
+                                        new URIAction("查看中國疫情數據",
+                                                URI.create(CountryEnum.CHINA.getActionUri()), null)
+                                )),
+                                new CarouselColumn(japanUri, "日本疫情統計", "fuga", Arrays.asList(
+                                        new URIAction("查看日本疫情數據",
+                                                URI.create(CountryEnum.JAPAN.getActionUri()), null)
+                                ))
+                        ));
+                TemplateMessage templateMessage = new TemplateMessage("請使用手機觀看", carouselTemplate);
+                break;
+            default:
+        }
         return null;
     }
+
+    private String getReplyText(DiffCountry diffCountry){
+
+        return null;
+    }
+
 }

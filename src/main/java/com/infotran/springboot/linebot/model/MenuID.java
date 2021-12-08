@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Component
 public class MenuID implements Serializable {
 	

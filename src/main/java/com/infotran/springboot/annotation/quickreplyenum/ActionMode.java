@@ -7,6 +7,7 @@ import com.linecorp.bot.model.message.quickreply.QuickReplyItem;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * ActionMode enum
  * @author chris
  */
 @Slf4j

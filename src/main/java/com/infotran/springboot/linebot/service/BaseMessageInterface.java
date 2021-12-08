@@ -7,6 +7,7 @@ import com.linecorp.bot.model.event.message.MessageContent;
 import com.linecorp.bot.model.response.BotApiResponse;
 
 /**
+ * BaseMessageHandler 規範層
  * @author chris
  */
 public interface BaseMessageInterface {
