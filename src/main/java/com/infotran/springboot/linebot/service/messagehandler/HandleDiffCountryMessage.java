@@ -1,6 +1,7 @@
 package com.infotran.springboot.linebot.service.messagehandler;
 
 import com.infotran.springboot.linebot.service.BaseMessageHandler;
+import com.infotran.springboot.linebot.service.messagehandler.enums.HandlerEnum;
 import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
 import com.linecorp.bot.model.event.message.MessageContent;
@@ -21,6 +22,11 @@ import java.util.List;
  */
 public class HandleDiffCountryMessage extends BaseMessageHandler {
 
+
+    @Override
+    public HandlerEnum getHandler() {
+        return HandlerEnum.HANDLE_FOREIGN_COVID;
+    }
 
     @Override
     protected List<TextMessage> textMessageReply(TextMessageContent event, String replyToken, String userId) {

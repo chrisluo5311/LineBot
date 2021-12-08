@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.infotran.springboot.annotation.QuickReplyMode;
 import com.infotran.springboot.exception.LineBotException;
 import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
+import com.infotran.springboot.linebot.service.messagehandler.enums.HandlerEnum;
 import com.infotran.springboot.webcrawler.confirmcase.service.ConfirmCaseService;
 import com.infotran.springboot.webcrawler.medicinestore.service.MedicineStoreService;
 import com.linecorp.bot.model.action.LocationAction;
@@ -42,17 +43,17 @@ public abstract class BaseMessageHandler extends BaseMessageUtil implements Base
     private static final String LOG_PREFIX = "BaseMessageHandler";
 
     @Resource
-    public ConfirmCaseService caseService;
+    public ConfirmCaseService confirmCaseService;
 
     @Resource
-    public MedicineStoreService mService;
+    public MedicineStoreService medicineStoreService;
 
     @Resource
     private ObjectMapper objectMapper;
 
     @Override
-    public boolean canSupport(String className) {
-        return getClassName().equals(className);
+    public boolean canSupport(HandlerEnum handlerEnum) {
+        return getHandler().equals(handlerEnum);
     }
 
     /**
@@ -107,10 +108,8 @@ public abstract class BaseMessageHandler extends BaseMessageUtil implements Base
                 List<Message> textList = new ArrayList<>(textMessageReply(event));
                 botApiResponse = reply(replyToken,textList);
                 break;
-            case "refreshfuntion2":
-
-                break;
             default:
+
         }
         return botApiResponse;
     }

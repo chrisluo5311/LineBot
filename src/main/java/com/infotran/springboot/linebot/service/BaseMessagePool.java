@@ -2,6 +2,7 @@ package com.infotran.springboot.linebot.service;
 
 import com.infotran.springboot.exception.LineBotException;
 import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
+import com.infotran.springboot.linebot.service.messagehandler.enums.HandlerEnum;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -43,7 +44,7 @@ public class BaseMessagePool implements InitializingBean, ApplicationContextAwar
      * @return BaseMessageInterface
      * @throws LineBotException 實現類未實作getClassName()方法
      * */
-    public BaseMessageInterface getMethod(String enums) throws Exception{
+    public BaseMessageInterface getMethod(HandlerEnum enums) throws Exception{
         for (BaseMessageInterface base : baseInterfaceList){
             if(base.canSupport(enums)){
                 return base;

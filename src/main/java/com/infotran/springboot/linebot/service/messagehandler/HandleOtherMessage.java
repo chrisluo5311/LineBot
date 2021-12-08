@@ -25,8 +25,8 @@ import java.util.List;
 public class HandleOtherMessage extends BaseMessageHandler {
 
     @Override
-    public String getClassName() {
-        return HandlerEnum.getHandlerName(6);
+    public HandlerEnum getHandler() {
+        return HandlerEnum.HANDLE_OTHER_MESSAGE;
     }
 
     @Override

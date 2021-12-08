@@ -1,5 +1,6 @@
 package com.infotran.springboot.linebot.service;
 
+import com.infotran.springboot.linebot.service.messagehandler.enums.HandlerEnum;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.MessageContent;
@@ -12,10 +13,10 @@ public interface BaseMessageInterface {
 
 	/**
 	 *  查詢實現類
-	 *  @param className 實作類名稱
+	 *  @param handlerEnum 實作類HandlerEnum
 	 *  @return boolean
 	 * */
-	boolean canSupport(String className);
+	boolean canSupport(HandlerEnum handlerEnum);
 
 
 	/**
@@ -23,7 +24,7 @@ public interface BaseMessageInterface {
 	 *  @return String
 	 *
 	 * */
-	default String getClassName(){
+	default HandlerEnum getHandler(){
 		return null;
 	}
 

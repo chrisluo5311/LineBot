@@ -37,8 +37,8 @@ public class HandleTodayAmountMessage extends BaseMessageHandler {
     RedisTemplate<Object, ConfirmCase> confirmCaseRedisTemplate;
 
     @Override
-    public String getClassName() {
-        return HandlerEnum.getHandlerName(1);
+    public HandlerEnum getHandler() {
+        return HandlerEnum.HANDLE_TODAY_AMOUNT_MESSAGE;
     }
 
     @Override
@@ -51,7 +51,7 @@ public class HandleTodayAmountMessage extends BaseMessageHandler {
             case "查詢今日確診":
                 confirmCase = confirmCaseRedisTemplate.opsForValue().get("今日確診");
                 if(confirmCase==null){
-                    confirmCase = caseService.findByConfirmTime(LocalDate.now());
+                    confirmCase = confirmCaseService.findByConfirmTime(LocalDate.now());
                 }
                 if (confirmCase != null) {
                     message.append("指揮中心快訊：今日新增").append(confirmCase.getTodayAmount()).append("例COVID-19確定病例。\n");
@@ -65,7 +65,7 @@ public class HandleTodayAmountMessage extends BaseMessageHandler {
                 return Collections.singletonList(new TextMessage(message.toString()));
             case "昨日確診數":
                 //todo caseService可以設非叢集索引
-                confirmCase = caseService.findByConfirmTime(LocalDate.now().minusDays(1));
+                confirmCase = confirmCaseService.findByConfirmTime(LocalDate.now().minusDays(1));
                 if (confirmCase != null) {
                     message.append("指揮中心快訊：昨日新增").append(confirmCase.getTodayAmount()).append("例COVID-19確定病例。\n");
                     message.append("校正回歸數").append(confirmCase.getReturnAmount()).append("例。\n");

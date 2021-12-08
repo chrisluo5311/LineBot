@@ -25,10 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author chris
- * 第五功能-处理疫苗统计图
+ * 第五功能-处理疫苗统计图<br>
  * 編號: 5 <br>
- *
+ * @author chris
  *
  * */
 @Slf4j
@@ -41,9 +40,9 @@ public class HandleVaccineIMGMessage extends BaseMessageHandler {
     VaccinedPeopleService vaccinedPeopleService;
 
     @Override
-    public String getClassName() {
+    public HandlerEnum getHandler() {
         //第五功能
-        return HandlerEnum.getHandlerName(5);
+        return HandlerEnum.HANDLE_STATISTIC_DIAGRAM;
     }
 
     @Override

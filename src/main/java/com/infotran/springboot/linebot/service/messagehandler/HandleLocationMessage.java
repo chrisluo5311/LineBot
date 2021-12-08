@@ -60,8 +60,8 @@ public class HandleLocationMessage extends BaseMessageHandler {
     RedisTemplate<Object, MedicineStore> medicineStoreRedisTemplate;
 
     @Override
-    public String getClassName() {
-        return HandlerEnum.getHandlerName(2);
+    public HandlerEnum getHandler() {
+        return HandlerEnum.HANDLE_LOCATION_MESSAGE;
     }
 
     @Override
@@ -124,7 +124,7 @@ public class HandleLocationMessage extends BaseMessageHandler {
     public List<LocationMessage> handleLocationMessageReply(LocationMessageContent event,String userId) {
         List<MedicineStore> medStoreList = medicineStoreRedisTemplate.opsForList().range("medicineStore",0,-1);
         if(Objects.isNull(medStoreList)){
-            medStoreList = mService.findAll();
+            medStoreList = medicineStoreService.findAll();
         }
         Double lat1 = event.getLatitude();
         Double long1 = event.getLongitude();

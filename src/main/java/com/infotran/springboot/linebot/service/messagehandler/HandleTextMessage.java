@@ -28,7 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * 測試及做筆記用
+ * 測試及做筆記用<br>
  * 編號: 0 <br>
  * @author chris
  * */
@@ -41,8 +41,8 @@ public class HandleTextMessage extends BaseMessageHandler {
 	private static final String LOG_PREFIX = "TestReplyMessageHandler";
 
 	@Override
-	public String getClassName() {
-		return HandlerEnum.getHandlerName(0);
+	public HandlerEnum getHandler() {
+		return HandlerEnum.HANDLE_DEFAULT_MESSAGE;
 	}
 
 	@Override

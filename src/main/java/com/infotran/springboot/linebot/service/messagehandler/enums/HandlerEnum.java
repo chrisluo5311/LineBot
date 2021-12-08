@@ -16,9 +16,12 @@ import java.util.stream.Stream;
 public enum HandlerEnum {
 
     //新增功能類別要對應功能enum
-    HANDLE_TEXT_MESSAGE(0,"處理測試文字"),
+    HANDLE_DEFAULT_MESSAGE(0,"處理測試文字"),
     HANDLE_TODAY_AMOUNT_MESSAGE(1,"處理今日確診數"),
     HANDLE_LOCATION_MESSAGE(2,"處理藥局地點"),
+    HANDLE_QRCODE(3,"掃描QRCode"),
+    HANDLE_FOREIGN_COVID(4,"國外疫情"),
+    HANDLE_STATISTIC_DIAGRAM(5,"查看統計圖"),
     HANDLE_OTHER_MESSAGE(6,"處理其他");
 
     private Integer id;
@@ -31,6 +34,15 @@ public enum HandlerEnum {
      * */
     public static String getHandlerName(Integer id){
         return Stream.of(HandlerEnum.values()).filter(x -> x.getId().equals(id)).findFirst().toString();
+    }
+
+    /**
+     *  取得 HandlerEnum 功能
+     *  @param handlerEnum 對應目錄表功能
+     *  @return HandlerEnum
+     * */
+    public static HandlerEnum getHandler(HandlerEnum handlerEnum){
+        return Arrays.stream(HandlerEnum.values()).filter(x->x.equals(handlerEnum)).findFirst().get();
     }
 
     /**

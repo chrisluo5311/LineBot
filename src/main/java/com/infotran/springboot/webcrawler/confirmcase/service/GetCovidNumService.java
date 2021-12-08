@@ -129,7 +129,7 @@ public class GetCovidNumService implements ClientUtil {
 			confirmCaseRedisTemplate.opsForValue().set(CONFIRMCASE_REDIS_KEY,cfc);
 			confirmCase = confirmCaseService.save(cfc);
 			if(Objects.isNull(confirmCase)){
-				log.warn("confirmCase 爬蟲成功 存redis成功 但新增至db失敗");
+				log.warn("confirmCase 爬蟲成功 但新增至db失敗");
 			}
 		} catch (IOException e) {
 			throw new LineBotException(LineBotExceptionEnums.FAIL_ON_SSLHELPER_CONNECTION,e.getMessage());
