@@ -56,7 +56,7 @@ docker pull rabbitmq:management
 
 ### Data source
 1. [衛福部疾管署](https://www.cdc.gov.tw/ "link") 
-2. [全球疫情地圖](https://covid-19.nchc.org.tw/ "全球疫情地圖")
+2. [全球疫情地圖](https://covid-19.nchc.org.tw/dt_owl.php?dt_name=3 "全球疫情地圖")
 3. [疫苗接種統計圖](https://covid-19.nchc.org.tw/dt_002-csse_covid_19_daily_reports_vaccine_city2.php "疫苗接種統計圖")
 4. [Infogram_疫苗累計施打人數統計圖&各縣市覆蓋率](https://infogram.com/f25f5a66-bd5e-4272-b4b4-be1258a276a8 "疫苗統計圖")
 5. [CDC疫苗統計資料pdf](https://www.cdc.gov.tw/Category/Page/9jFXNbCe-sFK9EImRRi2Og "疫苗統計pdf")
