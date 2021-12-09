@@ -21,10 +21,10 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * @author chris
  * 第一功能<br>
  * 編號: 1 <br>
  * 回覆今日新增的確診數目<br>
+ * @author chris
  *
  * */
 @Slf4j

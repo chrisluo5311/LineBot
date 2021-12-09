@@ -1,5 +1,8 @@
 package com.infotran.springboot.linebot.service.messagehandler;
 
+import com.infotran.springboot.annotation.MultiQuickReply;
+import com.infotran.springboot.annotation.QuickReplyMode;
+import com.infotran.springboot.annotation.quickreplyenum.ActionMode;
 import com.infotran.springboot.linebot.service.BaseMessageHandler;
 import com.infotran.springboot.linebot.service.messagehandler.enums.HandlerEnum;
 import com.infotran.springboot.util.TimeUtil;
@@ -24,8 +27,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * 第四功能
- * 國內外疫情
+ * 第四功能 <br>
+ * 國內外疫情 <br>
  * 編號: 4 <br>
  * 1.處理國外疫情状况
  *
@@ -58,8 +61,10 @@ public class HandleDiffCountryMessage extends BaseMessageHandler {
         return null;
     }
 
-
     @Override
+    @MultiQuickReply(value = {
+            @QuickReplyMode(mode= ActionMode.POSTBACK,label = "",data = "",displayText = "")
+    })
     protected List<Message> handleImagemapMessageReply(PostbackEvent event) {
         String replyToken = event.getReplyToken();
         String data = event.getPostbackContent().getData();
@@ -70,9 +75,8 @@ public class HandleDiffCountryMessage extends BaseMessageHandler {
                 URI usUri     = CountryEnum.US.getUri();
                 URI chinaUri  = CountryEnum.CHINA.getUri();
                 URI japanUri  = CountryEnum.JAPAN.getUri();
-                //建構內容text
-                List<CountryEnum> countryEnums = CountryEnum.getPriorityCountryEnum();
-                Map<CountryEnum, String> replyTestMap = getReplyText(countryEnums);
+                //建構內容text的Map
+                Map<CountryEnum, String> replyTestMap = this.getReplyText();
                 //建構CarouselTemplate
                 CarouselTemplate carouselTemplate = new CarouselTemplate(
                         Arrays.asList(
@@ -103,14 +107,13 @@ public class HandleDiffCountryMessage extends BaseMessageHandler {
 
     /**
      * 取得每個國家相對應的回覆內容
-     * @param countryEnumList
      * @return Map
      * */
-    private Map<CountryEnum,String> getReplyText(List<CountryEnum> countryEnumList){
+    private Map<CountryEnum,String> getReplyText(){
         Map<CountryEnum,String> replyMap = new HashMap<>();
         AtomicReference<DiffCountry> diffCountry = null;
         //找當天資料
-        countryEnumList.stream().forEach(x->{
+        CountryEnum.getPriorityCountryEnum().stream().forEach(x->{
             diffCountry.set(diffCountryService.findByIsoCodeAndLastUpdate(x.getCountryCode(), TimeUtil.formCustomDate("YYYY-MM-dd", null)));
             if(Objects.isNull(diffCountry.get())){
                 //前天資料

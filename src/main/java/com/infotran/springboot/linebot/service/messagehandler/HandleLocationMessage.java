@@ -24,10 +24,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- * 第二功能
+ * 第二功能 <br>
  * 編號: 2 <br>
- * 1.處理使用者回傳位置訊息
- * 2.搜尋最近的藥局並回傳: 第一次回傳五間，按快捷鍵再回傳五個
+ * 1.處理使用者回傳位置訊息 <br>
+ * 2.搜尋最近的藥局並回傳: 第一次回傳五間，按快捷鍵再回傳五個 <br>
  * @author chris
  *
  * */

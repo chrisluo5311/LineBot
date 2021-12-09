@@ -139,18 +139,18 @@ public abstract class BaseMessageUtil implements LineClientInterface {
             //如果有@QuickReply自動產生QuickReply物件
             QuickReply quickReply = getQuickReply(method);
             List<Message> messages = textMessageList.stream()
-                    .map(x -> x.toBuilder().quickReply(quickReply).build())
-                    .map(Message.class::cast)
-                    .collect(Collectors.toList());
+                                                    .map(x -> x.toBuilder().quickReply(quickReply).build())
+                                                    .map(Message.class::cast)
+                                                    .collect(Collectors.toList());
             return this.reply(replyToken,messages);
         } else if (messageList.stream().allMatch(LocationMessage.class::isInstance)){
             List<LocationMessage> locationMessageList = (List<LocationMessage>) messageList;
             //如果有@QuickReply自動產生QuickReply物件
             QuickReply quickReply = getQuickReply(method);
             List<Message> messages = locationMessageList.stream()
-                    .map(x -> x.toBuilder().quickReply(quickReply).build())
-                    .map(Message.class::cast)
-                    .collect(Collectors.toList());
+                                                        .map(x -> x.toBuilder().quickReply(quickReply).build())
+                                                        .map(Message.class::cast)
+                                                        .collect(Collectors.toList());
             return this.reply(replyToken,messages);
         }
         return null;
@@ -179,18 +179,13 @@ public abstract class BaseMessageUtil implements LineClientInterface {
             return QuickReply.builder().item(quickReplyItem).build();
         } else {
             //多個
-            List<QuickReplyItem> quickReplyItemList = new ArrayList<>();
-            for (QuickReplyMode quickReplyMode1 : multiQuickReply.value()){
-                QuickReplyItem item = getQuickReply(quickReplyMode1);
-                log.info("[{}] 回傳多個的QuickReplyItem物件: {}",LOG_PREFIX,item);
-                quickReplyItemList.add(item);
-            }
+            List<QuickReplyItem> quickReplyItemList = Arrays.stream(multiQuickReply.value()).map(this::getQuickReply).collect(Collectors.toList());
             return QuickReply.builder().items(quickReplyItemList).build();
         }
     }
 
     /**
-     * 依據不同的ActionMode
+     * 依據不同的ActionMode <br>
      * 建立不同Action的QuickReplyItem
      * @param quickReplyMode QuickReplyMode
      * @return QuickReplyItem

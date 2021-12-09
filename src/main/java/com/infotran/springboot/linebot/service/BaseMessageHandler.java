@@ -57,14 +57,13 @@ public abstract class BaseMessageHandler extends BaseMessageTemplate implements 
         BotApiResponse botApiResponse = null;
         String replyToken = event.getReplyToken();
         log.info("[{}] postBackReply方法的event data: {}",LOG_PREFIX,data);
-        List<Message> textList;
         switch (data){
             case "國外疫情" :
                 List<Message> imageMapList = handleImagemapMessageReply(event);
                 botApiResponse = reply(replyToken,imageMapList);
                 break;
             case "其他" :
-                textList = new ArrayList<>(textMessageReply(event));
+                List<Message> textList = new ArrayList<>(textMessageReply(event));
                 botApiResponse = reply(replyToken,textList);
                 break;
             default:

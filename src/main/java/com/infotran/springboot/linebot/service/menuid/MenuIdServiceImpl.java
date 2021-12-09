@@ -27,7 +27,7 @@ public class MenuIdServiceImpl implements MenuIdService {
 		MenuID menuId =getMenuId(id);
 		if (id.length()!=0 && menuId!=null) {
 			menuRepo.deleteAll();
-			log.info("{} LineBot 目錄id: {},",LOG_PREFIX,id);
+			log.info("{} LineBot 新的目錄id: {},",LOG_PREFIX,id);
 			menuRepo.save(menuid);
 			return menuid;
 		}

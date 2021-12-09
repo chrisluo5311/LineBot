@@ -4,6 +4,8 @@ import com.infotran.springboot.util.HandleFileUtil;
 import com.infotran.springboot.webcrawler.multicountry.model.DiffCountry;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -292,17 +294,21 @@ public enum CountryEnum implements CountryEnumInterface{
      * @param diffCountry
      * @return String
      * */
-    public static String createReplyTemplate(DiffCountry diffCountry){
+    public static String createReplyTemplate(@NonNull DiffCountry diffCountry){
         StringBuffer text = new StringBuffer();
         String country              = diffCountry.getCountry();
         String totalAmount          = diffCountry.getTotalAmount();
         String newAmount            = diffCountry.getNewAmount();
         String totalDeath           = diffCountry.getTotalDeath();
         String newDeath             = diffCountry.getNewDeath();
-        String confirmedInMillions  = diffCountry.getConfirmedInMillions();//每百萬確診數
-        String deathInMillions      = diffCountry.getDeathInMillions();//每百萬死亡數
-        String totalVaccinated      = diffCountry.getTotalVaccinated();//疫苗總接種人數
-        String vaccinatedInHundreds = diffCountry.getVaccinatedInHundreds();//每百人接種疫苗人數
+        //每百萬確診數
+        String confirmedInMillions  = diffCountry.getConfirmedInMillions();
+        //每百萬死亡數
+        String deathInMillions      = diffCountry.getDeathInMillions();
+        //疫苗總接種人數
+        String totalVaccinated      = diffCountry.getTotalVaccinated();
+        //每百人接種疫苗人數
+        String vaccinatedInHundreds = diffCountry.getVaccinatedInHundreds();
         String lastUpdate           = diffCountry.getLastUpdate();
         text.append(country).append("疫情狀況:\n");
         text.append("總確診數: ").append(totalAmount+"人\n");

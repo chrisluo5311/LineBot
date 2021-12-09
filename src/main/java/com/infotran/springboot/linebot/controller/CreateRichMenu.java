@@ -11,9 +11,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -60,6 +62,7 @@ public class CreateRichMenu implements LineClientInterface, CommandLineRunner {
 									.areas(area)
 									.build();
 		byte[] buffer = HandleFileUtil.file2Byte(RICH_MENU_FILE_PATH);
+		Assert.noNullElements(Collections.singleton(buffer),"LineBot RichMenu照片不可為null，請檢查FilePath!!!");
 		try {
 			RichMenuIdResponse menuResponse = CLIENT.createRichMenu(richmenu).get();
 			String menuId = menuResponse.getRichMenuId();

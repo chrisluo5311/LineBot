@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * 第六功能
+ * 第六功能 <br>
  * 編號: 6 <br>
  * 處理其他功能
  * @author chris

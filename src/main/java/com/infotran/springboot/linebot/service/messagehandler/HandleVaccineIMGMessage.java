@@ -63,8 +63,10 @@ public class HandleVaccineIMGMessage extends BaseMessageHandler {
                 if(vaccineTypePeople!=null){
                     content.append("根據衛生福利部疾病管制署公佈: \n")
                             .append("COVID-19疫苗接種人次，")
-                            .append(vaccineTypePeople.getBody()).append("\n\n資料來源: ")
-                            .append(vaccineTypePeople.getResourceUrl()).append("。");
+                            .append(vaccineTypePeople.getBody())
+                            .append("\n\n資料來源: ")
+                            .append(vaccineTypePeople.getResourceUrl())
+                            .append("。");
                 }
                 TextMessage pdfTextMessage = TextMessage.builder().text(content.toString()).quickReply(quickReply).build();
                 //圖片訊息
