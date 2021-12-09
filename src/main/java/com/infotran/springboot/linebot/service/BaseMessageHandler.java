@@ -67,6 +67,8 @@ public abstract class BaseMessageHandler extends BaseMessageTemplate implements 
                 botApiResponse = reply(replyToken,textList);
                 break;
             default:
+                List<Message> imageMapListDefault = handleImagemapMessageReply(event);
+                botApiResponse = reply(replyToken,imageMapListDefault);
         }
         return botApiResponse;
     }

@@ -20,6 +20,7 @@ import com.linecorp.bot.model.message.TemplateMessage;
 import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.message.template.CarouselColumn;
 import com.linecorp.bot.model.message.template.CarouselTemplate;
+import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import java.net.URI;
@@ -63,7 +64,24 @@ public class HandleDiffCountryMessage extends BaseMessageHandler {
 
     @Override
     @MultiQuickReply(value = {
-            @QuickReplyMode(mode= ActionMode.POSTBACK,label = "",data = "",displayText = "")
+            @QuickReplyMode(mode= ActionMode.POSTBACK,label = "全球",data = "全球",displayText = "全球"),
+            @QuickReplyMode(mode= ActionMode.POSTBACK,label = "美國",data = "美國",displayText = "美國"),
+            @QuickReplyMode(mode= ActionMode.POSTBACK,label = "北美洲",data = "北美洲",displayText = "北美洲"),
+            @QuickReplyMode(mode= ActionMode.POSTBACK,label = "歐盟",data = "歐洲聯盟",displayText = "歐盟"),
+            @QuickReplyMode(mode= ActionMode.POSTBACK,label = "南美洲",data = "南美洲",displayText = "南美洲"),
+            @QuickReplyMode(mode= ActionMode.POSTBACK,label = "印度",data = "印度",displayText = "印度"),
+            @QuickReplyMode(mode= ActionMode.POSTBACK,label = "巴西",data = "巴西",displayText = "巴西"),
+            @QuickReplyMode(mode= ActionMode.POSTBACK,label = "英國",data = "英國",displayText = "英國"),
+            @QuickReplyMode(mode= ActionMode.POSTBACK,label = "俄羅斯",data = "俄羅斯",displayText = "俄羅斯"),
+            @QuickReplyMode(mode= ActionMode.POSTBACK,label = "法國",data = "法國",displayText = "法國"),
+            @QuickReplyMode(mode= ActionMode.POSTBACK,label = "德國",data = "德國",displayText = "德國"),
+            @QuickReplyMode(mode= ActionMode.POSTBACK,label = "泰國",data = "泰國",displayText = "泰國"),
+            @QuickReplyMode(mode= ActionMode.POSTBACK,label = "以色列",data = "以色列",displayText = "以色列"),
+            @QuickReplyMode(mode= ActionMode.POSTBACK,label = "韓國",data = "韓國",displayText = "韓國"),
+            @QuickReplyMode(mode= ActionMode.POSTBACK,label = "香港",data = "香港",displayText = "香港"),
+            @QuickReplyMode(mode= ActionMode.POSTBACK,label = "中國大陸",data = "中國大陸",displayText = "中國大陸"),
+            @QuickReplyMode(mode= ActionMode.POSTBACK,label = "新加坡",data = "新加坡",displayText = "新加坡"),
+            @QuickReplyMode(mode= ActionMode.POSTBACK,label = "日本",data = "日本",displayText = "日本"),
     })
     protected List<Message> handleImagemapMessageReply(PostbackEvent event) {
         String replyToken = event.getReplyToken();
@@ -76,7 +94,7 @@ public class HandleDiffCountryMessage extends BaseMessageHandler {
                 URI chinaUri  = CountryEnum.CHINA.getUri();
                 URI japanUri  = CountryEnum.JAPAN.getUri();
                 //建構內容text的Map
-                Map<CountryEnum, String> replyTestMap = this.getReplyText();
+                Map<CountryEnum, String> replyTestMap = this.getReplyText(CountryEnum.getPriorityCountryEnum());
                 //建構CarouselTemplate
                 CarouselTemplate carouselTemplate = new CarouselTemplate(
                         Arrays.asList(
@@ -98,27 +116,41 @@ public class HandleDiffCountryMessage extends BaseMessageHandler {
                                 ))
                         ));
                 TemplateMessage templateMessage = new TemplateMessage("請使用手機觀看", carouselTemplate);
-                reply(replyToken,templateMessage);
-                break;
+                return Collections.singletonList(templateMessage);
             default:
+                CountryEnum eachCountry = CountryEnum.getCountryEnumByName(data);
+                String countryName = eachCountry.getName();
+                URI singleCountryUri = eachCountry.getUri();
+                Map<CountryEnum, String> singleReplyText = this.getReplyText(Collections.singletonList(eachCountry));
+                CarouselTemplate singleCarouselTemplate = new CarouselTemplate(
+                        Arrays.asList(
+                                new CarouselColumn(singleCountryUri, countryName+"疫情統計", singleReplyText.get(eachCountry), Arrays.asList(
+                                        new URIAction("查看"+countryName+"疫情數據",
+                                                URI.create(eachCountry.getActionUri()), null))
+                        ))
+                );
+                TemplateMessage eachTemplateMessage = new TemplateMessage("請使用手機觀看", singleCarouselTemplate);
+                return Collections.singletonList(eachTemplateMessage);
         }
-        return null;
     }
+
+
 
     /**
      * 取得每個國家相對應的回覆內容
      * @return Map
      * */
-    private Map<CountryEnum,String> getReplyText(){
+    private Map<CountryEnum,String> getReplyText(List<CountryEnum> countryEnumList){
         Map<CountryEnum,String> replyMap = new HashMap<>();
         AtomicReference<DiffCountry> diffCountry = null;
         //找當天資料
-        CountryEnum.getPriorityCountryEnum().stream().forEach(x->{
+        countryEnumList.stream().forEach(x->{
             diffCountry.set(diffCountryService.findByIsoCodeAndLastUpdate(x.getCountryCode(), TimeUtil.formCustomDate("YYYY-MM-dd", null)));
             if(Objects.isNull(diffCountry.get())){
                 //前天資料
                 diffCountry.set(diffCountryService.findByIsoCodeAndLastUpdate(x.getCountryCode(), TimeUtil.formCustomDate("YYYY-MM-dd", 1l)));
             }
+            Assert.notNull(diffCountry.get(),"國家不可為null，請手動確認國家資料狀態!!!");
             replyMap.put(x,CountryEnum.createReplyTemplate(diffCountry.get()));
         });
         return replyMap;
