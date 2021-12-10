@@ -203,7 +203,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
     }
 
     /**
-     * 執行 每日 取得 [CDC_World COVID-19 Data] <br>
+     * 執行 取得 [CDC_World COVID-19 Data] <br>
      * (每 6 小時執行一次)
      * */
     @Scheduled(fixedRate = 6 * TimeUnit.HOUR)

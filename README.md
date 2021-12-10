@@ -7,15 +7,17 @@
 |:------:|:--------:|:------------:|
 |  JDK  | 11.0.10   | Spring boot對低版支持無測試過 |
 |  Redis  | 5.0.10   | 低版支持無測試過  |
-|  MS SQLServer  | MS SQLServer2019  | 低版支持無測試過 |
+|  postgresql  | 42.2.19  | 低版支持無測試過 |
 
 ### 定時任務說明
 
 |  功能  |  任務說明  |
 |:------:|:--------:|
-|  查詢今日確診數   | `cron`表示式: `0 0/5 14 * * ?`(每天14:00開始到14:55，每五分鐘執行一次)  |
-|  查詢藥局口罩剩餘數目   | `cron`表示式: `0 0 0/1 * * ?`(每小時執行一次)  |
-|  定時新增藥局資訊至資料庫   | @Scheduled(fixedRate = 1*TimeUnit.HOUR)(每小時執行一次) |
+|  查詢今日確診數   | 每30分鐘執行一次  |
+|  查詢藥局口罩剩餘數目   | 每1小時執行一次  |
+|  獲取pdf並取得各疫苗接踵累计人次   | 每12小時執行一次 |
+|  截圖:累计接踵人次&各梯次疫苗涵蓋率圖  | 每1小時執行一次 |
+|  獲取CDC各國疫情狀況csv檔  | 每6小時執行一次 |
 
 ### 目錄內容 
 1. 功能表、負責人、狀態、使用技術 
@@ -23,36 +25,32 @@
 |  功能  |    負責人    | 狀態 | 主要技術 | 內容說明 |
 |:------:|:----------:|:------------:|:------------:| :----------:|
 |  查詢今日確診數  |  chris  | `完成` | okhttp、jsoup | 解析新聞稿並擷取出新增確診人數、校正回歸數、及死亡數  |
-|  哪裡買口罩  |  chris  | `完成` | okhttp、jsoup | 發送請求至 [口罩即時查](https://wenyo.github.io/maskmap/ "口罩即時查") 後台的Request URL，返回含經緯度的藥局資訊，解析後發送LocationMessage給使用者   |
-|  所處位置疫情狀況  |  chris  |  `尚未開始` | leaflet |           |
-|  國內外疫情  |  chris  |  `尚未開始`  | okhttp、jsoup |           |
-|  疫苗施打統計圖  |  chris  |  `完成`  | okhttp、jsoup |            |
-|  其他統計表  |  chris  |  `完成`  | okhttp、jsoup |             |
-
-
+|  哪裡買口罩  |  chris  | `完成` | okhttp、jsoup | 發送請求至 [口罩即時查](https://wenyo.github.io/maskmap/ "口罩即時查")，解析含經緯度的藥局資訊並發送給使用者  |
+|  掃描QRCode  |  chris  |  `完成` | LineBot | 使用LineBot Messaging API提供的CameraAction  |
+|  國外疫情  |  chris  |  `完成`  | okhttp、jsoup、util.zip(GZIPInputStream) |  解壓縮各國疫情gzip檔，將內容送入rabbitmq隊列，按國家解析各欄位  |
+|  疫苗施打統計圖  |  chris  |  `完成`  | okhttp、jsoup、Selenium、apache pdfbox |  1. 前往(infogram 標題:誰打了疫苗)取得累计接踵人次截圖 2. 前往全球疫情地圖之疫苗接種統計圖，取得各梯次疫苗涵蓋率圖 3.解析「疫苗接踵對象累計種人次.pdf」  |
+|  其他統計表  |  chris  |  `進行中`  | okhttp、jsoup | 暫定放個人履歷資訊 |
 
 2. 相關Maven依賴 
 
-|  套件  |  版本  |   备注   |
-|:------:|:--------:|:------------:|
-|  okhttp  | 3.14.9 |  |
-|  jsoup  | 1.13.1 |  |
-| Selenium | 3.141.59 |  |
-|  Redis  | 5.0.10 |  |
-|  lombok  | 1.18.20 |  |
+|  套件  |  版本  |
+|:------:|:--------:|
+|  okhttp  | 3.14.9 |
+|  jsoup  | 1.13.1 |  
+| Selenium | 3.141.59 |  
+|  Redis  | 5.0.10 |  
+|  lombok  | 1.18.20 |  
+|  apache.pdfbox  | 2.0.24 |  
+|  spring-boot-starter-amqp  | 2.4.5 |
 
 ### 測試須知
 1. [ngrok下載](https://ngrok.com/download "ngrok")
-2. ngrok http 9090  
 
 ### docker image
 > rabbitmq
 ```
 docker pull rabbitmq:management
 ```
-|  套件  |  版本  |   备注   |
-|:------:|:--------:|:------------:|
-|  spring-boot-starter-amqp  | 2.4.5 |  |
 
 ### Data source
 1. [衛福部疾管署](https://www.cdc.gov.tw/ "link") 
