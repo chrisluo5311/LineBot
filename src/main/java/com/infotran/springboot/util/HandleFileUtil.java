@@ -42,7 +42,7 @@ public class HandleFileUtil {
      * */
     public static String downloadByUrl(String govURL,String fileName) throws IOException {
         URL url = new URL(govURL);
-        StringBuilder strFileContents = null;
+        StringBuilder strFileContents = new StringBuilder();
         try (
             InputStream inputStream = url.openStream();
             BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);

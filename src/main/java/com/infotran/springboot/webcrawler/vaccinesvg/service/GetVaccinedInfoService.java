@@ -176,7 +176,7 @@ public class GetVaccinedInfoService implements ClientUtil {
     }
 
     /**
-     * 透過句號分割字串
+     * 透過句號分割字串 <br>
      * 只取第2個和第3個字串
      * @param content pdf內文
      * @return String 擷取(累計接踵疫苗人次字串)

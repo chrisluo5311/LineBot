@@ -67,7 +67,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
     }
 
     /**
-     * 執行 [當日新增確診數] 爬蟲
+     * 執行 [當日新增確診數] 爬蟲 <br>
      * 每三十分鐘執行一次
      *
      * */
@@ -105,7 +105,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
     }
 
     /**
-     * 執行 [剩餘口罩數] 爬蟲<br>
+     * 執行 [剩餘口罩數] 爬蟲 <br>
      * (每小時執行一次)
      *
      * */
