@@ -22,14 +22,14 @@
 ### 目錄內容 
 1. 功能表、負責人、狀態、使用技術 
 
-|  功能  |    負責人    | 狀態 | 主要技術 | 內容說明 |
-|:------:|:----------:|:------------:|:------------:| :----------:|
-|  查詢今日確診數  |  chris  | `完成` | okhttp、jsoup | 解析新聞稿並擷取出新增確診人數、校正回歸數、及死亡數  |
-|  哪裡買口罩  |  chris  | `完成` | okhttp、jsoup | 發送請求至 [口罩即時查](https://wenyo.github.io/maskmap/ "口罩即時查")，解析含經緯度的藥局資訊並發送給使用者  |
-|  掃描QRCode  |  chris  |  `完成` | LineBot | 使用LineBot Messaging API提供的CameraAction  |
-|  國外疫情  |  chris  |  `完成`  | okhttp、jsoup、util.zip(GZIPInputStream) |  解壓縮各國疫情gzip檔，將內容送入rabbitmq隊列，按國家解析各欄位  |
-|  疫苗施打統計圖  |  chris  |  `完成`  | okhttp、jsoup、Selenium、apache pdfbox |  1. 前往(infogram 標題:誰打了疫苗)取得累计接踵人次截圖 2. 前往全球疫情地圖之疫苗接種統計圖，取得各梯次疫苗涵蓋率圖 3.解析「疫苗接踵對象累計種人次.pdf」  |
-|  其他統計表  |  chris  |  `進行中`  | okhttp、jsoup | 暫定放個人履歷資訊 |
+|  功能  | 狀態 | 主要技術 | 內容說明 |
+|:------:|:------------:|:------------:| :----------|
+|  查詢今日確診數  | `完成` | okhttp、jsoup | 解析新聞稿並擷取出新增確診人數、校正回歸數、及死亡數  |
+|  哪裡買口罩  | `完成` | okhttp、jsoup | 發送請求至 [口罩即時查](https://wenyo.github.io/maskmap/ "口罩即時查")，解析含經緯度的藥局資訊並發送給使用者  |
+|  掃描QRCode  | `完成` | LineBot | 使用LineBot Messaging API提供的CameraAction  |
+|  國外疫情  | `完成` | okhttp、jsoup<br>java util.zip(GZIPInputStream) |  解壓縮各國疫情gzip檔，將內容送入rabbitmq隊列，按國家解析各欄位  |
+|  疫苗施打統計圖  | `完成` | okhttp、jsoup<br>Selenium、apache pdfbox |  1. 前往(infogram 標題:誰打了疫苗)取得累计接踵人次截圖<br> 2. 前往全球疫情地圖之疫苗接種統計圖，取得各梯次疫苗涵蓋率圖<br> 3. 解析「疫苗接踵對象累計種人次.pdf」 |
+|  其他統計表  | `進行中` | okhttp、jsoup | 暫定放個人履歷資訊 |
 
 2. 相關Maven依賴 
 
