@@ -74,7 +74,7 @@ public class GetCovidNumService implements ClientUtil {
 	 * @param body 疾管局新闻首页的连结
 	 * @return ConfirmCase
 	 */
-	public ConfirmCase getUrlOfNewsDetail(String body) {
+	public ConfirmCase getUrlOfNewsDetail(String body) throws LineBotException {
 		Document doc = Jsoup.parse(body);
 		Elements newsLists = doc.select(".cbp-item");
 		Map<String, String> todayMap = TimeUtil.genTodayDate();
@@ -87,8 +87,8 @@ public class GetCovidNumService implements ClientUtil {
 				return parseBody(CDC_URL_PREFIX.toString());
 			}
 		}
-		log.warn("{} 找不到新聞標題",LOG_PREFIX);
-		return null;
+		log.error("{} 找不到新聞標題",LOG_PREFIX);
+		throw new LineBotException(LineBotExceptionEnums.NEWS_TITLE_CHANGE);
 	}
 
 	/**
@@ -129,7 +129,7 @@ public class GetCovidNumService implements ClientUtil {
 			confirmCaseRedisTemplate.opsForValue().set(CONFIRMCASE_REDIS_KEY,cfc);
 			confirmCase = confirmCaseService.save(cfc);
 			if(Objects.isNull(confirmCase)){
-				log.warn("confirmCase 爬蟲成功 但新增至db失敗");
+				log.error("confirmCase 爬蟲成功 但新增至db失敗");
 			}
 		} catch (IOException e) {
 			throw new LineBotException(LineBotExceptionEnums.FAIL_ON_SSLHELPER_CONNECTION,e.getMessage());

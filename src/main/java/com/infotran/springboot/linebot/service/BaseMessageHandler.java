@@ -1,7 +1,6 @@
 package com.infotran.springboot.linebot.service;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.infotran.springboot.exception.LineBotException;
 import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
 import com.infotran.springboot.linebot.service.messagehandler.enums.HandlerEnum;
@@ -44,9 +43,6 @@ public abstract class BaseMessageHandler extends BaseMessageTemplate implements 
     @Resource
     public MedicineStoreService medicineStoreService;
 
-    @Resource
-    private ObjectMapper objectMapper;
-
     @Override
     public boolean canSupport(HandlerEnum handlerEnum) {
         return getHandler().equals(handlerEnum);
@@ -56,12 +52,8 @@ public abstract class BaseMessageHandler extends BaseMessageTemplate implements 
     public BotApiResponse postBackReply(PostbackEvent event,String data) {
         BotApiResponse botApiResponse = null;
         String replyToken = event.getReplyToken();
-        log.info("[{}] postBackReply方法的event data: {}",LOG_PREFIX,data);
+        log.info("[{}] postBackReply方法event data: {}",LOG_PREFIX,data);
         switch (data){
-            case "國外疫情" :
-                List<Message> imageMapList = handleImagemapMessageReply(event);
-                botApiResponse = reply(replyToken,imageMapList);
-                break;
             case "其他" :
                 List<Message> textList = new ArrayList<>(textMessageReply(event));
                 botApiResponse = reply(replyToken,textList);

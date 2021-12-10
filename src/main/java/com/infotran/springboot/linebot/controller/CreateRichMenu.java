@@ -4,6 +4,7 @@ import com.infotran.springboot.linebot.model.MenuID;
 import com.infotran.springboot.linebot.service.LineClientInterface;
 import com.infotran.springboot.linebot.service.MenuIdService;
 import com.infotran.springboot.util.HandleFileUtil;
+import com.linecorp.bot.model.action.CameraAction;
 import com.linecorp.bot.model.action.MessageAction;
 import com.linecorp.bot.model.action.PostbackAction;
 import com.linecorp.bot.model.richmenu.*;
@@ -42,17 +43,17 @@ public class CreateRichMenu implements LineClientInterface, CommandLineRunner {
 
 	@Override
 	public void run(String... args) {
-		//刪除MENU 目前需手動刪除
+		//若要刪除刪除MENU 目前需手動刪除
 		if (!isRichMenuExists()){
-			executeCreateRichMenu();
+			createRichMenu();
 		}
 	}
 
 	/**
 	 * 製做RichMenu
-	 * @throws Exception 製作Line RichMenu失敗
+	 * @throws Exception 製作 Line RichMenu失敗
 	 * */
-	public void executeCreateRichMenu() {
+	public void createRichMenu() {
 		List<RichMenuArea> area = createRichMenuArea();
 		RichMenu richmenu = RichMenu.builder()
 									.size(new RichMenuSize(2500, 1686))
@@ -92,8 +93,9 @@ public class CreateRichMenu implements LineClientInterface, CommandLineRunner {
 		RichMenuArea buyMask = new RichMenuArea(new RichMenuBounds(833, 2, 836, 844),action02);
 
 		//掃描QRCode action3
-		MessageAction action03 = new MessageAction("掃描QRCode","掃描QRCode");
-		RichMenuArea locationStatus = new RichMenuArea(new RichMenuBounds(1666, 3, 834, 843),action03);
+//		MessageAction action03 = new MessageAction("掃描QRCode","掃描QRCode");
+		CameraAction action03 = CameraAction.builder().label("掃描QRCode").build();
+		RichMenuArea qrcodeScanner = new RichMenuArea(new RichMenuBounds(1666, 3, 834, 843),action03);
 
 		//國外疫情 action4
 		PostbackAction action04 = PostbackAction.builder().label("國外疫情").data("國外疫情").displayText("國外疫情").build();
@@ -108,7 +110,7 @@ public class CreateRichMenu implements LineClientInterface, CommandLineRunner {
 		RichMenuArea others = new RichMenuArea(new RichMenuBounds(1663, 843, 835, 843),action06);
 		area.add(todayNum);
 		area.add(buyMask);
-		area.add(locationStatus);
+		area.add(qrcodeScanner);
 		area.add(globalStatus);
 		area.add(vaccineReport);
 		area.add(others);

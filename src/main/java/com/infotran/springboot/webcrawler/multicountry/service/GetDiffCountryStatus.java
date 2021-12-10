@@ -55,7 +55,7 @@ public class GetDiffCountryStatus {
      *
      * @param body CDC的csv檔
      * */
-    public void parseCsvInfo(String body){
+    public void parseCsvInfo(@NonNull String body){
         //每一行 以換行\n區分
         String[] countries = body.split("\n");
         CopyOnWriteArrayList<String> column = new CopyOnWriteArrayList<>();
@@ -110,7 +110,7 @@ public class GetDiffCountryStatus {
         DiffCountry diffCountry = genDiffCountry(column,time);
         DiffCountry result = diffCountryService.save(diffCountry);
         if(Objects.isNull(result)){
-            log.warn("{} 成功解析各國疫情狀況，但新增db失敗",LOG_PREFIX);
+            log.error("{} 成功解析各國疫情狀況，但新增db失敗",LOG_PREFIX);
         }
     }
 
@@ -122,14 +122,14 @@ public class GetDiffCountryStatus {
     private void updateDb(CopyOnWriteArrayList<String> column,String time){
         DiffCountry oldCountry = diffCountryService.findByIsoCodeAndLastUpdate(column.get(1),time);
         if(Objects.isNull(oldCountry)){
-            //新增
+            //無則新增
             saveToDb(column,time);
         } else {
             //更新
             DiffCountry newCountry = genDiffCountry(column,time);
             DiffCountry result = diffCountryService.save(newCountry);
             if(Objects.isNull(result)){
-                log.warn("{} 成功解析各國疫情狀況，但更新db失敗",LOG_PREFIX);
+                log.error("{} 成功解析各國疫情狀況，但更新db失敗",LOG_PREFIX);
             }
         }
     }

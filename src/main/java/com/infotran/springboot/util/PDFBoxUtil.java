@@ -10,14 +10,19 @@ import java.io.InputStream;
 import java.net.URL;
 
 /**
+ * 解析pdf工具類
  * @author chris
  */
-@Component
 @Slf4j
+@Component
 public class PDFBoxUtil {
 
-    private static final String LOG_PREFIX = "PdfBoxUtil";
-
+    /**
+     * 解析pdf，回傳文字內容
+     * @param urlPath
+     * @return String
+     * @throws IOException
+     * */
     public static String readPDF(String urlPath) throws IOException {
         URL pdfUrl = new URL(urlPath);
         InputStream inputStream = pdfUrl.openStream();

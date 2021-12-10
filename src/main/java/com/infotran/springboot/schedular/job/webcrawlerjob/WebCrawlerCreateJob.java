@@ -71,7 +71,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * 每三十分鐘執行一次
      *
      * */
-//    @Scheduled(fixedRate = 30 * TimeUnit.MINUTE)
+    @Scheduled(fixedRate = 30 * TimeUnit.MINUTE)
     public void executeCrawlCovid() {
         Request request = new Request.Builder().url(getCovidNumService.CDC_URL).get().build();
         Call call = CLIENT.newCall(request);
@@ -104,13 +104,12 @@ public class WebCrawlerCreateJob implements ClientUtil {
         });
     }
 
-
     /**
      * 執行 [剩餘口罩數] 爬蟲<br>
      * (每小時執行一次)
      *
      * */
-//    @Scheduled(fixedRate = TimeUnit.HOUR)
+    @Scheduled(fixedRate = TimeUnit.HOUR)
     public void executeMaskCrawl() {
         Request request = new Request.Builder().url(getMaskJsonService.MASK_URL).get().build();
         Call call = CLIENT.newCall(request);
@@ -129,24 +128,27 @@ public class WebCrawlerCreateJob implements ClientUtil {
             public void onResponse( Call call, Response response) {
                 MDC.put("job","Mask Info");
                 String jsonBody = null;
-                if(response.body()!=null){
-                    jsonBody = response.body().string();
-                }else {
-                    throw new LineBotException(LineBotExceptionEnums.FAIL_ON_BODY_RESPONSE);
+                try{
+                    if(response.body()!=null){
+                        jsonBody = response.body().string();
+                        rabbitMqService.sendMaskInfo(jsonBody);
+                    }else {
+                        throw new LineBotException(LineBotExceptionEnums.FAIL_ON_BODY_RESPONSE);
+                    }
+                } catch (LineBotException e){
+                    log.error("執行 [查詢剩餘口罩數] 爬蟲成功但響應失敗:{}",e.getMessage());
+                }finally {
+                    MDC.remove("job");
                 }
-                rabbitMqService.sendMaskInfo(jsonBody);
-                MDC.remove("job");
             }
         });
     }
 
-
-
     /**
      * 執行 [pdf 取得各疫苗接踵累计人次] 爬蟲<br>
-     * (每小時執行一次)
+     * (每12小時執行一次)
      * */
-//    @Scheduled(fixedRate = 12* TimeUnit.HOUR)
+    @Scheduled(fixedRate = 12* TimeUnit.HOUR)
     public void executeParsingPDF() {
         Request request = new Request.Builder().url(getVaccinedInfoService.getPdfUrl()).get().build();
         Call call = CLIENT.newCall(request);
@@ -183,7 +185,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * 執行 [截图: 累计接踵人次 & 各梯次疫苗涵蓋率] 爬蟲<br>
      * (每小時執行一次)
      * */
-//    @Scheduled(fixedRate = TimeUnit.HOUR)
+    @Scheduled(fixedRate = TimeUnit.HOUR)
     public void executeVaccineScreeShot() {
         MDC.put("job","Selenium Snapshot");
         try {
@@ -217,7 +219,9 @@ public class WebCrawlerCreateJob implements ClientUtil {
             byte[] bytes = HandleFileUtil.decomposeGzipToBytes(path);
             //轉utf-8
             String body = new String(bytes, StandardCharsets.UTF_8);
-            rabbitMqService.sendWorldCovid19Data(body);
+            if(Objects.nonNull(body)){
+                rabbitMqService.sendWorldCovid19Data(body);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (URISyntaxException e) {
@@ -226,7 +230,5 @@ public class WebCrawlerCreateJob implements ClientUtil {
             MDC.remove("job");
         }
     }
-
-
 
 }

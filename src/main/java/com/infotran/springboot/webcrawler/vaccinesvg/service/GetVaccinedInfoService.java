@@ -51,23 +51,16 @@ public class GetVaccinedInfoService implements ClientUtil {
     @Value("${CDC_URL_PREFIX}")
     private String CDC_URL_PREFIX;
 
-    private static String LOG_PREFIX;
+    private static String LOG_PREFIX= "[GetVaccinedInfoService 截圖]";
     /** selenium使用的driver */
-    private static String SYSTEM_DRIVER;
+    private static String SYSTEM_DRIVER = "webdriver.chrome.driver";
     /** chromedirver系统路径 */
-    private static String SYSTEM_PATH ;
+    private static String SYSTEM_PATH = "E:\\javalib\\selenium\\webdrivers\\chromedriver.exe";
     /** 累计接踵人次截圖FileName */
-    private static String cumuFileName;
+    private static String cumuFileName = "cumulativeVaccined.jpg";
     /** 各梯次疫苗涵蓋率图FileName */
-    private static String coverFileName;
+    private static String coverFileName = "eachBatchCoverage.jpg";
 
-    static {
-        LOG_PREFIX = "[GetVaccinedInfoService 截圖]";
-        SYSTEM_PATH = "E:\\javalib\\selenium\\webdrivers\\chromedriver.exe";
-        cumuFileName = "cumulativeVaccined.jpg";
-        coverFileName = "eachBatchCoverage.jpg";
-        SYSTEM_DRIVER = "webdriver.chrome.driver";
-    }
 
     @Resource
     CheckPDFRecordServiceImpl checkPDFRecordService;
@@ -97,8 +90,7 @@ public class GetVaccinedInfoService implements ClientUtil {
             Thread.sleep(1000);
             File cumulativeVaccinedFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
             //累计接踵人次截圖
-            StringBuilder fullPath = new StringBuilder();
-            fullPath.append(HandleFileUtil.filePath).append(cumuFileName);
+            StringBuilder fullPath = new StringBuilder().append(HandleFileUtil.filePath).append(cumuFileName);
             FileUtils.copyFile(cumulativeVaccinedFile,new File(fullPath.toString()));
         } catch (IOException | InterruptedException e) {
             log.error("累计接踵人次截圖 圖片輸出失敗:{}",e.getMessage());
@@ -125,8 +117,7 @@ public class GetVaccinedInfoService implements ClientUtil {
             Thread.sleep(1000);
             File cumulativeVaccinedFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
             //各梯次疫苗涵蓋率
-            StringBuilder fullPath = new StringBuilder();
-            fullPath.append(HandleFileUtil.filePath).append(coverFileName);
+            StringBuilder fullPath = new StringBuilder().append(HandleFileUtil.filePath).append(coverFileName);
             FileUtils.copyFile(cumulativeVaccinedFile,new File(fullPath.toString()));
         } catch (IOException | InterruptedException e) {
             log.error("取得各梯次疫苗涵蓋率 圖片輸出失敗:{}",e.getMessage());
@@ -164,7 +155,7 @@ public class GetVaccinedInfoService implements ClientUtil {
                                                             .build();
                 VaccineTypePeople vaccineTypePeople = vaccinedPeopleService.save(vPeople);
                 if(Objects.isNull(vaccineTypePeople)){
-                    log.warn("pdf解析成功 pdf内文新增至db失败");
+                    log.error("pdf解析成功 pdf内文新增至db失败");
                 }
                 //记录新的一筆
                 VaccinedPDFRecord vaccinedPDFRecord = VaccinedPDFRecord.builder()
@@ -172,7 +163,7 @@ public class GetVaccinedInfoService implements ClientUtil {
                                                                        .build();
                 VaccinedPDFRecord pdfRecord = checkPDFRecordService.save(vaccinedPDFRecord);
                 if(Objects.isNull(pdfRecord)){
-                    log.warn("pdf解析成功、pdf内文新增成功  pdf记录至db失败");
+                    log.error("pdf解析成功、pdf内文新增成功  pdf记录至db失败");
                 }
                 //儲存至static resource
                 HandleFileUtil.downloadWithFilesCopy(fullUrl.toString(),title.concat(".pdf"));

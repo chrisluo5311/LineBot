@@ -20,10 +20,14 @@ public class ConfirmCaseReceiver {
     GetCovidNumService getCovidNumService;
 
     @RabbitListener(queues = "${webcrawler.mq.confirmcase}")
-    public void receiveMessage(String json) throws LineBotException {
+    public void receiveMessage(String json) {
         MDC.put("consumer","Confirm Case Receiver");
         log.info("當日新增確診者接收處理-開始");
-        getCovidNumService.getUrlOfNewsDetail(json);
+        try{
+            getCovidNumService.getUrlOfNewsDetail(json);
+        } catch (LineBotException e) {
+            log.error("當日新增確診者接收失敗:{}",e.getMessage());
+        }
         log.info("當日新增確診者接收處理-結束");
         MDC.remove("consumer");
     }

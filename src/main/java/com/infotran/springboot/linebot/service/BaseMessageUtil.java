@@ -29,8 +29,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public abstract class BaseMessageUtil implements LineClientInterface {
 
-    private static final String LOG_PREFIX = "[BaseMessageUtil]";
-
     /** 最大MESSAGE傳送數量 */
     private static final Integer MAX_MESSAGE_AMOUNT = 1000;
 
@@ -69,7 +67,7 @@ public abstract class BaseMessageUtil implements LineClientInterface {
                     .replyMessage(new ReplyMessage(replyToken, messages, notificationDisabled))
                     .get();
             log.info("========================請求結束============================");
-            log.info("[{}] 送出給使用者的訊息: {}",LOG_PREFIX,messages);
+            log.info("送出給使用者的訊息: {}",messages);
             return apiResponse;
         } catch (InterruptedException | ExecutionException e) {
             log.error("發送post請求 失敗:{}",e.getMessage());
@@ -95,7 +93,6 @@ public abstract class BaseMessageUtil implements LineClientInterface {
     }
 
     /**
-     * 測試用<br>
      * 處理使用者回傳的貼圖<br>
      * (預設回復一模一樣的貼圖)
      * @param replyToken replyToken
@@ -175,7 +172,7 @@ public abstract class BaseMessageUtil implements LineClientInterface {
                 return null;
             }
             QuickReplyItem quickReplyItem = getQuickReply(quickReplyMode);
-            log.info("[{}] 回傳單一的QuickReplyItem物件: {}",LOG_PREFIX,quickReplyItem);
+            log.info("回傳單一的QuickReplyItem物件: {}",quickReplyItem);
             return QuickReply.builder().item(quickReplyItem).build();
         } else {
             //多個
@@ -197,7 +194,7 @@ public abstract class BaseMessageUtil implements LineClientInterface {
         String data = quickReplyMode.data();
         String displayText = quickReplyMode.displayText();
         String text = quickReplyMode.text();
-        log.info("[{}] @QuickReplyMode註解裡的參數 mode: {}, label: {}, data: {}, displayText: {},text: {}",LOG_PREFIX,mode,label,data,displayText,text);
+        log.info("@QuickReplyMode註解裡的參數 mode: {}, label: {}, data: {}, displayText: {},text: {}",mode,label,data,displayText,text);
         //回傳QuickReplyItem
         return mode.getQuickReplyItem(label,data,displayText,text);
     }

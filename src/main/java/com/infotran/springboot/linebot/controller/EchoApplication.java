@@ -109,9 +109,9 @@ public class EchoApplication {
                 throw new LineBotException(LineBotExceptionEnums.BOTAPI_RESPONSE_EMPTY,"MessageEvent");
             }
         } catch (LineBotException e) {
-            log.error("{} 接收處理MessageEvent失敗或無對應MessageEvent test:{}",LOG_PREFIX,e.getMessage());
+            log.error("{} 接收處理MessageEvent失敗或無對應MessageEvent text:{}",LOG_PREFIX,e.getMessage());
         } catch (Exception e) {
-            log.error("{} 接收處理MessageEvent失敗或無對應MessageEvent test:{}",LOG_PREFIX,e.getMessage());
+            log.error("{} 接收處理MessageEvent失敗或無對應MessageEvent text:{}",LOG_PREFIX,e.getMessage());
         }
     }
 
