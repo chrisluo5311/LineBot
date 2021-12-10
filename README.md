@@ -3,11 +3,12 @@
 ![目錄](https://github.com/chrisluo5311/LineBot/blob/master/src/main/resources/static/menufinal.jpg "line bot richmenu")
 
 ### 安裝軟體對應版本:
-|  軟體  |  版本  |   說明   |
-|:------:|:--------:|:------------:|
-|  JDK  | 11.0.10   | Spring boot對低版支持無測試過 |
-|  Redis  | 5.0.10   | 低版支持無測試過  |
-|  postgresql  | 42.2.19  | 低版支持無測試過 |
+|  軟體  |  版本  |  
+|:------:|:--------:|
+|  SpringBoot  | 2.4.5   | 
+|  JDK  | 11.0.10   | 
+|  Redis  | 5.0.10   | 
+|  postgresql  | 42.2.19  | 
 
 ### 定時任務說明
 
@@ -29,7 +30,7 @@
 |  掃描QRCode  | `完成` | LineBot | 使用LineBot Messaging API提供的CameraAction  |
 |  國外疫情  | `完成` | okhttp、jsoup<br>java util.zip(GZIPInputStream) |  解壓縮各國疫情gzip檔，將內容送入rabbitmq隊列，按國家解析各欄位  |
 |  疫苗施打統計圖  | `完成` | okhttp、jsoup<br>Selenium、apache pdfbox |  1. 前往(infogram 標題:誰打了疫苗)取得累计接踵人次截圖<br> 2. 前往全球疫情地圖之疫苗接種統計圖，取得各梯次疫苗涵蓋率圖<br> 3. 解析「疫苗接踵對象累計種人次.pdf」 |
-|  其他統計表  | `進行中` | okhttp、jsoup | 暫定放個人履歷資訊 |
+|  其他  | `進行中` | okhttp、jsoup | 暫定放個人履歷資訊 |
 
 2. 相關Maven依賴 
 
