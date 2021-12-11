@@ -20,6 +20,7 @@ import com.linecorp.bot.model.message.TemplateMessage;
 import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.message.template.CarouselColumn;
 import com.linecorp.bot.model.message.template.CarouselTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
@@ -38,6 +39,9 @@ import java.util.concurrent.atomic.AtomicReference;
 public class HandleDiffCountryMessage extends BaseMessageHandler {
 
     private static final String LOG_PREFIX = "HandleDiffCountryMessage";
+
+    @Value("${CDC.WORLD.COUNTRYCODE_URL}")
+    String worldCovidUrl;
 
     @Resource
     DiffCountryServiceImpl diffCountryService;
@@ -100,19 +104,19 @@ public class HandleDiffCountryMessage extends BaseMessageHandler {
                         Arrays.asList(
                                 new CarouselColumn(globalUri, "全球疫情統計", replyTestMap.get(CountryEnum.GLOBAL), Arrays.asList(
                                         new URIAction("查看全球疫情數據",
-                                                URI.create(CountryEnum.GLOBAL.getActionUri()), null)
+                                                URI.create(CountryEnum.GLOBAL.getActionUri(worldCovidUrl)), null)
                                 )),
                                 new CarouselColumn(usUri, "美國疫情統計", replyTestMap.get(CountryEnum.US), Arrays.asList(
                                         new URIAction("查看美國疫情數據",
-                                                URI.create(CountryEnum.US.getActionUri()), null)
+                                                URI.create(CountryEnum.US.getActionUri(worldCovidUrl)), null)
                                 )),
                                 new CarouselColumn(chinaUri, "中國疫情統計", replyTestMap.get(CountryEnum.CHINA), Arrays.asList(
                                         new URIAction("查看中國疫情數據",
-                                                URI.create(CountryEnum.CHINA.getActionUri()), null)
+                                                URI.create(CountryEnum.CHINA.getActionUri(worldCovidUrl)), null)
                                 )),
                                 new CarouselColumn(japanUri, "日本疫情統計", replyTestMap.get(CountryEnum.JAPAN), Arrays.asList(
                                         new URIAction("查看日本疫情數據",
-                                                URI.create(CountryEnum.JAPAN.getActionUri()), null)
+                                                URI.create(CountryEnum.JAPAN.getActionUri(worldCovidUrl)), null)
                                 ))
                         ));
                 TemplateMessage templateMessage = new TemplateMessage("請使用手機觀看", carouselTemplate);
@@ -126,7 +130,7 @@ public class HandleDiffCountryMessage extends BaseMessageHandler {
                         Arrays.asList(
                                 new CarouselColumn(singleCountryUri, countryName+"疫情統計", singleReplyText.get(eachCountry), Arrays.asList(
                                         new URIAction("查看"+countryName+"疫情數據",
-                                                URI.create(eachCountry.getActionUri()), null))
+                                                URI.create(eachCountry.getActionUri(worldCovidUrl)), null))
                         ))
                 );
                 TemplateMessage eachTemplateMessage = new TemplateMessage("請使用手機觀看", singleCarouselTemplate);

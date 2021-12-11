@@ -26,7 +26,7 @@ public enum CountryEnum implements CountryEnumInterface{
         }
 
         @Override
-        public String getActionUri() {
+        public String getActionUri(String worldCovidUrl) {
             return worldCovidUrl.concat(this.getCountryCode());
         }
     },
@@ -37,7 +37,7 @@ public enum CountryEnum implements CountryEnumInterface{
         }
 
         @Override
-        public String getActionUri() {
+        public String getActionUri(String worldCovidUrl) {
             return worldCovidUrl.concat(this.getCountryCode());
         }
     },
@@ -49,7 +49,7 @@ public enum CountryEnum implements CountryEnumInterface{
         }
 
         @Override
-        public String getActionUri() {
+        public String getActionUri(String worldCovidUrl) {
             return worldCovidUrl.concat(this.getCountryCode());
         }
     },
@@ -60,7 +60,7 @@ public enum CountryEnum implements CountryEnumInterface{
         }
 
         @Override
-        public String getActionUri() {
+        public String getActionUri(String worldCovidUrl) {
             return worldCovidUrl.concat(this.getCountryCode());
         }
     },
@@ -71,7 +71,7 @@ public enum CountryEnum implements CountryEnumInterface{
         }
 
         @Override
-        public String getActionUri() {
+        public String getActionUri(String worldCovidUrl) {
             return worldCovidUrl.concat(this.getCountryCode());
         }
     },
@@ -82,7 +82,7 @@ public enum CountryEnum implements CountryEnumInterface{
         }
 
         @Override
-        public String getActionUri() {
+        public String getActionUri(String worldCovidUrl) {
             return worldCovidUrl.concat(this.getCountryCode());
         }
     },
@@ -93,7 +93,7 @@ public enum CountryEnum implements CountryEnumInterface{
         }
 
         @Override
-        public String getActionUri() {
+        public String getActionUri(String worldCovidUrl) {
             return worldCovidUrl.concat(this.getCountryCode());
         }
     },
@@ -104,7 +104,7 @@ public enum CountryEnum implements CountryEnumInterface{
         }
 
         @Override
-        public String getActionUri() {
+        public String getActionUri(String worldCovidUrl) {
             return worldCovidUrl.concat(this.getCountryCode());
         }
     },
@@ -115,7 +115,7 @@ public enum CountryEnum implements CountryEnumInterface{
         }
 
         @Override
-        public String getActionUri() {
+        public String getActionUri(String worldCovidUrl) {
             return worldCovidUrl.concat(this.getCountryCode());
         }
     },
@@ -126,7 +126,7 @@ public enum CountryEnum implements CountryEnumInterface{
         }
 
         @Override
-        public String getActionUri() {
+        public String getActionUri(String worldCovidUrl) {
             return worldCovidUrl.concat(this.getCountryCode());
         }
     },
@@ -137,7 +137,7 @@ public enum CountryEnum implements CountryEnumInterface{
         }
 
         @Override
-        public String getActionUri() {
+        public String getActionUri(String worldCovidUrl) {
             return worldCovidUrl.concat(this.getCountryCode());
         }
     },
@@ -148,7 +148,7 @@ public enum CountryEnum implements CountryEnumInterface{
         }
 
         @Override
-        public String getActionUri() {
+        public String getActionUri(String worldCovidUrl) {
             return worldCovidUrl.concat(this.getCountryCode());
         }
     },
@@ -159,7 +159,7 @@ public enum CountryEnum implements CountryEnumInterface{
         }
 
         @Override
-        public String getActionUri() {
+        public String getActionUri(String worldCovidUrl) {
             return worldCovidUrl.concat(this.getCountryCode());
         }
     },
@@ -170,7 +170,7 @@ public enum CountryEnum implements CountryEnumInterface{
         }
 
         @Override
-        public String getActionUri() {
+        public String getActionUri(String worldCovidUrl) {
             return worldCovidUrl.concat(this.getCountryCode());
         }
     },
@@ -181,7 +181,7 @@ public enum CountryEnum implements CountryEnumInterface{
         }
 
         @Override
-        public String getActionUri() {
+        public String getActionUri(String worldCovidUrl) {
             return worldCovidUrl.concat(this.getCountryCode());
         }
     },
@@ -192,7 +192,7 @@ public enum CountryEnum implements CountryEnumInterface{
         }
 
         @Override
-        public String getActionUri() {
+        public String getActionUri(String worldCovidUrl) {
             return worldCovidUrl.concat(this.getCountryCode());
         }
     },
@@ -203,7 +203,7 @@ public enum CountryEnum implements CountryEnumInterface{
         }
 
         @Override
-        public String getActionUri() {
+        public String getActionUri(String worldCovidUrl) {
             return worldCovidUrl.concat(this.getCountryCode());
         }
     },
@@ -214,7 +214,7 @@ public enum CountryEnum implements CountryEnumInterface{
         }
 
         @Override
-        public String getActionUri() {
+        public String getActionUri(String worldCovidUrl) {
             return worldCovidUrl.concat(this.getCountryCode());
         }
     }

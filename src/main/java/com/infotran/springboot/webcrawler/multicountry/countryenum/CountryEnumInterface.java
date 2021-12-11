@@ -8,12 +8,10 @@ import java.net.URI;
  * */
 public interface CountryEnumInterface {
 
-    String worldCovidUrl = "https://covid-19.nchc.org.tw/dt_owl.php?dt_name=4&countrycode=";
-
     /** 國旗照片Uri */
     URI getUri();
 
     /** 各國疫情統計圖的超連結 */
-    String getActionUri();
+    String getActionUri(String worldCovidUrl);
 
 }
