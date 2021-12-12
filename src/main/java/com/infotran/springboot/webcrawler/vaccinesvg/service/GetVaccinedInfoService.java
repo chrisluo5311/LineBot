@@ -16,6 +16,8 @@ import org.jsoup.nodes.Element;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -35,21 +37,11 @@ import java.util.Objects;
 @Service
 public class GetVaccinedInfoService implements ClientUtil {
 
-    /** 疫苗施打統計(infogram)標題:誰打了疫苗 */
-    @Value("${VACCINE.IMG.URL}")
-    private String VACCINE_IMG_URL;
+    @Resource
+    CheckPDFRecordServiceImpl checkPDFRecordService;
 
-    /** 全球疫情地圖之疫苗接種統計圖 */
-    @Value("${VACCINE.URL}")
-    private String VACCINE_URL;
-
-    /** CDC疫苗統計資料pdf */
-    @Value("${PDF.URL}")
-    private String PDF_URL;
-
-    /** 疫苗統計資料PDF網址前綴 */
-    @Value("${CDC_URL_PREFIX}")
-    private String CDC_URL_PREFIX;
+    @Resource
+    VaccinedPeopleServiceImpl vaccinedPeopleService;
 
     private static String LOG_PREFIX= "[GetVaccinedInfoService 截圖]";
     /** selenium使用的driver */
@@ -57,20 +49,10 @@ public class GetVaccinedInfoService implements ClientUtil {
     /** chromedirver系统路径 */
     private static String SYSTEM_PATH = "E:\\javalib\\selenium\\webdrivers\\chromedriver.exe";
     /** 累计接踵人次截圖FileName */
-    private static String cumuFileName = "cumulativeVaccined.jpg";
+    private static String cumuFileName = "cumulativeVaccined.jpg" ;
     /** 各梯次疫苗涵蓋率图FileName */
     private static String coverFileName = "eachBatchCoverage.jpg";
 
-
-    @Resource
-    CheckPDFRecordServiceImpl checkPDFRecordService;
-
-    @Resource
-    VaccinedPeopleServiceImpl vaccinedPeopleService;
-
-    public String getPdfUrl(){
-        return this.PDF_URL;
-    }
 
     /**
      * 前往疫苗施打統計(infogram 標題:誰打了疫苗)<br>
@@ -81,7 +63,7 @@ public class GetVaccinedInfoService implements ClientUtil {
         System.setProperty(SYSTEM_DRIVER,SYSTEM_PATH);
         WebDriver driver = new ChromeDriver();
         try {
-            driver.get(VACCINE_IMG_URL);
+            driver.get(properties.VACCINE_IMG_URL);
             driver.manage().window().setSize(new Dimension(886,550));
             Thread.sleep(1000);
             //截图: 累计接踵人次
@@ -108,7 +90,7 @@ public class GetVaccinedInfoService implements ClientUtil {
         System.setProperty(SYSTEM_DRIVER,SYSTEM_PATH);
         WebDriver driver = new ChromeDriver();
         try {
-            driver.get(VACCINE_URL);
+            driver.get(properties.VACCINE_URL);
             driver.manage().window().setSize(new Dimension(1100,700));
             Thread.sleep(1000);
             //截图: 各梯次疫苗涵蓋率
@@ -142,11 +124,11 @@ public class GetVaccinedInfoService implements ClientUtil {
             String isNew = checkPDFRecordService.findByUploadTime(dateNum);
             if(Objects.nonNull(dateNum) && CheckPDFRecordServiceImpl.ISNEWPDF.equals(isNew)){
                 //提取url
-                fullUrl.append(CDC_URL_PREFIX).append(ancherPdf.attr("href"));
+                fullUrl.append(properties.PREFIX).append(ancherPdf.attr("href"));
                 //pdf轉換成文字
                 String content = PDFBoxUtil.readPDF(fullUrl.toString());
                 //解析內容 :累計接踵疫苗人次字串
-                String result = parseContent(content,new StringBuilder());
+                String result = parseContent(content,new StringBuilder()).trim();
                 //记录内容
                 VaccineTypePeople vPeople= VaccineTypePeople.builder()
                                                             .resourceUrl(fullUrl.toString())
@@ -184,6 +166,37 @@ public class GetVaccinedInfoService implements ClientUtil {
     private String parseContent(String content,StringBuilder result){
         String[] strings = content.split("。");
         return result.append(strings[1]).append(strings[2]).toString();
+    }
+
+
+    /**
+     * VaccinedInfo相關參數配置<br>
+     * 對應 webcrawl.properties(prefix = vaccineinfo)<br>
+     * @author chris
+     * */
+    @ConstructorBinding
+    @ConfigurationProperties(prefix = "vaccineinfo")
+    public static class properties {
+
+        /** 疫苗施打統計(infogram)標題:誰打了疫苗 */
+        public static String VACCINE_IMG_URL;
+
+        /** 全球疫情地圖之疫苗接種統計圖 */
+        public static String VACCINE_URL;
+
+        /** CDC疫苗統計資料pdf */
+        public static String PDF_URL;
+
+        /** 疫苗統計資料PDF網址前綴 */
+        @Value("${CDC_URL_PREFIX}")
+        public static String PREFIX;
+
+        public properties(String VACCINE_IMG_URL,String VACCINE_URL,String PDF_URL,String PREFIX) {
+            this.VACCINE_IMG_URL = VACCINE_IMG_URL;
+            this.VACCINE_URL = VACCINE_URL;
+            this.PDF_URL = PDF_URL;
+            this.PREFIX = PREFIX;
+        }
     }
 
 }

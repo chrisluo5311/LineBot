@@ -28,10 +28,6 @@ public class GetDiffCountryStatus {
 
     public static final String FILENAME = "world";
 
-    private static String TODAY_DATE = TimeUtil.formCustomDate("YYYY-MM-dd",null);
-
-    private static String YESTERDAY_DATE = TimeUtil.formCustomDate("YYYY-MM-dd",1l);
-
     /** CDC WORLD Data URL */
     @Value("${CDC.WORLD.COVID}")
     public String CDC_WORLD_URL;
@@ -67,10 +63,10 @@ public class GetDiffCountryStatus {
                 String isoCode = column.get(1);
                 if(checkTodayTime(date) && verifyIsoCode(isoCode)){
                     //儲存今日資料
-                    saveToDb(column,TODAY_DATE);
+                    saveToDb(column,TimeUtil.TODAY_DATE);
                 } else if(checkYesterdayTime(date) && verifyIsoCode(isoCode)){
                     //更新昨日資料
-                    updateDb(column,YESTERDAY_DATE);
+                    updateDb(column,TimeUtil.YESTERDAY_DATE);
                 }
             }
             column.clear();
@@ -82,7 +78,7 @@ public class GetDiffCountryStatus {
      * @param time 今日日期
      * */
     private Boolean checkTodayTime(@NonNull String time){
-        return (time.equals(TODAY_DATE))?true:false;
+        return (time.equals(TimeUtil.TODAY_DATE))?true:false;
     }
 
     /**
@@ -90,7 +86,7 @@ public class GetDiffCountryStatus {
      * @param time 昨日日期
      * */
     private Boolean checkYesterdayTime(@NonNull String time){
-        return (time.equals(YESTERDAY_DATE))?true:false;
+        return (time.equals(TimeUtil.YESTERDAY_DATE))?true:false;
     }
 
     /**
@@ -164,5 +160,6 @@ public class GetDiffCountryStatus {
                           .lastUpdate(date)
                           .build();
     }
+
 
 }

@@ -29,13 +29,9 @@ public class GetMaskJsonService implements ClientUtil {
     @Value("${Mask.URL}")
     public String MASK_URL;
 
-    private static final String LOG_PREFIX;
-    public static final String REDIS_KEY;
+    private static final String LOG_PREFIX= "[GetMaskJsonController]";
+    public static final String REDIS_KEY = "medicineStore";
 
-    static {
-        LOG_PREFIX = "[GetMaskJsonController]";
-        REDIS_KEY = "medicineStore";
-    }
 
     @Resource
     RedisTemplate<Object, MedicineStore> medicineStoreRedisTemplate;

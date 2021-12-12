@@ -5,6 +5,7 @@ import com.infotran.springboot.annotation.quickreplyenum.ActionMode;
 import com.infotran.springboot.linebot.service.BaseMessageHandler;
 import com.infotran.springboot.linebot.service.messagehandler.enums.HandlerEnum;
 import com.infotran.springboot.webcrawler.confirmcase.model.ConfirmCase;
+import com.infotran.springboot.webcrawler.confirmcase.service.GetCovidNumService;
 import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
@@ -54,7 +55,12 @@ public class HandleTodayAmountMessage extends BaseMessageHandler {
                     confirmCase = confirmCaseService.findByConfirmTime(LocalDate.now());
                 }
                 if (confirmCase != null) {
-                    message.append("指揮中心快訊：今日新增").append(confirmCase.getTodayAmount()).append("例COVID-19確定病例。\n");
+                    message.append("指揮中心快訊：今日新增").append(confirmCase.getTodayAmount()).append("例");
+                    if(GetCovidNumService.properties.ALL_IMPORTED.equals(confirmCase.getDomesticOrImportedCaseMemo())){
+                        message.append(GetCovidNumService.properties.ALL_IMPORTED).append("。\n");
+                    }else {
+                        message.append("COVID-19確定病例，").append(confirmCase.getDomesticOrImportedCaseMemo().trim()).append("。\n");
+                    }
                     message.append("校正回歸數").append(confirmCase.getReturnAmount()).append("例。\n");
                     message.append("死亡人數").append(confirmCase.getDeathAmount()).append("例。\n\n");
                     message.append("參考指揮中心新聞網址:").append(confirmCase.getNewsUrl());

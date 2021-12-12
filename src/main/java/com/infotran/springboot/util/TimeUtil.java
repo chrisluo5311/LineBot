@@ -19,8 +19,10 @@ import java.util.Objects;
 @Component
 public class TimeUtil {
 
-    private TimeUtil(){
-    }
+    /**今日日期*/
+    public static String TODAY_DATE = TimeUtil.formCustomDate("YYYY-MM-dd",null);
+    /**昨日日期*/
+    public static String YESTERDAY_DATE = TimeUtil.formCustomDate("YYYY-MM-dd",1l);
 
     /**
      * 月份與日期

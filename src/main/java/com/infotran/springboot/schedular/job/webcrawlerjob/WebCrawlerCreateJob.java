@@ -44,9 +44,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class WebCrawlerCreateJob implements ClientUtil {
 
     @Resource
-    GetCovidNumService getCovidNumService;
-
-    @Resource
     GetMaskJsonService getMaskJsonService;
 
     @Resource
@@ -71,9 +68,9 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * 每三十分鐘執行一次
      *
      * */
-    @Scheduled(fixedRate = 30 * TimeUnit.MINUTE)
+//    @Scheduled(fixedRate = 30 * TimeUnit.MINUTE)
     public void executeCrawlCovid() {
-        Request request = new Request.Builder().url(getCovidNumService.CDC_URL).get().build();
+        Request request = new Request.Builder().url(GetCovidNumService.properties.URL).get().build();
         Call call = CLIENT.newCall(request);
         call.enqueue(new Callback() {
             @SneakyThrows
@@ -97,7 +94,9 @@ public class WebCrawlerCreateJob implements ClientUtil {
                     }else {
                         throw new LineBotException(LineBotExceptionEnums.FAIL_ON_BODY_RESPONSE);
                     }
-                } finally {
+                } catch (LineBotException e){
+                    log.error("執行 [當日新增確診數] 爬蟲成功但響應失敗:{}",e.getMessage());
+                }finally {
                     MDC.remove("job");
                 }
             }
@@ -109,7 +108,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * (每小時執行一次)
      *
      * */
-    @Scheduled(fixedRate = TimeUnit.HOUR)
+//    @Scheduled(fixedRate = TimeUnit.HOUR)
     public void executeMaskCrawl() {
         Request request = new Request.Builder().url(getMaskJsonService.MASK_URL).get().build();
         Call call = CLIENT.newCall(request);
@@ -150,7 +149,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * */
     @Scheduled(fixedRate = 12* TimeUnit.HOUR)
     public void executeParsingPDF() {
-        Request request = new Request.Builder().url(getVaccinedInfoService.getPdfUrl()).get().build();
+        Request request = new Request.Builder().url(GetVaccinedInfoService.properties.PDF_URL).get().build();
         Call call = CLIENT.newCall(request);
         call.enqueue(new Callback() {
             @SneakyThrows
@@ -185,7 +184,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * 執行 [截图: 累计接踵人次 & 各梯次疫苗涵蓋率] 爬蟲<br>
      * (每小時執行一次)
      * */
-    @Scheduled(fixedRate = TimeUnit.HOUR)
+//    @Scheduled(fixedRate = TimeUnit.HOUR)
     public void executeVaccineScreeShot() {
         MDC.put("job","Selenium Snapshot");
         try {
@@ -206,7 +205,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * 執行 取得 [CDC_World COVID-19 Data] <br>
      * (每 6 小時執行一次)
      * */
-    @Scheduled(fixedRate = 6 * TimeUnit.HOUR)
+//    @Scheduled(fixedRate = 6 * TimeUnit.HOUR)
     public void executeTodayWorldCovidData()  {
         MDC.put("job","CDC_World_Today_CovidData");
         log.info("url :{} ", countryStatus.CDC_WORLD_URL);
@@ -223,9 +222,9 @@ public class WebCrawlerCreateJob implements ClientUtil {
                 rabbitMqService.sendWorldCovid19Data(body);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("下載CDC各國疫情csv檔失敗:{}",e.getMessage());
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            log.error("URI創建失敗:{}",e.getMessage());
         } finally {
             MDC.remove("job");
         }
