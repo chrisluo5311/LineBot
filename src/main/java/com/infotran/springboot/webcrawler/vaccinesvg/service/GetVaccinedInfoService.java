@@ -49,9 +49,11 @@ public class GetVaccinedInfoService implements ClientUtil {
     /** chromedirver系统路径 */
     private static String SYSTEM_PATH = "E:\\javalib\\selenium\\webdrivers\\chromedriver.exe";
     /** 累计接踵人次截圖FileName */
-    private static String cumuFileName = "cumulativeVaccined.jpg" ;
+    public static String cumuFileName = "cumulativeVaccined.jpg" ;
     /** 各梯次疫苗涵蓋率图FileName */
-    private static String coverFileName = "eachBatchCoverage.jpg";
+    public static String eachAgeCoverFileName = "eachAgeCoverage.jpg";
+
+    public static String eachCityCoverFileName = "eachCityCoverage.jpg";
 
 
     /**
@@ -64,10 +66,10 @@ public class GetVaccinedInfoService implements ClientUtil {
         WebDriver driver = new ChromeDriver();
         try {
             driver.get(properties.VACCINE_IMG_URL);
-            driver.manage().window().setSize(new Dimension(886,550));
+            driver.manage().window().setSize(new Dimension(880,800));
             Thread.sleep(1000);
             //截图: 累计接踵人次
-            ((JavascriptExecutor)driver).executeScript("window.scrollTo(0,845);");
+            ((JavascriptExecutor)driver).executeScript("window.scrollTo(0,1980);");
             ((JavascriptExecutor)driver).executeScript("return document.body.style.overflow = 'hidden';");
             Thread.sleep(1000);
             File cumulativeVaccinedFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
@@ -86,20 +88,25 @@ public class GetVaccinedInfoService implements ClientUtil {
      * 取得各梯次疫苗涵蓋率
      *
      * */
-    public void crawlEachBatchCoverage() {
+    public void crawlEachBatchCoverage(Integer height,Integer end,String fileName) {
         System.setProperty(SYSTEM_DRIVER,SYSTEM_PATH);
         WebDriver driver = new ChromeDriver();
         try {
             driver.get(properties.VACCINE_URL);
-            driver.manage().window().setSize(new Dimension(1100,700));
+            driver.manage().window().setSize(new Dimension(1000,height));
             Thread.sleep(1000);
             //截图: 各梯次疫苗涵蓋率
-            ((JavascriptExecutor)driver).executeScript("window.scrollTo(0,1960);");
+            if(end==2205){
+                ((JavascriptExecutor)driver).executeScript("window.scrollTo(0,2205);");
+            }else {
+                ((JavascriptExecutor)driver).executeScript("window.scrollTo(0,2650);");
+            }
             ((JavascriptExecutor)driver).executeScript("return document.body.style.overflow = 'hidden';");
-            Thread.sleep(1000);
+            Thread.sleep(1500);
             File cumulativeVaccinedFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
             //各梯次疫苗涵蓋率
-            StringBuilder fullPath = new StringBuilder().append(HandleFileUtil.filePath).append(coverFileName);
+            log.info("檔案名:{}",fileName);
+            StringBuilder fullPath = new StringBuilder().append(HandleFileUtil.filePath).append(fileName);
             FileUtils.copyFile(cumulativeVaccinedFile,new File(fullPath.toString()));
         } catch (IOException | InterruptedException e) {
             log.error("取得各梯次疫苗涵蓋率 圖片輸出失敗:{}",e.getMessage());
@@ -130,12 +137,12 @@ public class GetVaccinedInfoService implements ClientUtil {
                 //解析內容 :累計接踵疫苗人次字串
                 String result = parseContent(content,new StringBuilder()).trim();
                 //记录内容
-                VaccineTypePeople vPeople= VaccineTypePeople.builder()
+                VaccineTypePeople vaccineTypePeople1 = VaccineTypePeople.builder()
                                                             .resourceUrl(fullUrl.toString())
                                                             .body(result)
                                                             .createTime(TimeUtil.formTodayDate())
                                                             .build();
-                VaccineTypePeople vaccineTypePeople = vaccinedPeopleService.save(vPeople);
+                VaccineTypePeople vaccineTypePeople = vaccinedPeopleService.save(vaccineTypePeople1);
                 if(Objects.isNull(vaccineTypePeople)){
                     log.error("pdf解析成功 pdf内文新增至db失败");
                 }

@@ -4,6 +4,7 @@ import com.infotran.springboot.linebot.service.BaseMessageHandler;
 import com.infotran.springboot.linebot.service.messagehandler.enums.HandlerEnum;
 import com.infotran.springboot.util.HandleFileUtil;
 import com.infotran.springboot.webcrawler.vaccinesvg.model.VaccineTypePeople;
+import com.infotran.springboot.webcrawler.vaccinesvg.service.GetVaccinedInfoService;
 import com.infotran.springboot.webcrawler.vaccinesvg.service.VaccinedPeopleService;
 import com.linecorp.bot.model.action.MessageAction;
 import com.linecorp.bot.model.event.PostbackEvent;
@@ -53,6 +54,7 @@ public class HandleVaccineIMGMessage extends BaseMessageHandler {
     @Override
     protected List<TextMessage> textMessageReply(TextMessageContent event, String replyToken, String userId) {
         String receivedMessage = event.getText();
+        String filePrefix = "/static/";
         switch (receivedMessage){
             case "查看統計圖":
                 //混合型回覆 自行生成QuickReply物件
@@ -70,21 +72,34 @@ public class HandleVaccineIMGMessage extends BaseMessageHandler {
                 }
                 TextMessage pdfTextMessage = TextMessage.builder().text(content.toString()).quickReply(quickReply).build();
                 //圖片訊息
-                URI vaccineImgUri1 = HandleFileUtil.createUri("/static/cumulativeVaccined.jpg");
-                URI vaccineImgUri2 = HandleFileUtil.createUri("/static/eachBatchCoverage.jpg");
-                ImageMessage cumulativeVaccined = ImageMessage.builder().previewImageUrl(vaccineImgUri1).originalContentUrl(vaccineImgUri1).build();
-                ImageMessage eachBatchCoverage = ImageMessage.builder().previewImageUrl(vaccineImgUri2).originalContentUrl(vaccineImgUri2).build();
+                URI vaccineImgUri1 = HandleFileUtil.createUri(filePrefix.concat(GetVaccinedInfoService.cumuFileName));
+                URI vaccineImgUri2 = HandleFileUtil.createUri(filePrefix.concat(GetVaccinedInfoService.eachAgeCoverFileName));
+                ImageMessage cumulativeVaccinated = ImageMessage.builder().previewImageUrl(vaccineImgUri1).originalContentUrl(vaccineImgUri1).build();
+                ImageMessage eachAgeCoverage = ImageMessage.builder().previewImageUrl(vaccineImgUri2).originalContentUrl(vaccineImgUri2).build();
                 //組成List
                 List<Message> replyList = new ArrayList<Message>();
                 replyList.add(pdfTextMessage);
-                replyList.add(cumulativeVaccined);
-                replyList.add(eachBatchCoverage);
+                replyList.add(cumulativeVaccinated);
+                replyList.add(eachAgeCoverage);
                 //回覆
                 reply(replyToken,replyList);
                 break;
-            case "查看各縣市COVID-19疫苗涵蓋率":
-                //todo 查看各縣市COVID-19疫苗涵蓋率
-                log.warn("尚未製作 查看各縣市COVID-19疫苗涵蓋率");
+            case "查看各縣市COVID-19公費疫苗涵蓋率圖":
+                //select出文字訊息pdf
+                VaccineTypePeople vaccineTypePeople2 = vaccinedPeopleService.findOne();
+                StringBuilder content2 = new StringBuilder();
+                if(vaccineTypePeople2!=null){
+                    content2.append("資料來源: ")
+                            .append(vaccineTypePeople2.getResourceUrl())
+                            .append("。");
+                }
+                TextMessage eachCityTextMessage = TextMessage.builder().text(content2.toString()).build();
+                URI vaccineImgUri3 = HandleFileUtil.createUri(filePrefix.concat(GetVaccinedInfoService.eachCityCoverFileName));
+                ImageMessage eachCityCoverage = ImageMessage.builder().previewImageUrl(vaccineImgUri3).originalContentUrl(vaccineImgUri3).build();
+                List<Message> replyList2 = new ArrayList<Message>();
+                replyList2.add(eachCityTextMessage);
+                replyList2.add(eachCityCoverage);
+                reply(replyToken,replyList2);
             default:
         }
         return null;
@@ -108,8 +123,8 @@ public class HandleVaccineIMGMessage extends BaseMessageHandler {
      * */
     private QuickReply createQuickReplyItemList(){
         List<QuickReplyItem> quickReplyItemList = new ArrayList<>();
-        String label = "查看各縣市COVID-19疫苗涵蓋率";
-        String text = "查看各縣市COVID-19疫苗涵蓋率";
+        String label = "查看各縣市COVID-19公費疫苗涵蓋率圖";
+        String text = "查看各縣市COVID-19公費疫苗涵蓋率圖";
         QuickReplyItem item = QuickReplyItem.builder()
                 .action(new MessageAction(label,text))
                 .build();

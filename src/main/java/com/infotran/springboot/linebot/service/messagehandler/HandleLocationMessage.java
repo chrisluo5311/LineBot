@@ -138,7 +138,6 @@ public class HandleLocationMessage extends BaseMessageHandler {
                 medicineStoreMap.put(distance, medicineStore);
             }
         } else {
-            //TODO throw exception
             log.error("{} redis 或 資料庫無藥局資料 請手動確認",LOG_PREFIX);
         }
 
@@ -163,7 +162,6 @@ public class HandleLocationMessage extends BaseMessageHandler {
         //回覆前5家
         return locationLinkedList.stream().limit(5).collect(Collectors.toList());
     }
-
 
     /**
      * 計算兩點距離
