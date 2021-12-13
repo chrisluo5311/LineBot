@@ -71,7 +71,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * 每三十分鐘執行一次
      *
      * */
-    @Scheduled(fixedRate = 30 * TimeUnit.MINUTE)
+//    @Scheduled(fixedRate = 30 * TimeUnit.MINUTE)
     public void executeCrawlCovid() {
         Request request = new Request.Builder().url(GetCovidNumService.properties.URL).get().build();
         Call call = CLIENT.newCall(request);
@@ -111,7 +111,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * (每小時執行一次)
      *
      * */
-    @Scheduled(fixedRate = TimeUnit.HOUR)
+//    @Scheduled(fixedRate = TimeUnit.HOUR)
     public void executeMaskCrawl() {
         Request request = new Request.Builder().url(getMaskJsonService.MASK_URL).get().build();
         Call call = CLIENT.newCall(request);
@@ -150,7 +150,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * 執行 [pdf 取得各疫苗接踵累计人次] 爬蟲<br>
      * (每12小時執行一次)
      * */
-    @Scheduled(fixedRate = 12* TimeUnit.HOUR)
+//    @Scheduled(fixedRate = 12* TimeUnit.HOUR)
     public void executeParsingPDF() {
         Request request = new Request.Builder().url(GetVaccinedInfoService.properties.PDF_URL).get().build();
         Call call = CLIENT.newCall(request);
@@ -190,22 +190,26 @@ public class WebCrawlerCreateJob implements ClientUtil {
     @Scheduled(fixedRate = TimeUnit.HOUR)
     public void executeVaccineScreeShot() {
         MDC.put("job","Selenium Snapshot");
+        // Pair.of(擷取的高度(長度),頁面捲動至(2205或2650)的地方)
         Pair<Integer,Integer> eachAgeCoverage = Pair.of(500,2205);
         Pair<Integer,Integer> eachCityCoverage = Pair.of(700,2650);
         try {
             FutureTask crawlCumulativeVaccineImg = new FutureTask(() -> {
+                //取得累计接踵人次截圖
                 getVaccinedInfoService.crawlCumulativeVaccineImg();
             }, null);
             FutureTask crawlEachAgeCoverage = new FutureTask(() -> {
+                //取得各年齡疫苗涵蓋率
                 getVaccinedInfoService.crawlEachBatchCoverage(eachAgeCoverage.getFirst(),eachAgeCoverage.getSecond(),GetVaccinedInfoService.eachAgeCoverFileName);
             }, null);
             FutureTask crawlEachCityCoverage = new FutureTask(() -> {
+                //取得各縣市疫苗涵蓋率
                 getVaccinedInfoService.crawlEachBatchCoverage(eachCityCoverage.getFirst(),eachCityCoverage.getSecond(),GetVaccinedInfoService.eachCityCoverFileName);
             }, null);
             List<FutureTask> futureTaskList = new ArrayList<>();
             futureTaskList.add(crawlCumulativeVaccineImg);
-            futureTaskList.add(crawlEachAgeCoverage);
-            futureTaskList.add(crawlEachCityCoverage);
+//            futureTaskList.add(crawlEachAgeCoverage);
+//            futureTaskList.add(crawlEachCityCoverage);
             futureTaskList.stream().forEach(crawImgExecutor::submit);
         } finally {
             MDC.remove("job");
@@ -216,7 +220,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * 執行 取得 [CDC_World COVID-19 Data] <br>
      * (每 6 小時執行一次)
      * */
-    @Scheduled(fixedRate = 6 * TimeUnit.HOUR)
+//    @Scheduled(fixedRate = 6 * TimeUnit.HOUR)
     public void executeTodayWorldCovidData()  {
         MDC.put("job","CDC_World_Today_CovidData");
         log.info("url :{} ", countryStatus.CDC_WORLD_URL);

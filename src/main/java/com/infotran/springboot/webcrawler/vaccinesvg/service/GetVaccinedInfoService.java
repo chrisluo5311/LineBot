@@ -71,7 +71,8 @@ public class GetVaccinedInfoService implements ClientUtil {
             //截图: 累计接踵人次
             ((JavascriptExecutor)driver).executeScript("window.scrollTo(0,1980);");
             ((JavascriptExecutor)driver).executeScript("return document.body.style.overflow = 'hidden';");
-            Thread.sleep(1000);
+            //目的:等頁面渲染完畢
+            Thread.sleep(1500);
             File cumulativeVaccinedFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
             //累计接踵人次截圖
             StringBuilder fullPath = new StringBuilder().append(HandleFileUtil.filePath).append(cumuFileName);
@@ -102,6 +103,7 @@ public class GetVaccinedInfoService implements ClientUtil {
                 ((JavascriptExecutor)driver).executeScript("window.scrollTo(0,2650);");
             }
             ((JavascriptExecutor)driver).executeScript("return document.body.style.overflow = 'hidden';");
+            //目的:等頁面渲染完畢
             Thread.sleep(1500);
             File cumulativeVaccinedFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
             //各梯次疫苗涵蓋率
