@@ -43,7 +43,6 @@ public class CreateRichMenu implements LineClientInterface, CommandLineRunner {
 
 	@Override
 	public void run(String... args) {
-		//若要刪除刪除MENU 目前需手動刪除
 		if (!isRichMenuExists()){
 			createRichMenu();
 		}
@@ -72,6 +71,7 @@ public class CreateRichMenu implements LineClientInterface, CommandLineRunner {
 			BLOB_CLIENT.setRichMenuImage(menuId, "image/jpeg", buffer).get();
 			CLIENT.linkRichMenuIdToUser("all", menuId).get();
 			CLIENT.setDefaultRichMenu(menuId).get();
+			log.info("Rich Menu 創建成功 Menu Id:{}",menuId);
 		} catch (InterruptedException | ExecutionException e) {
 			log.error("製作Line RichMenu失敗 : {}",e.getMessage());
 		}
@@ -118,25 +118,43 @@ public class CreateRichMenu implements LineClientInterface, CommandLineRunner {
 
 	/**
 	 * 檢查是否有RichMenu存在<br>
-	 * false: 沒有目錄<br>
-	 * true:  有目錄
+	 * false: 沒目錄、要創建<br>
+	 * true: 有目錄
 	 *
 	 * @return boolean
 	 */
 	private boolean isRichMenuExists() {
 		try {
 			List<RichMenuResponse>  richMenuResponseList = CLIENT.getRichMenuList().get().getRichMenus();
+			log.info("RichMenu數量:{}",richMenuResponseList.size());
+			//空的則創建
+			if(richMenuResponseList.size()==0) {
+				log.info("查詢RichMenu不存在 開始創建");
+				return false;
+			}
+			//超過1個則先刪除再創建
+			if(richMenuResponseList.size()>1){
+				richMenuResponseList.forEach(x->CLIENT.deleteRichMenu(x.getRichMenuId()));
+				menuService.deleteAll();
+				log.warn("RichMenu數量超過1個 進行全部刪除 開始重建");
+				return false;
+			}
+			//1個 檢查db有無紀錄
 			for (RichMenuResponse res : richMenuResponseList){
-				if(res.getRichMenuId().length()!=0){
-					//檢查db有沒有
-					MenuID menu = menuService.getMenuId(res.getRichMenuId());
-					if(Objects.isNull(menu)){
-						MenuID oldMenu = MenuID.builder().menuId(res.getRichMenuId()).menuName(res.getName()).build();
-						menuService.save(oldMenu);
+				MenuID menu = menuService.getMenuId(res.getRichMenuId());
+				if(Objects.isNull(menu)){
+					MenuID saveResult = menuService.save(
+							MenuID.builder()
+									.menuId(res.getRichMenuId())
+									.menuName(res.getName())
+									.build()
+					);
+					if(Objects.isNull(saveResult)){
+						log.error("查詢RichMenu存在 但MenuID新增db失敗");
 					}
 				}
-				//只有一個才能這樣判定
-				return res.getRichMenuId().length() != 0;
+				log.info("查詢RichMenu已存在 不需重建");
+				return true;
 			}
 		} catch (InterruptedException | ExecutionException e) {
 			log.error("獲取Linebot Menu失敗:{}",e.getMessage());

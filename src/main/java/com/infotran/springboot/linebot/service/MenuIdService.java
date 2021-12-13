@@ -32,4 +32,10 @@ public interface MenuIdService {
 	 *
 	 * */
 	MenuID getMenuByName(String menuName);
+
+	/**
+	 * 刪除全部
+	 *
+	 * */
+	void deleteAll();
 }

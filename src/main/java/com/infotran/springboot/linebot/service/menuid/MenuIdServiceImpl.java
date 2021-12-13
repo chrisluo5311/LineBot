@@ -23,15 +23,7 @@ public class MenuIdServiceImpl implements MenuIdService {
 	
 	@Override
 	public MenuID save(MenuID menuid) {
-		String id = menuid.getMenuId();
-		MenuID menuId =getMenuId(id);
-		if (id.length()!=0 && menuId!=null) {
-			menuRepo.deleteAll();
-			log.info("{} LineBot 新的目錄id: {},",LOG_PREFIX,id);
-			menuRepo.save(menuid);
-			return menuid;
-		}
-		return null;
+		return menuRepo.save(menuid);
 	}
 
 	@Override
@@ -42,5 +34,10 @@ public class MenuIdServiceImpl implements MenuIdService {
 	@Override
 	public MenuID getMenuByName(String menuName){
 		return  menuRepo.findByMenuName(menuName);
+	}
+
+	@Override
+	public void deleteAll() {
+		menuRepo.deleteAll();
 	}
 }

@@ -21,4 +21,6 @@ public interface MenuIdRepository extends JpaRepository<MenuID, Integer>{
      * @return MenuID
      * */
     MenuID findByMenuName(String menuName);
+
+
 }
