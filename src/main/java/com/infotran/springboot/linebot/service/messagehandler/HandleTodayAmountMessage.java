@@ -70,7 +70,6 @@ public class HandleTodayAmountMessage extends BaseMessageHandler {
                 }
                 return Collections.singletonList(new TextMessage(message.toString()));
             case "昨日確診數":
-                //todo caseService可以設非叢集索引
                 confirmCase = confirmCaseService.findByConfirmTime(LocalDate.now().minusDays(1));
                 if (confirmCase != null) {
                     message.append("指揮中心快訊：昨日新增").append(confirmCase.getTodayAmount()).append("例COVID-19確定病例。\n");

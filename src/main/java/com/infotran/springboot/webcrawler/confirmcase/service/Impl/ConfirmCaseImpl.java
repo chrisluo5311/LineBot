@@ -20,12 +20,12 @@ public class ConfirmCaseImpl implements ConfirmCaseService {
 	private ConfirmCaseRepository conRepo;
 
 	@Override
-	public ConfirmCase save (ConfirmCase fcase) {
+	public ConfirmCase save (ConfirmCase newConfirmCase) {
 		ConfirmCase confirmCase = findByConfirmTime(LocalDate.now());
 		if (Objects.nonNull(confirmCase)){
 			conRepo.delete(confirmCase);
 		}
-		return conRepo.save(fcase);
+		return conRepo.save(newConfirmCase);
 	}
 
 	@Override

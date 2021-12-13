@@ -21,6 +21,7 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 /**
@@ -59,17 +60,21 @@ public class GetCovidNumService implements ClientUtil {
 		Document doc = Jsoup.parse(body);
 		Elements newsLists = doc.select(".cbp-item");
 		Map<String, String> todayMap = TimeUtil.genTodayDate();
+		ConfirmCase confirmCase = null;
 		for (Element element : newsLists) {
 			String month = element.select("p.icon-year").text().substring(7);
 			String date = element.select("p.icon-date").text();
 			String tName = element.select(".content-boxes-v3 > a").attr("title");
 			if (todayMap.containsKey(month) && todayMap.containsValue(date) && tName.indexOf(properties.TITLE_NAME) != -1) {
 				properties.PREFIX.append(element.select(".content-boxes-v3 > a").attr("href"));
-				parseBody(properties.PREFIX.toString());
+				confirmCase = parseBody(properties.PREFIX.toString());
+				break;
 			}
 		}
-		log.error("{} 找不到新聞標題",LOG_PREFIX);
-		throw new LineBotException(LineBotExceptionEnums.NEWS_TITLE_CHANGE);
+		if(Objects.isNull(confirmCase)){
+			log.error("{} 找不到新聞標題",LOG_PREFIX);
+			throw new LineBotException(LineBotExceptionEnums.NEWS_TITLE_CHANGE);
+		}
 	}
 
 	/**
@@ -78,25 +83,28 @@ public class GetCovidNumService implements ClientUtil {
 	 * @param detailedURL 当日新增确诊数目的新闻连结
 	 * @throws LineBotException SSL Connection 失敗
 	 */
-	public void parseBody(String detailedURL) throws LineBotException {
+	public ConfirmCase parseBody(String detailedURL) throws LineBotException {
 		try {
+			log.info("完整新聞url:{}"+detailedURL);
 			Document doc = SSLHelper.getConnection(detailedURL).timeout(3000).maxBodySize(0).get();
 			String divChild = doc.select("div.news-v3-in > div ").text();
 			//今日確診數
 			Integer newNum = getNumFromDivChild(properties.DOMESTIC_NEW_NUM,divChild);
-
 			//校正回歸數
 			Integer reNum = getNumFromDivChild(properties.RETURN_NUM,divChild);
 			//判斷是否為全境外
 			String domesticOrImportedCase = null;
 			//ex. 國內新增6例
 			String newNumKeyWord = properties.DOMESTIC_NEW_NUM.concat(String.valueOf(newNum)).concat("例");
-			if(isAllImported(newNumKeyWord,";",divChild)){
+			log.info("newNumKeyWord:{}",newNumKeyWord);
+			if(isAllImported(newNumKeyWord,"；",divChild)){
 				//全為境外
 				domesticOrImportedCase = properties.ALL_IMPORTED;
+				log.info("全為境外");
 			} else {
 				//確診案例中分佈(有境外移入&本土)
 				domesticOrImportedCase = getDomesticOrImportedCase("，","；",divChild);
+				log.info("有境外移入&本土");
 			}
 			//總數
 			Integer totalNum = newNum + reNum;
@@ -116,10 +124,12 @@ public class GetCovidNumService implements ClientUtil {
 			}
 			confirmCaseRedisTemplate.delete(CONFIRMCASE_REDIS_KEY);
 			confirmCaseRedisTemplate.opsForValue().set(CONFIRMCASE_REDIS_KEY,cfc);
+			confirmCaseRedisTemplate.expire(CONFIRMCASE_REDIS_KEY,30, TimeUnit.MINUTES);
 			ConfirmCase confirmCase = confirmCaseService.save(cfc);
 			if(Objects.isNull(confirmCase)){
 				log.error("confirmCase 爬蟲成功 但新增至db失敗");
 			}
+			return confirmCase;
 		} catch (IOException e) {
 			throw new LineBotException(LineBotExceptionEnums.FAIL_ON_SSLHELPER_CONNECTION,e.getMessage());
 		}
@@ -172,7 +182,7 @@ public class GetCovidNumService implements ClientUtil {
 		// 擷取終點
 		Integer end = 0;
 		log.info("第一個逗點的位置:{}",divChild.indexOf(comma));
-		if(divChild.indexOf(comma)<50){
+		if(divChild.indexOf(comma)<40){
 			//為第一行
 			start = divChild.indexOf(comma)+ comma.length();
 			end = divChild.indexOf(semicolon);
@@ -196,20 +206,22 @@ public class GetCovidNumService implements ClientUtil {
 		if(divChild.indexOf(keyWord)!=-1){
 			start = divChild.indexOf(keyWord)+ keyWord.length();
 			end = divChild.indexOf(semicolon);
-			String target = divChild.substring(start,end);
-			return properties.ALL_IMPORTED.equals(target);
+			String result = divChild.substring(start,end);
+			return properties.ALL_IMPORTED.equals(result);
 		}
 		return false;
 	}
 
 	/**
 	 * 新聞相關參數配置<br>
+	 * 務必連同建構子一起新增
 	 * 對應 webcrawl.properties(prefix = news)<br>
 	 * @author chris
 	 * */
 	@ConstructorBinding
 	@ConfigurationProperties(prefix = "news")
 	public static class properties {
+
 		/** http://at.cdc.tw/YEc68Q */
 		public static String URL;
 		/** https://www.cdc.gov.tw */
@@ -225,13 +237,14 @@ public class GetCovidNumService implements ClientUtil {
 		/** COVID-19境外移入確定病例 */
 		public static String ALL_IMPORTED;
 
-		public properties(String URL, StringBuilder PREFIX, String TITLE_NAME, String DOMESTIC_NEW_NUM, String RETURN_NUM, String DEATH_NUM) {
+		public properties(String URL, StringBuilder PREFIX, String TITLE_NAME, String DOMESTIC_NEW_NUM, String RETURN_NUM, String DEATH_NUM,String ALL_IMPORTED) {
 			this.URL = URL;
 			this.PREFIX = PREFIX;
 			this.TITLE_NAME = TITLE_NAME;
 			this.DOMESTIC_NEW_NUM = DOMESTIC_NEW_NUM;
 			this.RETURN_NUM = RETURN_NUM;
 			this.DEATH_NUM = DEATH_NUM;
+			this.ALL_IMPORTED = ALL_IMPORTED;
 		}
 	}
 }

@@ -21,7 +21,7 @@ public class ConfirmCaseReceiver {
 
     @RabbitListener(queues = "${webcrawler.mq.confirmcase}")
     public void receiveMessage(String json) {
-        MDC.put("consumer","Confirm Case Receiver");
+        MDC.put("consumer","執行當日新增:");
         log.info("當日新增確診者接收處理-開始");
         try{
             getCovidNumService.getUrlOfNewsDetail(json);

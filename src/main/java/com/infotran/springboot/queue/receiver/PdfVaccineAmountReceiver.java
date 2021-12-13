@@ -21,7 +21,7 @@ public class PdfVaccineAmountReceiver {
 
     @RabbitListener(queues = "${webcrawler.mq.PDFVaccinedAmount}")
     public void receiveMessage(String json) {
-        MDC.put("consumer","PDF Receiver");
+        MDC.put("consumer","執行pdf解析:");
         log.info("pdf取得各疫苗接踵累计人次接收處理-開始");
         getVaccinedInfoService.crawlPdfVaccinedAmount(json);
         log.info("pdf取得各疫苗接踵累计人次接收處理-結束");

@@ -30,9 +30,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -60,7 +60,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
     @PostConstruct
     public void init(){
         crawImgExecutor = new ThreadPoolExecutor(2,4,180,
-                                                java.util.concurrent.TimeUnit.SECONDS,new ArrayBlockingQueue<>(5),new ThreadPoolExecutor.AbortPolicy());
+                                                java.util.concurrent.TimeUnit.SECONDS,new SynchronousQueue<>(),new ThreadPoolExecutor.AbortPolicy());
     }
 
     /**
@@ -147,7 +147,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * 執行 [pdf 取得各疫苗接踵累计人次] 爬蟲<br>
      * (每12小時執行一次)
      * */
-    @Scheduled(fixedRate = 12* TimeUnit.HOUR)
+//    @Scheduled(fixedRate = 12* TimeUnit.HOUR)
     public void executeParsingPDF() {
         Request request = new Request.Builder().url(GetVaccinedInfoService.properties.PDF_URL).get().build();
         Call call = CLIENT.newCall(request);
@@ -184,7 +184,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * 執行 [截图: 累计接踵人次 & 各梯次疫苗涵蓋率] 爬蟲<br>
      * (每小時執行一次)
      * */
-//    @Scheduled(fixedRate = TimeUnit.HOUR)
+    @Scheduled(fixedRate = TimeUnit.HOUR)
     public void executeVaccineScreeShot() {
         MDC.put("job","Selenium Snapshot");
         try {

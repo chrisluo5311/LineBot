@@ -21,7 +21,7 @@ public class DiffCountryDataReceiver {
 
     @RabbitListener(queues = "${webcrawler.mq.WorldCovidData}")
     public void receiveMessage(String json) {
-        MDC.put("consumer","CDC_MQ");
+        MDC.put("consumer","執行各國疫情:");
         log.info("各國疫情狀況接收處理-開始");
         diffCountryStatus.parseCsvInfo(json);
         log.info("各國疫情狀況接收處理-結束");

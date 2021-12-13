@@ -21,7 +21,7 @@ public class MaskInfoReceiver {
 
     @RabbitListener(queues = "${webcrawler.mq.maskinfo}")
     public void receiveMessage(String json) throws LineBotException {
-        MDC.put("consumer","Mask Info Receiver");
+        MDC.put("consumer","執行查詢剩餘口罩:");
         log.info("查詢剩餘口罩數接收處理-開始");
         getMaskJsonService.parseMaskInfo(json);
         log.info("查詢剩餘口罩數接收處理-結束");

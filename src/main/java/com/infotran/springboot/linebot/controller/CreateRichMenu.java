@@ -93,7 +93,6 @@ public class CreateRichMenu implements LineClientInterface, CommandLineRunner {
 		RichMenuArea buyMask = new RichMenuArea(new RichMenuBounds(833, 2, 836, 844),action02);
 
 		//掃描QRCode action3
-//		MessageAction action03 = new MessageAction("掃描QRCode","掃描QRCode");
 		CameraAction action03 = CameraAction.builder().label("掃描QRCode").build();
 		RichMenuArea qrcodeScanner = new RichMenuArea(new RichMenuBounds(1666, 3, 834, 843),action03);
 
