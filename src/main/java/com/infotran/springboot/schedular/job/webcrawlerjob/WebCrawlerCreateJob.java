@@ -29,6 +29,8 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.*;
 
@@ -185,14 +187,16 @@ public class WebCrawlerCreateJob implements ClientUtil {
     public void executeVaccineScreeShot() {
         MDC.put("job","Selenium Snapshot");
         try {
-            crawImgExecutor.submit(()->{
+            FutureTask crawlCumulativeVaccineImg = new FutureTask(() -> {
                 getVaccinedInfoService.crawlCumulativeVaccineImg();
+            }, null);
+            FutureTask crawlEachBatchCoverage = new FutureTask(() -> {
                 getVaccinedInfoService.crawlEachBatchCoverage();
-            }).get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+            }, null);
+            List<FutureTask> futureTaskList = new ArrayList<>();
+            futureTaskList.add(crawlCumulativeVaccineImg);
+            futureTaskList.add(crawlEachBatchCoverage);
+            futureTaskList.stream().forEach(crawImgExecutor::submit);
         } finally {
             MDC.remove("job");
         }
