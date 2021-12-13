@@ -85,7 +85,7 @@ public class GetVaccinedInfoService implements ClientUtil {
 
     /**
      * 全球疫情地圖之疫苗接種統計圖<br>
-     * 取得各梯次疫苗涵蓋率
+     * 取得各年齡以及各縣市疫苗涵蓋率
      *
      * */
     public void crawlEachBatchCoverage(Integer height,Integer end,String fileName) {
