@@ -94,11 +94,14 @@ public class HandleVaccineIMGMessage extends BaseMessageHandler {
                             .append("。");
                 }
                 TextMessage eachCityTextMessage = TextMessage.builder().text(content2.toString()).build();
+                //圖片訊息
                 URI vaccineImgUri3 = HandleFileUtil.createUri(filePrefix.concat(GetVaccinedInfoService.eachCityCoverFileName));
                 ImageMessage eachCityCoverage = ImageMessage.builder().previewImageUrl(vaccineImgUri3).originalContentUrl(vaccineImgUri3).build();
+                //組成List
                 List<Message> replyList2 = new ArrayList<Message>();
                 replyList2.add(eachCityTextMessage);
                 replyList2.add(eachCityCoverage);
+                //回覆
                 reply(replyToken,replyList2);
             default:
         }

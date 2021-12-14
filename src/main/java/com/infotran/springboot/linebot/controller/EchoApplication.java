@@ -56,7 +56,7 @@ public class EchoApplication {
         messageEventRequestMapping.put("重新定位",HandlerEnum.HANDLE_LOCATION_MESSAGE);
         messageEventRequestMapping.put("掃描QRCode",HandlerEnum.HANDLE_QRCODE);
         messageEventRequestMapping.put("查看統計圖",HandlerEnum.HANDLE_STATISTIC_DIAGRAM);
-        messageEventRequestMapping.put("查看各縣市COVID-19疫苗涵蓋率",HandlerEnum.HANDLE_STATISTIC_DIAGRAM);
+        messageEventRequestMapping.put("查看各縣市COVID-19公費疫苗涵蓋率圖",HandlerEnum.HANDLE_STATISTIC_DIAGRAM);
     }
 
     /**
