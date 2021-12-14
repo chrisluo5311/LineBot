@@ -3,6 +3,7 @@ package com.infotran.springboot.schedular.job.webcrawlerjob;
 import com.infotran.springboot.exception.LineBotException;
 import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
 import com.infotran.springboot.queue.service.RabbitMqService;
+import com.infotran.springboot.schedular.TimeUnit;
 import com.infotran.springboot.util.ClientUtil;
 import com.infotran.springboot.util.HandleFileUtil;
 import com.infotran.springboot.webcrawler.confirmcase.service.GetCovidNumService;
@@ -18,6 +19,7 @@ import okhttp3.Response;
 import okhttp3.internal.annotations.EverythingIsNonNull;
 import org.slf4j.MDC;
 import org.springframework.data.util.Pair;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -69,7 +71,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * 每三十分鐘執行一次
      *
      * */
-//    @Scheduled(fixedRate = 30 * TimeUnit.MINUTE)
+    @Scheduled(fixedRate = 30 * TimeUnit.MINUTE)
     public void executeCrawlCovid() {
         Request request = new Request.Builder().url(GetCovidNumService.properties.URL).get().build();
         Call call = CLIENT.newCall(request);
@@ -109,7 +111,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * (每小時執行一次)
      *
      * */
-//    @Scheduled(fixedRate = TimeUnit.HOUR)
+    @Scheduled(fixedRate = TimeUnit.HOUR)
     public void executeMaskCrawl() {
         Request request = new Request.Builder().url(getMaskJsonService.MASK_URL).get().build();
         Call call = CLIENT.newCall(request);
@@ -148,7 +150,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * 執行 [pdf 取得各疫苗接踵累计人次] 爬蟲<br>
      * (每12小時執行一次)
      * */
-//    @Scheduled(fixedRate = 12* TimeUnit.HOUR)
+    @Scheduled(fixedRate = 12* TimeUnit.HOUR)
     public void executeParsingPDF() {
         Request request = new Request.Builder().url(GetVaccinedInfoService.properties.PDF_URL).get().build();
         Call call = CLIENT.newCall(request);
@@ -185,7 +187,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * 執行 [截图: 累计接踵人次 & 各梯次疫苗涵蓋率] 爬蟲<br>
      * (每小時執行一次)
      * */
-//    @Scheduled(fixedRate = TimeUnit.HOUR)
+    @Scheduled(fixedRate = TimeUnit.HOUR)
     public void executeVaccineScreeShot() {
         MDC.put("job","Selenium Snapshot");
         // Pair.of(擷取的高度(長度),頁面捲動至(2205或2650)的地方)
@@ -206,8 +208,8 @@ public class WebCrawlerCreateJob implements ClientUtil {
             }, null);
             List<FutureTask> futureTaskList = new ArrayList<>();
             futureTaskList.add(crawlCumulativeVaccineImg);
-//            futureTaskList.add(crawlEachAgeCoverage);
-//            futureTaskList.add(crawlEachCityCoverage);
+            futureTaskList.add(crawlEachAgeCoverage);
+            futureTaskList.add(crawlEachCityCoverage);
             futureTaskList.stream().forEach(crawImgExecutor::submit);
         } finally {
             MDC.remove("job");
@@ -218,7 +220,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
      * 執行 取得 [CDC_World COVID-19 Data] <br>
      * (每 6 小時執行一次)
      * */
-//    @Scheduled(fixedRate = 6 * TimeUnit.HOUR)
+    @Scheduled(fixedRate = 6 * TimeUnit.HOUR)
     public void executeTodayWorldCovidData()  {
         MDC.put("job","CDC_World_Today_CovidData");
         log.info("url :{} ", countryStatus.CDC_WORLD_URL);
@@ -226,7 +228,7 @@ public class WebCrawlerCreateJob implements ClientUtil {
             HandleFileUtil.downloadWithFilesCopy(countryStatus.CDC_WORLD_URL,GetDiffCountryStatus.FILENAME);
             URI uri = new URI(HandleFileUtil.filePath.concat(GetDiffCountryStatus.FILENAME));
             log.info("CSV檔完整存儲路徑:{}",uri);
-            Path path = Paths.get("src/main/resources/static/world");
+            Path path = Paths.get("/static/world");
             //取出並解壓縮成Bytes
             byte[] bytes = HandleFileUtil.decomposeGzipToBytes(path);
             //轉utf-8

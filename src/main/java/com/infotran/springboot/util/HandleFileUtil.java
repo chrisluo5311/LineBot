@@ -190,7 +190,7 @@ public class HandleFileUtil {
     public static byte[] file2Byte(String filePath) {
         byte[] buffer = null;
         try {
-            FileInputStream fis = new FileInputStream(new File(filePath));
+            FileInputStream fis = new FileInputStream(filePath);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] b = new byte[81920];
             int len = 0;
