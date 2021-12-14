@@ -61,7 +61,7 @@
 |  掃描QRCode  | `完成` | LineBot | 使用LineBot Messaging API提供的CameraAction  |
 |  國外疫情  | `完成` | okhttp、jsoup<br>java util.zip(GZIPInputStream) |  解壓縮各國疫情gzip檔，將內容送入rabbitmq隊列，按國家解析各欄位  |
 |  疫苗施打<br>統計圖  | `完成` | okhttp、jsoup<br>Selenium、apache pdfbox |  1. 前往(infogram 標題:誰打了疫苗)取得累计接踵人次截圖<br> 2. 前往全球疫情地圖之疫苗接種統計圖，取得各梯次疫苗涵蓋率圖<br> 3. 解析「疫苗接踵對象累計種人次.pdf」 |
-|  其他  | `進行中` | okhttp、jsoup | 暫定放個人履歷資訊 |
+|  其他  | `進行中` |  | 暫定放個人履歷資訊 |
 
 2. 相關Maven依賴 
 
