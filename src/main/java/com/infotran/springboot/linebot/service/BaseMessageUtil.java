@@ -4,12 +4,10 @@ import com.infotran.springboot.annotation.MultiQuickReply;
 import com.infotran.springboot.annotation.QuickReplyMode;
 import com.infotran.springboot.annotation.quickreplyenum.ActionMode;
 import com.linecorp.bot.model.ReplyMessage;
+import com.linecorp.bot.model.action.CameraAction;
 import com.linecorp.bot.model.action.LocationAction;
 import com.linecorp.bot.model.event.message.StickerMessageContent;
-import com.linecorp.bot.model.message.LocationMessage;
-import com.linecorp.bot.model.message.Message;
-import com.linecorp.bot.model.message.StickerMessage;
-import com.linecorp.bot.model.message.TextMessage;
+import com.linecorp.bot.model.message.*;
 import com.linecorp.bot.model.message.quickreply.QuickReply;
 import com.linecorp.bot.model.message.quickreply.QuickReplyItem;
 import com.linecorp.bot.model.response.BotApiResponse;
@@ -113,13 +111,30 @@ public abstract class BaseMessageUtil implements LineClientInterface {
     public TextMessage openMap() {
         final List<QuickReplyItem> items = List.of(
                 QuickReplyItem.builder()
-                        .action(LocationAction.withLabel("打開定位"))
+                        .action(LocationAction.withLabel("定位"))
                         .build()
         );
 
         final QuickReply quickReply = QuickReply.items(items);
 
         return TextMessage.builder().text("點選下方打開地圖").quickReply(quickReply).build();
+    }
+
+    /**
+     * 打開相機
+     * @return TestMessage 訊息帶打開相機動作的QuickReply
+     *
+     * */
+    public TextMessage openCamera(){
+        final List<QuickReplyItem> items = List.of(
+                QuickReplyItem.builder()
+                        .action(CameraAction.builder().label("相機").build())
+                        .build()
+        );
+
+        final QuickReply quickReply = QuickReply.items(items);
+
+        return TextMessage.builder().text("點選下方打開相機").quickReply(quickReply).build();
     }
 
     /**
@@ -145,6 +160,15 @@ public abstract class BaseMessageUtil implements LineClientInterface {
             //如果有@QuickReply自動產生QuickReply物件
             QuickReply quickReply = getQuickReply(method);
             List<Message> messages = locationMessageList.stream()
+                                                        .map(x -> x.toBuilder().quickReply(quickReply).build())
+                                                        .map(Message.class::cast)
+                                                        .collect(Collectors.toList());
+            return this.reply(replyToken,messages);
+        } else if (messageList.stream().allMatch(TemplateMessage.class::isInstance)){
+            List<TemplateMessage> templateMessageList = (List<TemplateMessage>) messageList;
+            //如果有@QuickReply自動產生QuickReply物件
+            QuickReply quickReply = getQuickReply(method);
+            List<Message> messages = templateMessageList.stream()
                                                         .map(x -> x.toBuilder().quickReply(quickReply).build())
                                                         .map(Message.class::cast)
                                                         .collect(Collectors.toList());

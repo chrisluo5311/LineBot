@@ -4,6 +4,7 @@ import com.infotran.springboot.webcrawler.multicountry.dao.DiffCountryRepository
 import com.infotran.springboot.webcrawler.multicountry.model.DiffCountry;
 import com.infotran.springboot.webcrawler.multicountry.service.DiffCountryService;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -14,6 +15,7 @@ import java.util.Optional;
  * DiffCountryService Implement
  * @author chris
  * */
+@Slf4j
 @Service
 public class DiffCountryServiceImpl implements DiffCountryService {
 
@@ -26,8 +28,8 @@ public class DiffCountryServiceImpl implements DiffCountryService {
     }
 
     @Override
-    public DiffCountry findByIsoCodeAndLastUpdate(@NonNull String isoCode,@NonNull String time) {
-        DiffCountry diffCountry = diffCountryRepository.findByIsoCodeAndLastUpdate(isoCode,time);
+    public DiffCountry findByIsoCodeAndLastUpdate(String isoCode,String time) {
+        DiffCountry diffCountry = diffCountryRepository.findDiffCountryByIsoCodeAndLastUpdate(isoCode,time);
         if(diffCountry!=null){
             return diffCountry;
         }

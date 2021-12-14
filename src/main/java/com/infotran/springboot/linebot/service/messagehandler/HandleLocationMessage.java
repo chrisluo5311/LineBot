@@ -1,6 +1,5 @@
 package com.infotran.springboot.linebot.service.messagehandler;
 
-import com.infotran.springboot.annotation.LogExecutionTime;
 import com.infotran.springboot.annotation.MultiQuickReply;
 import com.infotran.springboot.annotation.QuickReplyMode;
 import com.infotran.springboot.annotation.quickreplyenum.ActionMode;
@@ -11,9 +10,7 @@ import com.infotran.springboot.webcrawler.medicinestore.model.MedicineStore;
 import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
-import com.linecorp.bot.model.message.LocationMessage;
-import com.linecorp.bot.model.message.Message;
-import com.linecorp.bot.model.message.TextMessage;
+import com.linecorp.bot.model.message.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -91,7 +88,7 @@ public class HandleLocationMessage extends BaseMessageHandler {
                 }
                 break;
             case "查看所在位置口罩剩餘狀態":
-            case "重新定位":
+                //這裡為RichMenu點擊後第一個回傳
                 TextMessage textMessage = openMap();
                 reply(replyToken,textMessage);
                 break;
@@ -107,7 +104,7 @@ public class HandleLocationMessage extends BaseMessageHandler {
     }
 
     @Override
-    protected List<Message> handleImagemapMessageReply(PostbackEvent event) {
+    protected List<TemplateMessage> handleImagemapMessageReply(PostbackEvent event) {
         //不使用
         return null;
     }
@@ -117,15 +114,14 @@ public class HandleLocationMessage extends BaseMessageHandler {
      *
      * @param event  MessageEvent
      */
-    @LogExecutionTime
     @MultiQuickReply(value = {
             @QuickReplyMode(mode=ActionMode.MESSAGE,label = "下五間",text = "下五間"),
-            @QuickReplyMode(mode=ActionMode.MESSAGE,label = "重新定位",text = "重新定位")
+            @QuickReplyMode(mode=ActionMode.LOCATION,label = "重新定位",text = "重新定位")
     })
     @Override
     public List<LocationMessage> handleLocationMessageReply(LocationMessageContent event,String userId) {
         List<MedicineStore> medStoreList = medicineStoreRedisTemplate.opsForList().range("medicineStore",0,-1);
-        if(Objects.isNull(medStoreList)){
+        if(medStoreList.size()==0){
             medStoreList = medicineStoreService.findAll();
         }
         Double lat1 = event.getLatitude();

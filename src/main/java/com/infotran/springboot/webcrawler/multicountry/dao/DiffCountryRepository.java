@@ -11,7 +11,7 @@ import java.util.Optional;
  */
 public interface DiffCountryRepository extends JpaRepository<DiffCountry, Integer> {
 
-    DiffCountry findByIsoCodeAndLastUpdate(String isoCode,String time);
+    DiffCountry findDiffCountryByIsoCodeAndLastUpdate(String isoCode,String time);
 
     DiffCountry findByLastUpdate(String lastUpdate);
 

@@ -15,6 +15,7 @@ import com.linecorp.bot.model.event.message.TextMessageContent;
 import com.linecorp.bot.model.event.source.Source;
 import com.linecorp.bot.model.message.LocationMessage;
 import com.linecorp.bot.model.message.Message;
+import com.linecorp.bot.model.message.TemplateMessage;
 import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.response.BotApiResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +50,7 @@ public abstract class BaseMessageHandler extends BaseMessageTemplate implements 
     }
 
     @Override
-    public BotApiResponse postBackReply(PostbackEvent event,String data) {
+    public BotApiResponse postBackReply(PostbackEvent event,String data) throws NoSuchMethodException {
         BotApiResponse botApiResponse = null;
         String replyToken = event.getReplyToken();
         log.info("[{}] postBackReply方法event data: {}",LOG_PREFIX,data);
@@ -59,8 +60,12 @@ public abstract class BaseMessageHandler extends BaseMessageTemplate implements 
                 botApiResponse = reply(replyToken,textList);
                 break;
             default:
-                List<Message> imageMapListDefault = handleImagemapMessageReply(event);
-                botApiResponse = reply(replyToken,imageMapListDefault);
+                List<TemplateMessage> templateMessageList = handleImagemapMessageReply(event);
+                if (Objects.nonNull(templateMessageList)){
+                    Method textMethod = this.getClass().getDeclaredMethod("handleImagemapMessageReply",PostbackEvent.class);
+                    //使用@MultiQuickReply或@QuickReplyMode自動產生QuickReply，若為混合型回復需自行實作
+                    return executeReply(textMethod,templateMessageList,replyToken);
+                }
         }
         return botApiResponse;
     }

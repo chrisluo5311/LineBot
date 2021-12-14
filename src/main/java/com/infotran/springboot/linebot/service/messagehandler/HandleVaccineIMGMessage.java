@@ -11,10 +11,7 @@ import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
 import com.linecorp.bot.model.event.message.MessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
-import com.linecorp.bot.model.message.ImageMessage;
-import com.linecorp.bot.model.message.LocationMessage;
-import com.linecorp.bot.model.message.Message;
-import com.linecorp.bot.model.message.TextMessage;
+import com.linecorp.bot.model.message.*;
 import com.linecorp.bot.model.message.quickreply.QuickReply;
 import com.linecorp.bot.model.message.quickreply.QuickReplyItem;
 import lombok.extern.slf4j.Slf4j;
@@ -66,6 +63,7 @@ public class HandleVaccineIMGMessage extends BaseMessageHandler {
                     content.append("根據衛生福利部疾病管制署公佈: \n")
                             .append("COVID-19疫苗接種人次，")
                             .append(vaccineTypePeople.getBody())
+                            .append("。")
                             .append("\n\n資料來源: ")
                             .append(vaccineTypePeople.getResourceUrl())
                             .append("。");
@@ -74,8 +72,8 @@ public class HandleVaccineIMGMessage extends BaseMessageHandler {
                 //圖片訊息
                 URI vaccineImgUri1 = HandleFileUtil.createUri(filePrefix.concat(GetVaccinedInfoService.cumuFileName));
                 URI vaccineImgUri2 = HandleFileUtil.createUri(filePrefix.concat(GetVaccinedInfoService.eachAgeCoverFileName));
-                ImageMessage cumulativeVaccinated = ImageMessage.builder().previewImageUrl(vaccineImgUri1).originalContentUrl(vaccineImgUri1).build();
-                ImageMessage eachAgeCoverage = ImageMessage.builder().previewImageUrl(vaccineImgUri2).originalContentUrl(vaccineImgUri2).build();
+                ImageMessage cumulativeVaccinated = ImageMessage.builder().previewImageUrl(vaccineImgUri1).originalContentUrl(vaccineImgUri1).quickReply(quickReply).build();
+                ImageMessage eachAgeCoverage = ImageMessage.builder().previewImageUrl(vaccineImgUri2).originalContentUrl(vaccineImgUri2).quickReply(quickReply).build();
                 //組成List
                 List<Message> replyList = new ArrayList<Message>();
                 replyList.add(pdfTextMessage);
@@ -99,8 +97,8 @@ public class HandleVaccineIMGMessage extends BaseMessageHandler {
                 ImageMessage eachCityCoverage = ImageMessage.builder().previewImageUrl(vaccineImgUri3).originalContentUrl(vaccineImgUri3).build();
                 //組成List
                 List<Message> replyList2 = new ArrayList<Message>();
-                replyList2.add(eachCityTextMessage);
                 replyList2.add(eachCityCoverage);
+                replyList2.add(eachCityTextMessage);
                 //回覆
                 reply(replyToken,replyList2);
             default:
@@ -115,7 +113,7 @@ public class HandleVaccineIMGMessage extends BaseMessageHandler {
     }
 
     @Override
-    protected List<Message> handleImagemapMessageReply(PostbackEvent event) {
+    protected List<TemplateMessage> handleImagemapMessageReply(PostbackEvent event) {
         return null;
     }
 
@@ -126,7 +124,7 @@ public class HandleVaccineIMGMessage extends BaseMessageHandler {
      * */
     private QuickReply createQuickReplyItemList(){
         List<QuickReplyItem> quickReplyItemList = new ArrayList<>();
-        String label = "查看各縣市COVID-19公費疫苗涵蓋率圖";
+        String label = "COVID-19疫苗涵蓋率圖";
         String text = "查看各縣市COVID-19公費疫苗涵蓋率圖";
         QuickReplyItem item = QuickReplyItem.builder()
                 .action(new MessageAction(label,text))

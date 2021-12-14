@@ -259,6 +259,37 @@ public enum CountryEnum implements CountryEnumInterface{
     }
 
     /**
+     * 匹配 CountryName
+     * @param countryName countryName
+     * @return Boolean
+     * */
+    public static Boolean matchCountryName(String countryName){
+        return Arrays.stream(CountryEnum.values()).anyMatch(x->x.getName().equals(countryName));
+    }
+
+    /**
+     * 匹配 「點我看更多日本資訊」
+     * @param textMessageContent text
+     * @return Boolean
+     * */
+    public static Boolean isValidCountryName(String textMessageContent){
+        if(textMessageContent.startsWith("點我看更多")){
+            String countryName = textMessageContent.substring(5, textMessageContent.indexOf("資訊"));
+            return matchCountryName(countryName);
+        }
+        return false;
+    }
+
+    /**
+     * ex. 擷取「點我看更多日本資訊」 中的 「日本」
+     * @param textMessageContent text
+     * @return String
+     * */
+    public static String getCountryNameByTextMessageContent(String textMessageContent){
+        return textMessageContent.substring(5, textMessageContent.indexOf("資訊"));
+    }
+
+    /**
      * Get CountryEnum By Code
      * @param isoCode
      * @return CountryEnum
@@ -273,7 +304,7 @@ public enum CountryEnum implements CountryEnumInterface{
      * @return CountryEnum
      * */
     public static CountryEnum getCountryEnumByName(String countryName){
-        return Arrays.stream(CountryEnum.values()).filter(x->x.getCountryCode().equals(countryName)).findFirst().get();
+        return Arrays.stream(CountryEnum.values()).filter(x->x.getName().equals(countryName)).findFirst().get();
     }
 
     /**
@@ -294,9 +325,8 @@ public enum CountryEnum implements CountryEnumInterface{
      * @param diffCountry
      * @return String
      * */
-    public static String createReplyTemplate(@NonNull DiffCountry diffCountry){
+    public static String createReplyTemplate(@NonNull DiffCountry diffCountry,Boolean isCarousel){
         StringBuffer text = new StringBuffer();
-        String country              = diffCountry.getCountry();
         String totalAmount          = diffCountry.getTotalAmount();
         String newAmount            = diffCountry.getNewAmount();
         String totalDeath           = diffCountry.getTotalDeath();
@@ -310,17 +340,24 @@ public enum CountryEnum implements CountryEnumInterface{
         //每百人接種疫苗人數
         String vaccinatedInHundreds = diffCountry.getVaccinatedInHundreds();
         String lastUpdate           = diffCountry.getLastUpdate();
-        text.append(country).append("疫情狀況:\n");
-        text.append("總確診數: ").append(totalAmount+"人\n");
-        text.append("新增確診數: ").append(newAmount+"人\n");
-        text.append("總死亡數: ").append(totalDeath+"人\n");
-        text.append("新增死亡數: ").append(newDeath+"人\n");
-        text.append("每百萬確診數: ").append(confirmedInMillions+"\n");
-        text.append("每百萬死亡數: ").append(deathInMillions+"\n");
-        text.append("疫苗總接種人數: ").append(totalVaccinated+"人\n");
-        text.append("每百人接種疫苗人數: ").append(vaccinatedInHundreds+"\n\n");
-        text.append("最後更新時間: ").append(lastUpdate+"\n");
-        text.append("備:若欄位應不為0而為0者，可能為該國未提供，一切資料僅供參考，造成不便，敬請見諒");
+        if(isCarousel){
+            text.append("新增確診數: ").append(newAmount+"人\n");
+            text.append("新增死亡數: ").append(newDeath+"人\n");
+            text.append("更新時間: ").append(lastUpdate+"\n");
+        } else {
+            text.append("總確診數: ").append(totalAmount+"人\n");
+            text.append("新增確診數: ").append(newAmount+"人\n");
+            text.append("總死亡數: ").append(totalDeath+"人\n");
+            text.append("新增死亡數: ").append(newDeath+"人\n");
+            text.append("每百萬確診數: ").append(confirmedInMillions+"\n");
+            text.append("每百萬死亡數: ").append(deathInMillions+"\n");
+            text.append("疫苗總接種數: ").append(totalVaccinated+"人\n");
+            text.append("每百人接種疫苗人數: ").append(vaccinatedInHundreds+"\n");
+            text.append("更新時間: ").append(lastUpdate+"\n\n");
+            text.append("備:欄位為0者，可能為該國未提供，資料僅供參考，若有誤差，以官方提供為準。");
+        }
         return text.toString();
     }
+
+
 }

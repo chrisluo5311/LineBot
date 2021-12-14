@@ -4,7 +4,6 @@ import com.infotran.springboot.linebot.model.MenuID;
 import com.infotran.springboot.linebot.service.LineClientInterface;
 import com.infotran.springboot.linebot.service.MenuIdService;
 import com.infotran.springboot.util.HandleFileUtil;
-import com.linecorp.bot.model.action.CameraAction;
 import com.linecorp.bot.model.action.MessageAction;
 import com.linecorp.bot.model.action.PostbackAction;
 import com.linecorp.bot.model.richmenu.*;
@@ -67,6 +66,7 @@ public class CreateRichMenu implements LineClientInterface, CommandLineRunner {
 			RichMenuIdResponse menuResponse = CLIENT.createRichMenu(richmenu).get();
 			String menuId = menuResponse.getRichMenuId();
 			MenuID menu = MenuID.builder().menuId(menuId).menuName(richmenu.getName()).build();
+			menuService.deleteAll();
 			menuService.save(menu);
 			BLOB_CLIENT.setRichMenuImage(menuId, "image/jpeg", buffer).get();
 			CLIENT.linkRichMenuIdToUser("all", menuId).get();
@@ -93,7 +93,7 @@ public class CreateRichMenu implements LineClientInterface, CommandLineRunner {
 		RichMenuArea buyMask = new RichMenuArea(new RichMenuBounds(833, 2, 836, 844),action02);
 
 		//掃描QRCode action3
-		CameraAction action03 = CameraAction.builder().label("掃描QRCode").build();
+		MessageAction action03 = new MessageAction("掃描QRCode","掃描QRCode");
 		RichMenuArea qrcodeScanner = new RichMenuArea(new RichMenuBounds(1666, 3, 834, 843),action03);
 
 		//國外疫情 action4
@@ -153,7 +153,7 @@ public class CreateRichMenu implements LineClientInterface, CommandLineRunner {
 						log.error("查詢RichMenu存在 但MenuID新增db失敗");
 					}
 				}
-				log.info("查詢RichMenu已存在 不需重建");
+				log.info("查詢RichMenu已存在");
 				return true;
 			}
 		} catch (InterruptedException | ExecutionException e) {

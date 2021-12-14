@@ -7,8 +7,10 @@ import com.linecorp.bot.model.event.message.LocationMessageContent;
 import com.linecorp.bot.model.event.message.MessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
 import com.linecorp.bot.model.message.LocationMessage;
-import com.linecorp.bot.model.message.Message;
+import com.linecorp.bot.model.message.TemplateMessage;
 import com.linecorp.bot.model.message.TextMessage;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 /**
@@ -19,6 +21,8 @@ import java.util.List;
  *
  * @author chris
  */
+@Slf4j
+@Component
 public class HandleQRCodeMessage  extends BaseMessageHandler {
     @Override
     public HandlerEnum getHandler() {
@@ -30,8 +34,8 @@ public class HandleQRCodeMessage  extends BaseMessageHandler {
         String text = event.getText();
         switch (text){
             case "掃描QRCode":
-
-                break;
+                TextMessage textMessage = openCamera();
+                reply(replyToken,textMessage);
             default:
         }
         return null;
@@ -48,7 +52,7 @@ public class HandleQRCodeMessage  extends BaseMessageHandler {
     }
 
     @Override
-    protected List<Message> handleImagemapMessageReply(PostbackEvent event) {
+    protected List<TemplateMessage> handleImagemapMessageReply(PostbackEvent event) {
         return null;
     }
 }

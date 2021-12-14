@@ -5,6 +5,7 @@ import com.infotran.springboot.exception.exceptionenum.LineBotExceptionEnums;
 import com.infotran.springboot.linebot.service.BaseMessageInterface;
 import com.infotran.springboot.linebot.service.BaseMessagePool;
 import com.infotran.springboot.linebot.service.messagehandler.enums.HandlerEnum;
+import com.infotran.springboot.webcrawler.multicountry.countryenum.CountryEnum;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
@@ -45,7 +46,7 @@ public class EchoApplication {
     @PostConstruct
     public void init(){
         //PostbackEvent
-        postbackRequestMapping.put("國內外疫情",HandlerEnum.HANDLE_FOREIGN_COVID);
+        postbackRequestMapping.put("國外疫情",HandlerEnum.HANDLE_FOREIGN_COVID);
         postbackRequestMapping.put("其他",HandlerEnum.HANDLE_OTHER_MESSAGE);
 
         //MessageEvent
@@ -70,13 +71,15 @@ public class EchoApplication {
             String data = event.getPostbackContent().getData();
             if(postbackRequestMapping.containsKey(data)){
                 handlerEnum = postbackRequestMapping.get(data);
+            } else if(CountryEnum.matchCountryName(data)){
+                handlerEnum = HandlerEnum.HANDLE_FOREIGN_COVID;
             } else {
-                throw new LineBotException(LineBotExceptionEnums.BOTAPI_RESPONSE_EMPTY,"PostbackEvent");
+                throw new LineBotException(LineBotExceptionEnums.BOTAPI_RESPONSE_EMPTY,"Mapping不到key，請手動確認回傳訊息");
             }
             handleMessage = baseMessagePool.getMethod(handlerEnum);
             BotApiResponse botApiResponse = handleMessage.postBackReply(event,data);
             if(Objects.isNull(botApiResponse)){
-                throw new LineBotException(LineBotExceptionEnums.BOTAPI_RESPONSE_EMPTY,"PostbackEvent");
+                throw new LineBotException(LineBotExceptionEnums.BOTAPI_RESPONSE_EMPTY,"BotApiResponse為null");
             }
         } catch (LineBotException e) {
             log.error("{} 接收處理PostbackEvent失敗 或 無對應PostbackEvent Data 或 實作類未對應enum:{}",LOG_PREFIX,e.getMessage());
@@ -99,6 +102,9 @@ public class EchoApplication {
                 HandlerEnum handlerEnum = (messageEventRequestMapping.containsKey(text))
                                             ? messageEventRequestMapping.get(text)
                                             : HandlerEnum.HANDLE_DEFAULT_MESSAGE;
+                if(CountryEnum.isValidCountryName(text)){
+                    handlerEnum = HandlerEnum.HANDLE_FOREIGN_COVID;
+                }
                 handleMessage = baseMessagePool.getMethod(handlerEnum);
             } else if (event.getMessage() instanceof LocationMessageContent){
                 handleMessage = baseMessagePool.getMethod(HandlerEnum.HANDLE_LOCATION_MESSAGE);
@@ -106,7 +112,7 @@ public class EchoApplication {
             //接收處理 MessageEvent
             BotApiResponse botApiResponse = handleMessage.handleMessageEvent(event);
             if(Objects.isNull(botApiResponse)){
-                throw new LineBotException(LineBotExceptionEnums.BOTAPI_RESPONSE_EMPTY,"MessageEvent");
+                throw new LineBotException(LineBotExceptionEnums.BOTAPI_RESPONSE_EMPTY,"BotApiResponse為null");
             }
         } catch (LineBotException e) {
             log.error("{} 接收處理MessageEvent失敗或無對應MessageEvent text:{}",LOG_PREFIX,e.getMessage());

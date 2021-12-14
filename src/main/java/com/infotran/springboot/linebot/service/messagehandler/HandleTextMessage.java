@@ -120,7 +120,7 @@ public class HandleTextMessage extends BaseMessageHandler {
 	}
 
 	@Override
-	protected List<Message> handleImagemapMessageReply(PostbackEvent event) {
+	protected List<TemplateMessage> handleImagemapMessageReply(PostbackEvent event) {
 		//不使用
 		return null;
 	}

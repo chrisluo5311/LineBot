@@ -24,13 +24,14 @@ public enum LineBotExceptionEnums {
 
     DB_FAILED("D01","資料庫儲存失敗"),
 
-    FAIL_ON_IMPLEMENT_GETCLASSNAME("E01","實現類未實作getClassName()方法"),
+    FAIL_ON_IMPLEMENT_GETCLASSNAME("E01","BaseMessageInterface實現類未實作getHandler()方法 或 未加上@Component註解"),
 
     FAIL_ON_OUTPUT_FILE("F01","檔案輸出失敗"),
 
     FAIL_ON_CREATE_RICHMENU("G01","製作Line RichMenu失敗"),
 
-    MISSING_COUNTRY_RESPONSECODE("H01","各國CSV檔不支援此對應欄位")
+    MISSING_COUNTRY_RESPONSECODE("H01","各國CSV檔不支援此對應欄位"),
+    MISSING_COUNTRY_DBINFO("H01","資料庫無各國疫情")
     ;
 
     private String code;

@@ -6,9 +6,10 @@ import com.linecorp.bot.model.event.message.LocationMessageContent;
 import com.linecorp.bot.model.event.message.MessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
 import com.linecorp.bot.model.message.LocationMessage;
-import com.linecorp.bot.model.message.Message;
+import com.linecorp.bot.model.message.TemplateMessage;
 import com.linecorp.bot.model.message.TextMessage;
 import lombok.extern.slf4j.Slf4j;
+
 import java.util.List;
 
 /**
@@ -54,5 +55,5 @@ public abstract class BaseMessageTemplate extends BaseMessageUtil {
      * @param event  PostbackEvent
      * @return  List<Message>
      */
-    protected abstract List<Message> handleImagemapMessageReply(PostbackEvent event);
+    protected abstract List<TemplateMessage> handleImagemapMessageReply(PostbackEvent event);
 }
