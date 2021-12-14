@@ -1,4 +1,4 @@
-# LineBot聊天機器人 & Covid19疫情資訊爬蟲<br> (LINE Messaging API + Spring Boot+ Rabbitmq + Selenium)
+# LineBot聊天機器人 & Covid19疫情資訊爬蟲
 
 <div>
  <img src="https://komarev.com/ghpvc/?username=chrisluo5311&label=Profile%20views&color=red&style=flat" alt="chrisluo5311" />
