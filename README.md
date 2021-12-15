@@ -84,7 +84,7 @@
 ### 測試須知
 1. [ngrok下載](https://ngrok.com/download "ngrok")
 
-### docker image
+2. docker image
 > rabbitmq
 ```
 docker pull rabbitmq:management
