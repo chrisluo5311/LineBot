@@ -31,7 +31,9 @@
  
 <h2 ><img src="https://img.icons8.com/offices/30/000000/content.png"/>&nbsp疫情小幫手(目錄):</h2>
 
-![目錄](https://github.com/chrisluo5311/LineBot/blob/master/src/main/resources/static/menufinal.jpg "line bot richmenu")
+<!-- ![目錄](https://github.com/chrisluo5311/LineBot/blob/master/src/main/resources/static/menufinal.jpg "line bot richmenu") -->
+<img src="https://github.com/chrisluo5311/LineBot/blob/master/src/main/resources/static/menufinal.jpg" width="1000" height="600">
+
 
 ### 安裝軟體對應版本:
 |  軟體  |  版本  |  
@@ -74,6 +76,10 @@
 |  lombok  | `1.18.20` |  
 |  apache.pdfbox  | `2.0.24` |  
 |  spring-boot-starter-amqp  | `2.4.5` |
+
+3. 策略模式: 依據目錄不同通功能調用不同類別來處理
+<img width="1000" height="500" src="https://github.com/chrisluo5311/LineBot/blob/master/src/main/resources/static/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8FUML.png" /> 
+
 
 ### 測試須知
 1. [ngrok下載](https://ngrok.com/download "ngrok")
