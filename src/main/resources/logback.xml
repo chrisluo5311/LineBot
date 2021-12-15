@@ -15,6 +15,7 @@
             <fileNamePattern>logs/%d{yyyy-MM-dd}/LineBot_Covid19.log</fileNamePattern>
             <!-- 儲存10天的日誌 -->
             <maxHistory>10</maxHistory>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
         </rollingPolicy>
         <encoder charset="UTF-8">
             <!-- 輸出日誌記錄格式 -->
