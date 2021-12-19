@@ -14,7 +14,6 @@ import com.linecorp.bot.model.event.message.StickerMessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
 import com.linecorp.bot.model.event.source.Source;
 import com.linecorp.bot.model.message.LocationMessage;
-import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.TemplateMessage;
 import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.response.BotApiResponse;
@@ -56,15 +55,18 @@ public abstract class BaseMessageHandler extends BaseMessageTemplate implements 
         log.info("[{}] postBackReply方法event data: {}",LOG_PREFIX,data);
         switch (data){
             case "其他" :
-                List<Message> textList = new ArrayList<>(textMessageReply(event));
-                botApiResponse = reply(replyToken,textList);
-                break;
-            default:
-                List<TemplateMessage> templateMessageList = handleImagemapMessageReply(event);
-                if (Objects.nonNull(templateMessageList)){
+                List<TemplateMessage> templateMessageList1 = new ArrayList<>(handleImagemapMessageReply(event));
+                if (Objects.nonNull(templateMessageList1)){
                     Method textMethod = this.getClass().getDeclaredMethod("handleImagemapMessageReply",PostbackEvent.class);
                     //使用@MultiQuickReply或@QuickReplyMode自動產生QuickReply，若為混合型回復需自行實作
-                    return executeReply(textMethod,templateMessageList,replyToken);
+                    return executeReply(textMethod,templateMessageList1,replyToken);
+                }
+            default:
+                List<TemplateMessage> templateMessageList2 = handleImagemapMessageReply(event);
+                if (Objects.nonNull(templateMessageList2)){
+                    Method textMethod = this.getClass().getDeclaredMethod("handleImagemapMessageReply",PostbackEvent.class);
+                    //使用@MultiQuickReply或@QuickReplyMode自動產生QuickReply，若為混合型回復需自行實作
+                    return executeReply(textMethod,templateMessageList2,replyToken);
                 }
         }
         return botApiResponse;

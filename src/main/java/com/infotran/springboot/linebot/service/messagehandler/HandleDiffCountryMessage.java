@@ -65,7 +65,7 @@ public class HandleDiffCountryMessage extends BaseMessageHandler {
      * */
     @Override
     protected List<TextMessage> textMessageReply(TextMessageContent event, String replyToken, String userId) {
-        //ex. 點我看更多日本資訊
+        //ex. 看更多日本資訊
         String text = event.getText();
         log.info("{} 使用者:{} 觸發:{}",LOG_PREFIX,userId,text);
         String countryName = CountryEnum.getCountryNameByTextMessageContent(text);
@@ -99,8 +99,8 @@ public class HandleDiffCountryMessage extends BaseMessageHandler {
             @QuickReplyMode(mode= ActionMode.POSTBACK,label = "英國",data = "英國",displayText = "英國"),
             @QuickReplyMode(mode= ActionMode.POSTBACK,label = "法國",data = "法國",displayText = "法國"),
             @QuickReplyMode(mode= ActionMode.POSTBACK,label = "德國",data = "德國",displayText = "德國"),
-            @QuickReplyMode(mode= ActionMode.POSTBACK,label = "泰國",data = "泰國",displayText = "泰國"),
-            @QuickReplyMode(mode= ActionMode.POSTBACK,label = "日本",data = "日本",displayText = "日本"),
+            @QuickReplyMode(mode= ActionMode.POSTBACK,label = "以色列",data = "以色列",displayText = "以色列"),
+            @QuickReplyMode(mode= ActionMode.POSTBACK,label = "俄羅斯",data = "俄羅斯",displayText = "俄羅斯"),
             @QuickReplyMode(mode= ActionMode.POSTBACK,label = "中國大陸",data = "中國大陸",displayText = "中國大陸")
     })
     protected List<TemplateMessage> handleImagemapMessageReply(PostbackEvent event) {
@@ -122,22 +122,22 @@ public class HandleDiffCountryMessage extends BaseMessageHandler {
                                 new CarouselColumn(globalUri, "全球疫情統計", replyTestMap.get(CountryEnum.GLOBAL), Arrays.asList(
                                         new URIAction("線上查看全球疫情數據",
                                                 URI.create(CountryEnum.GLOBAL.getActionUri(worldCovidUrl)), null),
-                                        new MessageAction("全球詳細資訊","點我看更多全球資訊")
+                                        new MessageAction("全球詳細資訊","看更多全球資訊")
                                 )),
                                 new CarouselColumn(usUri, "美國疫情統計", replyTestMap.get(CountryEnum.US), Arrays.asList(
                                         new URIAction("線上查看美國疫情數據",
                                                 URI.create(CountryEnum.US.getActionUri(worldCovidUrl)), null),
-                                        new MessageAction("美國詳細資訊","點我看更多美國資訊")
+                                        new MessageAction("美國詳細資訊","看更多美國資訊")
                                 )),
                                 new CarouselColumn(chinaUri, "中國疫情統計", replyTestMap.get(CountryEnum.CHINA), Arrays.asList(
                                         new URIAction("線上查看中國疫情數據",
                                                 URI.create(CountryEnum.CHINA.getActionUri(worldCovidUrl)), null),
-                                        new MessageAction("中國詳細資訊","點我看更多中國資訊")
+                                        new MessageAction("中國詳細資訊","看更多中國資訊")
                                 )),
                                 new CarouselColumn(japanUri, "日本疫情統計", replyTestMap.get(CountryEnum.JAPAN), Arrays.asList(
                                         new URIAction("線上查看日本疫情數據",
                                                 URI.create(CountryEnum.JAPAN.getActionUri(worldCovidUrl)), null),
-                                        new MessageAction("日本詳細資訊","點我看更多日本資訊")
+                                        new MessageAction("日本詳細資訊","看更多日本資訊")
                                 ))
                         ));
                 TemplateMessage templateMessage = new TemplateMessage("請使用手機觀看", carouselTemplate);
@@ -153,7 +153,7 @@ public class HandleDiffCountryMessage extends BaseMessageHandler {
                                 new CarouselColumn(singleCountryUri, countryName+"疫情統計", singleReplyText.get(eachCountry), Arrays.asList(
                                         new URIAction("線上查看"+countryName+"疫情數據",
                                                 URI.create(eachCountry.getActionUri(worldCovidUrl)), null),
-                                        new MessageAction(countryName+"詳細資訊","點我看更多"+countryName+"資訊")
+                                        new MessageAction(countryName+"詳細資訊","看更多"+countryName+"資訊")
                                 ))
                         )
                 );
@@ -166,9 +166,11 @@ public class HandleDiffCountryMessage extends BaseMessageHandler {
 
     /**
      * 取得每個國家相對應的回覆內容
+     * @param countryEnumList
+     * @param isCarousel
      * @return Map
      * */
-    private Map<CountryEnum,String> getReplyText(List<CountryEnum> countryEnumList,Boolean isCarousel){
+    public Map<CountryEnum,String> getReplyText(List<CountryEnum> countryEnumList,Boolean isCarousel){
         Map<CountryEnum,String> replyMap = new HashMap<>();
         //找當天資料
         countryEnumList.stream().forEach(x->{

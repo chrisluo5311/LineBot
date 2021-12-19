@@ -3,6 +3,7 @@ package com.infotran.springboot.linebot.service;
 import com.infotran.springboot.annotation.MultiQuickReply;
 import com.infotran.springboot.annotation.QuickReplyMode;
 import com.infotran.springboot.annotation.quickreplyenum.ActionMode;
+import com.linecorp.bot.model.PushMessage;
 import com.linecorp.bot.model.ReplyMessage;
 import com.linecorp.bot.model.action.CameraAction;
 import com.linecorp.bot.model.action.LocationAction;
@@ -66,6 +67,21 @@ public abstract class BaseMessageUtil implements LineClientInterface {
                     .get();
             log.info("========================請求結束============================");
             log.info("送出給使用者的訊息: {}",messages);
+            return apiResponse;
+        } catch (InterruptedException | ExecutionException e) {
+            log.error("發送post請求 失敗:{}",e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected BotApiResponse sendPushMessage(PushMessage pushMessage){
+        try {
+            log.info("======================發送post請求==========================");
+            BotApiResponse apiResponse = CLIENT
+                    .pushMessage(pushMessage)
+                    .get();
+            log.info("========================請求結束============================");
+            log.info("送出push message 給自己的訊息: {}",pushMessage);
             return apiResponse;
         } catch (InterruptedException | ExecutionException e) {
             log.error("發送post請求 失敗:{}",e.getMessage());

@@ -48,7 +48,8 @@ public class EchoApplication {
         //PostbackEvent
         postbackRequestMapping.put("國外疫情",HandlerEnum.HANDLE_FOREIGN_COVID);
         postbackRequestMapping.put("其他",HandlerEnum.HANDLE_OTHER_MESSAGE);
-
+        postbackRequestMapping.put("問題回報",HandlerEnum.HANDLE_OTHER_MESSAGE);
+        postbackRequestMapping.put("關於作者",HandlerEnum.HANDLE_OTHER_MESSAGE);
         //MessageEvent
         messageEventRequestMapping.put("查詢今日確診",HandlerEnum.HANDLE_TODAY_AMOUNT_MESSAGE);
         messageEventRequestMapping.put("昨日確診數",HandlerEnum.HANDLE_TODAY_AMOUNT_MESSAGE);
@@ -73,6 +74,8 @@ public class EchoApplication {
                 handlerEnum = postbackRequestMapping.get(data);
             } else if(CountryEnum.matchCountryName(data)){
                 handlerEnum = HandlerEnum.HANDLE_FOREIGN_COVID;
+            } else if(data.contains("失效")) {
+                handlerEnum = HandlerEnum.HANDLE_OTHER_MESSAGE;
             } else {
                 throw new LineBotException(LineBotExceptionEnums.BOTAPI_RESPONSE_EMPTY,"Mapping不到key，請手動確認回傳訊息");
             }

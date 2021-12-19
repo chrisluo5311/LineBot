@@ -273,20 +273,20 @@ public enum CountryEnum implements CountryEnumInterface{
      * @return Boolean
      * */
     public static Boolean isValidCountryName(String textMessageContent){
-        if(textMessageContent.startsWith("點我看更多")){
-            String countryName = textMessageContent.substring(5, textMessageContent.indexOf("資訊"));
+        if(textMessageContent.startsWith("看更多")){
+            String countryName = textMessageContent.substring(3, textMessageContent.indexOf("資訊"));
             return matchCountryName(countryName);
         }
         return false;
     }
 
     /**
-     * ex. 擷取「點我看更多日本資訊」 中的 「日本」
+     * ex. 擷取「看更多日本資訊」 中的 「日本」
      * @param textMessageContent text
      * @return String
      * */
     public static String getCountryNameByTextMessageContent(String textMessageContent){
-        return textMessageContent.substring(5, textMessageContent.indexOf("資訊"));
+        return textMessageContent.substring(3, textMessageContent.indexOf("資訊"));
     }
 
     /**
