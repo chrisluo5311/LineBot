@@ -101,5 +101,4 @@ docker pull rabbitmq:management
 8. [LINE Messaging API SDK for Java](https://github.com/line/line-bot-sdk-java "LineBot API SDK")
 9. [Messaging API reference](https://developers.line.biz/en/reference/messaging-api/ "LineBot API 文件")
 
-### Demo 示範影片
 
