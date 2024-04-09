@@ -1,4 +1,4 @@
-# LineBot聊天機器人 & Covid19疫情資訊爬蟲
+# LineBot chatbot & Covid 19 epidemic information crawler
 
 <div>
  <img src="https://komarev.com/ghpvc/?username=chrisluo5311&label=Profile%20views&color=red&style=flat" alt="chrisluo5311" />
@@ -23,51 +23,51 @@
  
  ---
  
- <h2 ><img src="https://img.icons8.com/office/30/000000/training.png"/> &nbsp專案介紹: </h2>
+ <h2 ><img src="https://img.icons8.com/office/30/000000/training.png"/> &nbspProject Introduction: </h2>
  
-#### 由於COVID19疫情肆虐，本專案針對每日新增確診數、口罩剩餘資訊、QRCode掃描、各國疫情以及疫苗接踵統計表等等，進行爬蟲、截圖、解析資料並提供給用戶。鑒於一般人並非每天都會至疾管署平台觀看疫情資訊，因此以台灣人最頻繁使用的社交軟體Line來製作LineBot，讓用戶很方便地獲取疫情資訊，並且保持資料定時更新至最新消息，減少政府與民間的資訊不對稱。 
+#### Due to the COVID-19 pandemic, this project crawls and parses data such as daily new confirmed cases, remaining mask information, QR code scanning, global epidemic statistics, and vaccine registration statistics, and provides this information to users. As people may not check the health department's platform every day for epidemic information, a LineBot is created using Line, the most frequently used social media platform in Taiwan, to conveniently provide users with epidemic information and ensure that the data is updated to the latest news, reducing information asymmetry between the government and the public.
  
  ---
  
-<h2 ><img src="https://img.icons8.com/offices/30/000000/content.png"/>&nbsp疫情小幫手(目錄):</h2>
+<h2 ><img src="https://img.icons8.com/offices/30/000000/content.png"/>&nbspTable of Contents:</h2>
 
 <!-- ![目錄](https://github.com/chrisluo5311/LineBot/blob/master/src/main/resources/static/menufinal.jpg "line bot richmenu") -->
-<img src="https://github.com/chrisluo5311/LineBot/blob/master/src/main/resources/static/menufinal.jpg" width="1000" height="600">
+<img src="https://github.com/chrisluo5311/LineBot/blob/master/src/main/resources/static/menufinal.jpg" width="600" height="400">
 
 
-### 安裝軟體對應版本:
-|  軟體  |  版本  |  
+### Software version:
+|  Software  |  version  |  
 |:------:|:--------:|
 |  SpringBoot  | `2.4.5`   | 
 |  JDK  | `11.0.10`   | 
 |  Redis  | `5.0.10`   | 
 |  postgresql  | `42.2.19`  | 
 
-### 定時任務說明
+### Scheduled task description
 
-|  功能  |  任務說明  |
+|  Function  |  Explanation  |
 |:------:|:--------:|
-|  查詢今日確診數   | 每30分鐘執行一次  |
-|  查詢藥局口罩剩餘數目   | 每1小時執行一次  |
-|  獲取pdf並取得各疫苗接踵累计人次   | 每12小時執行一次 |
-|  截圖:累计接踵人次&各梯次疫苗涵蓋率圖  | 每1小時執行一次 |
-|  獲取CDC各國疫情狀況csv檔  | 每6小時執行一次 |
+|  Query the number of confirmed cases today   | every 30 mins  |
+|  Check the remaining number of masks in the pharmacy   | every hour  |
+|  Get pdf and get the cumulative number of visits for each vaccine   | every 12 hours |
+|  Screenshot: Cumulative number of admissions & vaccine coverage rate chart for each tier  | every hour |
+|  Obtain csv files of CDC in various countries  | every 6 hours |
 
-### 目錄內容 
-1. 功能表、狀態、使用技術 
+### Content Descriptions
+1. Menu, status, techniques 
 
-|  功能  | 狀態 | 主要技術 | 內容說明 |
+|  Function  | status | Main techniques | Explanation |
 |:------:|:------------:|:------------:| :----------|
-|  查詢今日<br>確診數  | `完成` | okhttp、jsoup | 解析新聞稿並擷取出新增確診人數、校正回歸數、及死亡數  |
-|  哪裡<br>買口罩  | `完成` | okhttp、jsoup | 發送請求至 [口罩即時查](https://wenyo.github.io/maskmap/ "口罩即時查")，解析含經緯度的藥局資訊並發送給使用者  |
-|  掃描QRCode  | `完成` | LineBot | 使用LineBot Messaging API提供的CameraAction  |
-|  國外疫情  | `完成` | okhttp、jsoup<br>java util.zip(GZIPInputStream) |  解壓縮各國疫情gzip檔，將內容送入rabbitmq隊列，按國家解析各欄位  |
-|  疫苗施打<br>統計圖  | `完成` | okhttp、jsoup<br>Selenium、apache pdfbox |  1. 前往(infogram 標題:誰打了疫苗)取得累计接踵人次截圖<br> 2. 前往全球疫情地圖之疫苗接種統計圖，取得各梯次疫苗涵蓋率圖<br> 3. 解析「疫苗接踵對象累計種人次.pdf」 |
-|  其他  | `進行中` |  | 暫定放個人履歷資訊 |
+|  Query today<br>cases  | `Finished` | okhttp、jsoup | Parse the press release and extract the number of new confirmed cases, adjusted regression numbers, and deaths  |
+|  where to<br>buy mask  | `Finished` | okhttp、jsoup | Send API request to [口罩即時查](https://wenyo.github.io/maskmap/ "口罩即時查")，and parse pharmacy information including latitude and longitude and send it to the user  |
+|  Scan QRCode  | `Finished` | LineBot | Using the CameraAction provided by the LineBot Messaging API  |
+|  Foreign situation  | `Finished` | okhttp、jsoup<br>java util.zip(GZIPInputStream) |  Unzip the gzip file of the epidemic situation in each country, send the content to the rabbitmq queue, and analyze each field by country.  |
+|  Vaccination<br>Statistics Chart  | `Finished` | okhttp、jsoup<br>Selenium、apache pdfbox |  1. Go to (infogram title: Who has been vaccinated) to get the screenshot of the cumulative number of recipients<br> 2. Go to the vaccination statistics chart of the global epidemic map to obtain the vaccine coverage rate chart for each tier<br> 3. Analyze "Cumulative Number of People Vaccinated.pdf" |
 
-2. 相關Maven依賴 
 
-|  套件  |  版本  |
+2. Maven 
+
+|  Libraries  |  Version  |
 |:------:|:--------:|
 |  okhttp  | `3.14.9` |
 |  jsoup  | `1.13.1` |  
@@ -77,12 +77,12 @@
 |  apache.pdfbox  | `2.0.24` |  
 |  spring-boot-starter-amqp  | `2.4.5` |
 
-3. 策略模式: 依據目錄不同通功能調用不同類別來處理
+3. Strategy pattern: according to different functions of the directory, different categories are called for processing.
 <img width="1000" height="500" src="https://github.com/chrisluo5311/LineBot/blob/master/src/main/resources/static/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8FUML.png" /> 
 
 
-### 測試須知
-1. [ngrok下載](https://ngrok.com/download "ngrok")
+### Testing instructions
+1. [ngrok download](https://ngrok.com/download "ngrok")
 
 2. docker image
 > rabbitmq
@@ -96,7 +96,7 @@ docker pull rabbitmq:management
 3. [疫苗接種統計圖](https://covid-19.nchc.org.tw/dt_002-csse_covid_19_daily_reports_vaccine_city2.php "疫苗接種統計圖")
 4. [Infogram_疫苗累計施打人數統計圖&各縣市覆蓋率](https://infogram.com/f25f5a66-bd5e-4272-b4b4-be1258a276a8 "疫苗統計圖")
 5. [CDC疫苗統計資料pdf](https://www.cdc.gov.tw/Category/Page/9jFXNbCe-sFK9EImRRi2Og "疫苗統計pdf")
-6. [健保特約機構口罩剩餘數量明細](https://data.gov.tw/dataset/116285 "口罩link") 或 [口罩即時查](https://wenyo.github.io/maskmap/ "口罩即時查")(帶經緯度)
+6. [健保特約機構口罩剩餘數量明細](https://data.gov.tw/dataset/116285 "口罩link") or [口罩即時查](https://wenyo.github.io/maskmap/ "口罩即時查")(With latitude and longitude)
 7. [台灣電子地圖服務網](https://www.map.com.tw/ "台灣電子地圖服務網")
 8. [LINE Messaging API SDK for Java](https://github.com/line/line-bot-sdk-java "LineBot API SDK")
 9. [Messaging API reference](https://developers.line.biz/en/reference/messaging-api/ "LineBot API 文件")
